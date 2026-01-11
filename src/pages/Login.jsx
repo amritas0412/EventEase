@@ -1,19 +1,41 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
 const Login = () => {
   const [role, setRole] = useState('Student');
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // ROLE BASED REDIRECTION
+    if (role === 'Faculty') {
+      navigate('/faculty-dashboard');
+    } 
+    else if (role === 'Placement Cell') {
+      navigate('/placement-dashboard');
+    } 
+    else if (role === 'Admin') {
+      navigate('/admin-dashboard'); // (optional, if you add later)
+    } 
+    else {
+      navigate('/student-dashboard'); // (optional)
+    }
+  };
 
   return (
     <div className="login-page">
       <div className="login-card">
+
         <div className="login-header">
           <div className="login-logo">E</div>
           <h1>EventEase</h1>
           <p>Your Campus Event Hub. Sign in to continue.</p>
         </div>
 
-        <form className="login-form">
+        <form className="login-form" onSubmit={handleSubmit}>
+
           <div className="form-group">
             <label>Your Role</label>
             <select value={role} onChange={(e) => setRole(e.target.value)}>
@@ -37,7 +59,10 @@ const Login = () => {
             <input type="password" required />
           </div>
 
-          <button type="submit" className="sign-in-btn">Sign In</button>
+          <button type="submit" className="sign-in-btn">
+            Sign In
+          </button>
+
         </form>
 
         <div className="login-footer">
@@ -46,6 +71,7 @@ const Login = () => {
             For admin/faculty/placement-cell accounts, please contact your administrator.
           </p>
         </div>
+
       </div>
     </div>
   );

@@ -1,0 +1,113 @@
+/* ✅ FULL SCREEN FIX */
+.placement-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  background: #eef6ff;
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+}
+
+
+.page-header {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.page-header h2 {
+  margin-bottom: 5px;
+}
+
+.page-header p {
+  color: #666;
+}
+
+.feedback-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: #f3e5f5;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.events-box {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+}
+
+.events-box h3 {
+  margin-bottom: 5px;
+}
+
+.events-box p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.empty-events {
+  border: 1px dashed #ddd;
+  border-radius: 14px;
+  padding: 80px;
+  text-align: center;
+}
+
+.empty-events h4 {
+  font-size: 18px;
+}
+
+.empty-events p {
+  color: #777;
+}
+
+/* Badge */
+.badge {
+  background: #e1bee7;
+  color: #4a0072;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin-left: 5px;
+}
+.event-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.add-event-btn {
+  margin-bottom: 30px;   /* ✅ space below button */
+}
+.form-actions {
+  display: flex;
+  gap: 15px;   /* ✅ space between Submit & Cancel */
+}
+.event-form {
+  margin-bottom: 40px;   /* ✅ space before Upcoming Placement */
+}
+.action-buttons {
+  display: flex;
+  gap: 12px;   /* space between Approve & Reject */
+  margin-top: 10px;
+}
+.sidebar {
+  position: fixed;          /* ✅ keeps sidebar fixed */
+  top: 0;
+  left: 0;
+  height: 100vh;            /* full screen height */
+  width: 240px;             /* keep same width */
+  background: #fff;
+  z-index: 1000;
+}
+.main-content {
+  margin-left: 240px;       /* same as sidebar width */
+  padding: 20px;
+}
+
+
+
+
+
+

@@ -8,7 +8,7 @@
 }
 
 .login-card {
-  background: white;
+  background: black;
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -67,9 +67,9 @@
 input, select {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ddd;
+  border: 1px solid white;
   border-radius: 6px;
-  background-color: #fafafa;
+  background-color: black;
 }
 
 .sign-in-btn {
