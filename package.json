@@ -1,0 +1,21 @@
+{
+  "name": "eventease",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amritas0412/EventEase.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amritas0412/EventEase/issues"
+  },
+  "homepage": "https://github.com/amritas0412/EventEase#readme",
+  "description": ""
+}

@@ -1,52 +1,63 @@
-import React from "react";
-import "./Welcome.css";
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import '../styles/Welcome.css'
 
 const Welcome = () => {
+  const navigate = useNavigate()
+
   return (
-    <>
+    <div className="welcome-container">
+      
       {/* Navbar */}
       <nav className="navbar">
         <div className="logo">
-          <span className="logo-icon">📘</span>
-          <span className="logo-text">EventEase</span>
+          <span className="logo-icon">E</span> EventEase
         </div>
 
-        <div className="nav-actions">
-          <button className="btn-link">Sign In</button>
-          <button className="btn-primary">Get Started</button>
+        <div className="nav-links">
+          <button 
+            className="sign-in"
+            onClick={() => navigate('/login')}
+          >
+            Sign In
+          </button>
+
+          <button className="get-started">
+            Get Started
+          </button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-left">
-          <h1>
-            Excellence for All, Excellence <br /> from All
-          </h1>
+      <main className="hero">
+        <div className="hero-content">
+          <h1>Excellence for All, Excellence from All</h1>
           <p>
-            EventEase helps you discover events, manage clubs, and find
+            EventEase helps you discover events, manage clubs, and find 
             placement opportunities, all in one place.
           </p>
-
-          <button className="btn-primary hero-btn">
-            Explore Events
-          </button>
+          <button className="explore-btn">Explore Events</button>
         </div>
-
-        <div className="hero-right">
-          <img
-            src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1"
-            alt="Event"
+        
+        <div className="hero-image">
+          <img 
+            src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=800" 
+            alt="Event Hall"
           />
         </div>
-      </section>
+      </main>
 
       {/* Footer */}
       <footer className="footer">
-        © 2025 EventEase. All rights reserved.
+        <p>© 2026 EventEase. All rights reserved.</p>
+        <div className="footer-links">
+          <span>Terms of Service</span>
+          <span>Privacy</span>
+        </div>
       </footer>
-    </>
-  );
-};
 
-export default Welcome;
+    </div>
+  )
+}
+
+export default Welcome

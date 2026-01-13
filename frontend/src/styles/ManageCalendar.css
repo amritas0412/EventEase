@@ -1,0 +1,162 @@
+.student-calendar-page {
+  padding: 30px;
+  background: #f7f5ff;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* HEADER */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.calendar-header button {
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* CONTROLS */
+.calendar-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.calendar-controls input {
+  width: 80px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.sync-btn {
+  background: #7c4dff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.placement-btn {
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+/* CALENDAR */
+.calendar-wrapper {
+  width: 420px;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+}
+
+.calendar-weekdays {
+  margin-bottom: 12px;
+}
+
+.weekday {
+  text-align: center;
+  font-weight: 600;
+}
+
+.calendar-grid {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.calendar-day {
+  aspect-ratio: 1 / 1;
+  background: #f1f1f1;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.calendar-day:hover {
+  background: #e8e4ff;
+}
+
+.calendar-day.empty {
+  background: transparent;
+  cursor: default;
+}
+
+.event-day {
+  background: #e6dbff;
+  color: #5e35b1;
+  font-weight: 600;
+}
+
+.placement-day {
+  background: #d1fae5;
+  color: #047857;
+  font-weight: 600;
+}
+
+.selected-day {
+  outline: 2px solid #7c4dff;
+}
+
+/* DETAILS PANEL */
+.date-details {
+  margin-top: 20px;
+  background: white;
+  padding: 16px;
+  border-radius: 14px;
+  width: 420px;
+}
+
+.event-text {
+  color: #5e35b1;
+  font-weight: 600;
+}
+
+.placement-text {
+  color: #047857;
+  font-weight: 600;
+}
+
+/* LEGEND */
+.calendar-legend {
+  margin-top: 16px;
+  display: flex;
+  gap: 20px;
+}
+
+.legend-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.legend-box.event {
+  background: #7c4dff;
+}
+
+.legend-box.placement {
+  background: #22c55e;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+}

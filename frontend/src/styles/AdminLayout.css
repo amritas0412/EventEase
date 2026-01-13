@@ -1,0 +1,11 @@
+.admin-layout {
+  display: flex;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 30px;
+  background: #f6f0fb; /* same as student */
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+}

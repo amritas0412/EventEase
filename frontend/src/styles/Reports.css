@@ -1,0 +1,57 @@
+.reports-page {
+  padding: 30px;
+}
+
+.report-filter {
+  margin: 15px 0 25px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.report-filter select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feedback-card {
+  background: white;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.event-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.rating {
+  color: #7c4dff;
+  font-size: 18px;
+}
+
+.feedback-text {
+  margin-top: 10px;
+  font-style: italic;
+  color: #444;
+}
+
+.no-feedback {
+  margin-top: 10px;
+  color: #888;
+  font-size: 14px;
+}

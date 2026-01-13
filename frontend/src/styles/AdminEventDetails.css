@@ -1,0 +1,48 @@
+.admin-event-details-page {
+  padding: 30px;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.details-header h2 {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.back-btn {
+  background: transparent;
+  border: 1px solid #7c4dff;
+  color: #7c4dff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background: #7c4dff;
+  color: white;
+}
+
+.details-card {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.details-card p {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.description-box {
+  margin-top: 15px;
+  background: #f6f3ff;
+  padding: 15px;
+  border-radius: 10px;
+}

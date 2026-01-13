@@ -1,0 +1,85 @@
+.student-sidebar {
+  width: 260px;
+  height: 100vh;
+  background: #ffffff;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  font-family: "Inter", sans-serif;
+}
+
+/* Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.logo-icon {
+  background: #6a3df2;
+  color: #ffffff;
+  font-weight: bold;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Menu */
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menu-item {
+  text-decoration: none;
+  color: #444;
+  padding: 10px 14px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.menu-item:hover {
+  background: #f1ecff;
+}
+
+.menu-item.active {
+  background: #f1ecff;
+  color: #6a3df2;
+  font-weight: 600;
+}
+
+/* Badge */
+.badge {
+  background: #ede7ff;
+  color: #6a3df2;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+/* Footer */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 12px 14px;
+  color: #777;
+  font-size: 14px;
+}
+
+.settings-text {
+  cursor: pointer;
+}

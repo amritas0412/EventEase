@@ -1,0 +1,33 @@
+.admin-sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: #ffffff;
+  padding: 20px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08);
+  font-family: "Inter", sans-serif;
+}
+
+.admin-logo {
+  font-size: 24px;
+  margin-bottom: 30px;
+  color: #6a3df2;
+}
+
+.admin-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.admin-menu a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.admin-menu a.active {
+  background: #ede7ff;
+  color: #6a3df2;
+}

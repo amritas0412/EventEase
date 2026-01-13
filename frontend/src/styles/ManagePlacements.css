@@ -1,0 +1,68 @@
+.manage-placements {
+  padding: 25px;
+  font-family: "Inter", sans-serif;
+}
+
+.manage-placements h2 {
+  margin-bottom: 20px;
+}
+
+/* Table */
+.placements-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.placements-table th,
+.placements-table td {
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.placements-table th {
+  background: #f4f6fa;
+  font-weight: 600;
+}
+
+/* Button */
+.delete-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.approve-btn {
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.approve-btn:hover {
+  background: #16a34a;
+}
+
+.reject-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.reject-btn:hover {
+  background: #dc2626;
+}
