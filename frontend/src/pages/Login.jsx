@@ -9,15 +9,30 @@ const Login = () => {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // ROLE-BASED REDIRECT
-    if (role === "Student") {
-      navigate("/student/dashboard");
-    } else if (role === "Admin") {
-      navigate("/admin/dashboard"); // ✅ FIXED
-    } else if (role === "Faculty") {
-      alert("Faculty dashboard coming soon");
-    } else if (role === "Placement Cell") {
-      alert("Placement Cell dashboard coming soon");
+    // 🔐 Store role for protected routes
+    switch (role) {
+      case "Student":
+        localStorage.setItem("role", "student");
+        navigate("/student/dashboard");
+        break;
+
+      case "Admin":
+        localStorage.setItem("role", "admin");
+        navigate("/admin/dashboard");
+        break;
+
+      case "Faculty":
+        localStorage.setItem("role", "faculty");
+        navigate("/faculty/dashboard");
+        break;
+
+      case "Placement Cell":
+        localStorage.setItem("role", "placement");
+        navigate("/placement/dashboard"); // ✅ FIXED
+        break;
+
+      default:
+        navigate("/");
     }
   };
 
@@ -61,7 +76,7 @@ const Login = () => {
             Don't have an account? <a href="#">Sign Up</a>
           </p>
           <p className="admin-note">
-            For admin/faculty/placement-cell accounts, please contact your administrator.
+            For admin, faculty, or placement accounts, please contact your administrator.
           </p>
         </div>
       </div>

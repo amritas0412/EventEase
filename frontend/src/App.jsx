@@ -24,6 +24,14 @@ import AdminRegisteredStudents from "./pages/admin/AdminRegisteredStudents";
 import AdminEventDetails from "./pages/admin/AdminEventDetails";
 import AdminPlacementDetails from "./pages/admin/AdminPlacementDetails";
 
+/* ================= FACULTY PAGES ================= */
+import FacultyDashboard from "./pages/faculty/FacultyDashboard";
+import FacultyEvents from "./pages/faculty/FacultyEvents";
+
+/* ================= PLACEMENT PAGES ================= */
+import PlacementDashboard from "./pages/placement/PlacementDashboard";
+import Placements from "./pages/placement/Placements";
+
 function App() {
   return (
     <Routes>
@@ -37,13 +45,10 @@ function App() {
         <Route path="events" element={<StudentEvents />} />
         <Route path="events/:id" element={<StudentEventDetails />} />
         <Route path="placements" element={<StudentPlacements />} />
-
-        {/* ✅ ADD THIS ROUTE */}
         <Route
           path="placements/:id"
           element={<StudentPlacementDetails />}
         />
-
         <Route path="calendar" element={<StudentCalendar />} />
         <Route path="profile" element={<StudentProfile />} />
       </Route>
@@ -53,22 +58,32 @@ function App() {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="events" element={<ManageEvents />} />
         <Route path="events/:id" element={<AdminEventDetails />} />
-
         <Route path="placements" element={<ManagePlacements />} />
         <Route
           path="placements/:id"
           element={<AdminPlacementDetails />}
         />
-
         <Route path="users" element={<ManageUsers />} />
         <Route path="calendar" element={<ManageCalendar />} />
         <Route path="reports" element={<Reports />} />
-
         <Route
           path="registered/:type/:id"
           element={<AdminRegisteredStudents />}
         />
       </Route>
+
+      {/* ---------- FACULTY ROUTES ---------- */}
+      <Route path="/faculty">
+        <Route path="dashboard" element={<FacultyDashboard />} />
+        <Route path="events" element={<FacultyEvents />} />
+      </Route>
+
+      {/* ---------- PLACEMENT ROUTES ---------- */}
+      <Route path="/placement">
+        <Route path="dashboard" element={<PlacementDashboard />} />
+        <Route path="placements" element={<Placements />} />
+      </Route>
+
     </Routes>
   );
 }
