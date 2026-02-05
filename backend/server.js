@@ -107,9 +107,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-const mongoURI = "mongodb+srv://dbUser:dbUserPassword@eventeasecluster.ros41nx.mongodb.net/eventease?retryWrites=true&w=majority";
-
+mongoose.connect(process.env.MONGO_URI);
+//const 
 // Connect to MongoDB
 mongoose.connect(mongoURI)
   .then(() => console.log("MongoDB connected"))
