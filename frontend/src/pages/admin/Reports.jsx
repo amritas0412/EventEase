@@ -20,9 +20,9 @@ const Reports = () => {
       feedback: "Enjoyable but sound system needs improvement.",
     },
     {
-      event: "Placement Drive",
+      event: "TCS",
       rating: 4,
-      feedback: "Good companies participated.",
+      feedback: "Nice Experience.",
     },
     {
       event: "Placement Drive",
@@ -54,6 +54,7 @@ const Reports = () => {
           <option value="Tech Fest 2026">Tech Fest 2026</option>
           <option value="Cultural Night">Cultural Night</option>
           <option value="Placement Drive">Placement Drive</option>
+          <option value="TCS">TCS</option>
         </select>
       </div>
 

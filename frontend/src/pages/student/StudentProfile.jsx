@@ -21,7 +21,7 @@ const StudentProfile = () => {
             <span>Ritika Bhandari</span>
           </div>
 
-          {/* ✅ NEW EMAIL ROW */}
+          {/*  NEW EMAIL ROW */}
           <div className="profile-row">
             <span>Email</span>
             <span>ritikabhandari@gmail.com</span>
@@ -67,6 +67,15 @@ const StudentProfile = () => {
             <span>8.6</span>
           </div>
         </div>
+
+        {/* Update Profile Button */}
+<div className="profile-actions">
+  <button className="update-profile-btn">
+    Update Profile
+  </button>
+</div>
+
+
 
         {/* Skills (optional – commented) */}
         {/*

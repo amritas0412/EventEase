@@ -66,3 +66,17 @@
   font-size: 14px;
   padding: 20px;
 }
+
+.delete-btn {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.delete-btn:hover {
+  background: #d9363e;
+}

@@ -5,6 +5,9 @@ import "../../styles/StudentDashboard.css";
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [showProfile, setShowProfile] = useState(false);
+
+
 
   /* ---------------- DUMMY DATA ---------------- */
   const todayEvent = {
@@ -45,27 +48,50 @@ const StudentDashboard = () => {
         />
 
         <div className="topbar-actions">
-          <button
-            className="sync-btn"
-            onClick={() => navigate("/student/calendar")}
-          >
-            View Calendar
-          </button>
+          
 
-          <button
-            className="logout-btn"
-            onClick={() => navigate("/login")}
-          >
-            Logout
-          </button>
+          
 
           {/* Profile Avatar */}
-          <div
-            className="profile-avatar"
-            onClick={() => navigate("/student/profile")}
-          >
-            RB
-          </div>
+          <div className="profile-wrapper">
+  <div
+    className="profile-avatar"
+    onClick={() => setShowProfile(!showProfile)}
+  >
+    👤
+  </div>
+
+  {showProfile && (
+    <div className="profile-dropdown">
+      {/* Student name navigates */}
+      <p
+        className="profile-name clickable"
+        onClick={() => navigate("/student/profile")}
+      >
+        Student Name
+      </p>
+      <p className="profile-email">student@email.com</p>
+
+      <button
+        className="profile-btn"
+        onClick={() => navigate("/student/calendar")}
+      >
+        📅 View Calendar
+      </button>
+
+      <button
+        className="profile-btn logout"
+        onClick={() => {
+          localStorage.removeItem("role");
+          navigate("/login");
+        }}
+      >
+        🚪 Logout
+      </button>
+    </div>
+  )}
+</div>
+
         </div>
       </div>
 

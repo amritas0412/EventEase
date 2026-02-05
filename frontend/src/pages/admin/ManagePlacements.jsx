@@ -5,7 +5,7 @@ import "../../styles/ManagePlacements.css";
 const ManagePlacements = () => {
   const navigate = useNavigate();
 
-  // ✅ STATE instead of normal array
+  //  STATE instead of normal array
   const [placements, setPlacements] = useState([
     {
       id: 1,
@@ -25,7 +25,7 @@ const ManagePlacements = () => {
     },
   ]);
 
-  // ✅ APPROVE HANDLER
+  //  APPROVE HANDLER
   const approvePlacement = (id) => {
     setPlacements((prev) =>
       prev.map((item) =>
@@ -34,7 +34,7 @@ const ManagePlacements = () => {
     );
   };
 
-  // ✅ REJECT HANDLER
+  //  REJECT HANDLER
   const rejectPlacement = (id) => {
     setPlacements((prev) =>
       prev.map((item) =>
@@ -45,7 +45,7 @@ const ManagePlacements = () => {
 
   return (
     <div className="manage-placements-page">
-      <h2 className="page-title">Manage Placements & Internships</h2>
+      <h2 className="page-title">Placements & Internships</h2>
 
       <div className="table-card">
         <table className="data-table">
@@ -86,10 +86,12 @@ const ManagePlacements = () => {
 
                 {/* ACTION BUTTONS */}
                 <td>
+                  {item.status === "Pending" ? (
+                    <>
                   <button
                     className="approve-btn"
                     onClick={() => approvePlacement(item.id)}
-                    disabled={item.status !== "Pending"}
+                    //disabled={item.status !== "Pending"}
                   >
                     Approve
                   </button>
@@ -97,10 +99,14 @@ const ManagePlacements = () => {
                   <button
                     className="reject-btn"
                     onClick={() => rejectPlacement(item.id)}
-                    disabled={item.status !== "Pending"}
+                    //disabled={item.status !== "Pending"}
                   >
                     Reject
                   </button>
+                  </>
+                  ) : (
+                    <span>-</span>
+                  )}
                 </td>
 
                 {/* DETAILS */}

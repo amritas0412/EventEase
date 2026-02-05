@@ -1,6 +1,11 @@
-import { Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
+import AboutUs from "./pages/AboutUs";
+import ForgotPassword from "./pages/ForgotPassword";
+import CompaniesVisited from "./pages/placement/CompaniesVisited";
+import ExploreEvents from "./pages/ExploreEvents";
+import ResetPassword from "./pages/ResetPassword";
 
 /* ================= STUDENT PAGES ================= */
 import StudentLayout from "./pages/student/StudentLayout";
@@ -38,6 +43,10 @@ function App() {
       {/* ---------- PUBLIC ROUTES ---------- */}
       <Route path="/" element={<Welcome />} />
       <Route path="/login" element={<Login />} />
+<Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/about" element={<AboutUs />} />
+      <Route path="/events" element={<ExploreEvents />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
 
       {/* ---------- STUDENT ROUTES ---------- */}
       <Route path="/student" element={<StudentLayout />}>
@@ -79,10 +88,11 @@ function App() {
       </Route>
 
       {/* ---------- PLACEMENT ROUTES ---------- */}
-      <Route path="/placement">
-        <Route path="dashboard" element={<PlacementDashboard />} />
-        <Route path="placements" element={<Placements />} />
-      </Route>
+<Route path="/placement">
+  <Route path="dashboard" element={<PlacementDashboard />} />
+  <Route path="placements" element={<Placements />} />
+  <Route path="companies" element={<CompaniesVisited />} />  
+</Route>
 
     </Routes>
   );

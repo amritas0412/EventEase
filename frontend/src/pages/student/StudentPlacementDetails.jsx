@@ -13,7 +13,7 @@ const StudentPlacementDetails = () => {
   const [submitted, setSubmitted] = useState(false);
 
   const placement = {
-    company: "Company ID " + id,
+    company: "Google",
     role: "Software Engineer Intern",
     date: "15 March 2026",
     time: "10:00 AM – 4:00 PM",
@@ -59,7 +59,7 @@ const StudentPlacementDetails = () => {
           {registered ? "Registered" : "Not Registered"}
         </p>
 
-        {/* ✅ ONLY REGISTER BUTTON */}
+        {/*  ONLY REGISTER BUTTON */}
         <button
           className={registered ? "registered-btn" : "register-btn"}
           onClick={() => setRegistered(true)}

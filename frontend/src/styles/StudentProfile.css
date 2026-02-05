@@ -64,3 +64,9 @@
   font-size: 13px;
   font-weight: 500;
 }
+
+.profile-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+}

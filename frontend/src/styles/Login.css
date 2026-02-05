@@ -152,3 +152,17 @@
     padding: 24px;
   }
 }
+
+.forgot-password {
+  display: block;         /* puts it on a new line */
+  text-align: right;      /* aligns it to the right */
+  margin-top: 5px;        /* small spacing from input */
+  font-size: 0.9rem;      /* slightly smaller text */
+  color: #007bff;         /* blue link */
+  text-decoration: none;  /* remove underline */
+  transition: 0.2s;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}

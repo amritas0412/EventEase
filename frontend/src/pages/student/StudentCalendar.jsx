@@ -48,13 +48,13 @@ const StudentCalendar = () => {
       </div>
 
       {/* ===== WEEKDAYS ===== */}
-      <div className="calendar-weekdays">
+      {/*<div className="calendar-weekdays">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
           <div key={day} className="weekday">
             {day}
           </div>
         ))}
-      </div>
+      </div>*/}
 
       {/* ===== CALENDAR GRID ===== */}
       <div className="calendar-grid">

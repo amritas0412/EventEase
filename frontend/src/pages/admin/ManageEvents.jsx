@@ -23,7 +23,7 @@ const ManageEvents = () => {
     },
   ]);
 
-  // ✅ APPROVE HANDLER
+  //  APPROVE HANDLER
   const approveEvent = (id) => {
     setEvents((prevEvents) =>
       prevEvents.map((event) =>
@@ -34,7 +34,7 @@ const ManageEvents = () => {
     );
   };
 
-  // ✅ REJECT HANDLER
+  //  REJECT HANDLER
   const rejectEvent = (id) => {
     setEvents((prevEvents) =>
       prevEvents.map((event) =>
@@ -47,7 +47,7 @@ const ManageEvents = () => {
 
   return (
     <div className="manage-events-page">
-      <h2 className="page-title">Manage Events</h2>
+      <h2 className="page-title">Events</h2>
 
       <div className="table-card">
         <table className="data-table">

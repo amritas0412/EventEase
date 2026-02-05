@@ -1,0 +1,102 @@
+/* Two-column layout */
+.events-layout {
+  display: flex;
+  gap: 40px;
+  margin-top: 30px;
+}
+
+/* Each column */
+.events-column {
+  flex: 1;
+}
+
+/* Section titles */
+.section-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #3b2fbf;
+}
+
+.past-title {
+  color: #777;
+}
+
+/* Event cards */
+.event-card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  transition: transform 0.2s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Past events style */
+.past-event {
+  opacity: 0.7;
+}
+
+/* Category badges */
+.category {
+  display: inline-block;
+  background: #5a2dfc;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.past-badge {
+  background: #999;
+}
+
+/* Buttons */
+.signin-btn,
+.register-btn,
+.completed-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.signin-btn {
+  background: transparent;
+  border: 2px solid #5a2dfc;
+  color: #5a2dfc;
+}
+
+.signin-btn:hover {
+  background: #5a2dfc;
+  color: #fff;
+}
+
+.register-btn {
+  background: #5a2dfc;
+  color: white;
+  border: none;
+}
+
+.register-btn:hover {
+  background: #4320d9;
+}
+
+.completed-btn {
+  background: #ccc;
+  border: none;
+  color: #555;
+  cursor: not-allowed;
+}
+
+/* Responsive: stack on mobile */
+@media (max-width: 900px) {
+  .events-layout {
+    flex-direction: column;
+  }
+}

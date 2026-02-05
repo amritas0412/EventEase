@@ -11,21 +11,21 @@ const AdminRegisteredStudents = () => {
       id: 1,
       name: "Ritika Bhandari",
       email: "ritika@gmail.com",
-      department: "CSE",
+      //department: "CSE",
       year: "3rd Year",
     },
     {
       id: 2,
-      name: "Aman Verma",
-      email: "aman@gmail.com",
-      department: "IT",
+      name: "Aashi Verma",
+      email: "aashi@gmail.com",
+      //department: "IT",
       year: "4th Year",
     },
     {
       id: 3,
       name: "Neha Sharma",
       email: "neha@gmail.com",
-      department: "ECE",
+      //department: "ECE",
       year: "3rd Year",
     },
   ];
@@ -44,7 +44,7 @@ const AdminRegisteredStudents = () => {
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th>Department</th>
+            {/*<th>Department</th>*/}
             <th>Year</th>
           </tr>
         </thead>
@@ -54,7 +54,7 @@ const AdminRegisteredStudents = () => {
             <tr key={student.id}>
               <td>{student.name}</td>
               <td>{student.email}</td>
-              <td>{student.department}</td>
+              {/*<td>{student.department}</td>*/}
               <td>{student.year}</td>
             </tr>
           ))}

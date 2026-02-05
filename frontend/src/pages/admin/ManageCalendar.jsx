@@ -6,8 +6,6 @@ const months = [
   "July", "August", "September", "October", "November", "December"
 ];
 
-const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
 // helpers
 const getDaysInMonth = (month, year) =>
   new Date(year, month + 1, 0).getDate();
@@ -16,7 +14,7 @@ const getStartDay = (month, year) =>
   new Date(year, month, 1).getDay();
 
 const ManageCalendar = () => {
-  const [monthIndex, setMonthIndex] = useState(0); // January
+  const [monthIndex, setMonthIndex] = useState(0);
   const [year, setYear] = useState(2026);
 
   const [eventDates, setEventDates] = useState([5, 12, 18, 25]);
@@ -28,7 +26,6 @@ const ManageCalendar = () => {
   const daysInMonth = getDaysInMonth(monthIndex, year);
   const startDay = getStartDay(monthIndex, year);
 
-  /* ---------- ADD EVENT / PLACEMENT ---------- */
   const addEvent = () => {
     const day = Number(inputDate);
     if (day >= 1 && day <= daysInMonth && !eventDates.includes(day)) {
@@ -45,14 +42,11 @@ const ManageCalendar = () => {
     }
   };
 
-  /* ---------- MONTH NAVIGATION ---------- */
   const prevMonth = () => {
     if (monthIndex === 0) {
       setMonthIndex(11);
       setYear(year - 1);
-    } else {
-      setMonthIndex(monthIndex - 1);
-    }
+    } else setMonthIndex(monthIndex - 1);
     setSelectedDate(null);
   };
 
@@ -60,9 +54,7 @@ const ManageCalendar = () => {
     if (monthIndex === 11) {
       setMonthIndex(0);
       setYear(year + 1);
-    } else {
-      setMonthIndex(monthIndex + 1);
-    }
+    } else setMonthIndex(monthIndex + 1);
     setSelectedDate(null);
   };
 
@@ -85,60 +77,41 @@ const ManageCalendar = () => {
           value={inputDate}
           onChange={(e) => setInputDate(e.target.value)}
         />
-        <button className="sync-btn" onClick={addEvent}>
-          Add Event
-        </button>
+        <button className="sync-btn" onClick={addEvent}>Add Event</button>
         <button className="placement-btn" onClick={addPlacement}>
           Add Placement
         </button>
       </div>
 
       {/* CALENDAR */}
-      <div className="calendar-wrapper">
-        {/* WEEKDAYS */}
-        <div className="calendar-weekdays">
-          {weekDays.map(day => (
-            <div key={day} className="weekday">
+      <div className="calendar-grid">
+        {Array.from({ length: startDay }).map((_, i) => (
+          <div key={`empty-${i}`} className="calendar-day empty"></div>
+        ))}
+
+        {Array.from({ length: daysInMonth }, (_, i) => {
+          const day = i + 1;
+          let cls = "calendar-day";
+          if (eventDates.includes(day)) cls += " event-day";
+          if (placementDates.includes(day)) cls += " placement-day";
+          if (selectedDate === day) cls += " selected-day";
+
+          return (
+            <div
+              key={day}
+              className={cls}
+              onClick={() => setSelectedDate(day)}
+            >
               {day}
             </div>
-          ))}
-        </div>
-
-        {/* GRID */}
-        <div className="calendar-grid">
-          {/* Empty cells */}
-          {Array.from({ length: startDay }).map((_, i) => (
-            <div key={`empty-${i}`} className="calendar-day empty"></div>
-          ))}
-
-          {/* Days */}
-          {Array.from({ length: daysInMonth }, (_, i) => {
-            const day = i + 1;
-            let cls = "calendar-day";
-
-            if (eventDates.includes(day)) cls += " event-day";
-            if (placementDates.includes(day)) cls += " placement-day";
-            if (selectedDate === day) cls += " selected-day";
-
-            return (
-              <div
-                key={day}
-                className={cls}
-                onClick={() => setSelectedDate(day)}
-              >
-                {day}
-              </div>
-            );
-          })}
-        </div>
+          );
+        })}
       </div>
 
       {/* DETAILS */}
       {selectedDate && (
         <div className="date-details">
-          <h3>
-            {selectedDate} {months[monthIndex]} {year}
-          </h3>
+          <h3>{selectedDate} {months[monthIndex]} {year}</h3>
 
           {eventDates.includes(selectedDate) && (
             <p className="event-text">📌 Event scheduled</p>
@@ -159,12 +132,8 @@ const ManageCalendar = () => {
 
       {/* LEGEND */}
       <div className="calendar-legend">
-        <div>
-          <span className="legend-box event"></span> Event
-        </div>
-        <div>
-          <span className="legend-box placement"></span> Placement
-        </div>
+        <div><span className="legend-box event"></span> Event</div>
+        <div><span className="legend-box placement"></span> Placement</div>
       </div>
     </div>
   );

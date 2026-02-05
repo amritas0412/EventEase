@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/PlacementDashboard.css"; // ✅ FIXED PATH
+import "../../styles/PlacementDashboard.css"; //  FIXED PATH
+import { companies } from "../../data/companiesData";
+
 
 const PlacementDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -9,10 +11,10 @@ const PlacementDashboard = () => {
 
   const upcomingDrives = 0;
   const pendingRequests = 0;
-  const companiesVisited = 0;
+  const companiesVisited = companies.length;
 
   const handleLogout = () => {
-    localStorage.removeItem("role"); // ✅ IMPORTANT
+    localStorage.removeItem("role"); 
     navigate("/login");
   };
 
@@ -47,7 +49,7 @@ const PlacementDashboard = () => {
           {showProfile && (
             <div className="profile-dropdown">
               <p className="profile-name">Placement Cell</p>
-              <p className="profile-email">placement@email.com</p>
+              <p className="profile-email">placementcell@banasthali.in</p>
 
               <p className="profile-stat">
                 Total Placement Drives: <strong>—</strong>
@@ -79,11 +81,15 @@ const PlacementDashboard = () => {
             <p>Awaiting admin approval</p>
           </div>
 
-          <div className="card">
-            <h3>🏢 Companies Visited</h3>
-            <h2>{companiesVisited}</h2>
-            <p>Total companies</p>
-          </div>
+          <div
+  className="card clickable"
+  onClick={() => navigate("/placement/companies")}
+>
+  <h3>🏢 Companies Visited</h3>
+  <h2>{companiesVisited}</h2>
+  <p>Total companies</p>
+</div>
+
         </section>
 
         {/* History */}
@@ -97,7 +103,9 @@ const PlacementDashboard = () => {
               <h4>Past Drive</h4>
               <p>Date</p>
               <p className="muted-text">Total Registrations: --</p>
+              <p>Total Appeared Students</p>
               <p>Total Placed Students</p>
+              <p>Feedback</p>
             </div>
 
             <div className="event-card dashboard-card empty-card">

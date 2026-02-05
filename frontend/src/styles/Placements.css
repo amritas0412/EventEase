@@ -168,3 +168,18 @@
     flex-direction: column;
   }
 }
+
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.time-row input {
+  flex: 1;
+}
+
+.to-text {
+  font-weight: 600;
+  color: #555;
+}

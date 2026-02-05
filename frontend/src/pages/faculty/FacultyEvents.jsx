@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/FacultyEvents.css"; // ✅ FIXED PATH
+import "../../styles/FacultyEvents.css"; //  FIXED PATH
 
 const FacultyEvents = () => {
   const navigate = useNavigate();
@@ -32,6 +32,12 @@ const FacultyEvents = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (formData.endtime <= formData.time) {
+      alert("❌ End time must be after start time");
+      return;
+    }
+
+
     if (editId) {
       setEvents(
         events.map((ev) =>
@@ -62,19 +68,27 @@ const FacultyEvents = () => {
     resetForm();
   };
 
-  const approveEvent = (id) =>
-    setEvents(
-      events.map((ev) =>
-        ev.id === id ? { ...ev, status: "approved" } : ev
-      )
-    );
+  const approveEvent = (id) => {
+  setEvents(
+    events.map((ev) =>
+      ev.id === id ? { ...ev, status: "approved" } : ev
+    )
+  );
 
-  const rejectEvent = (id) =>
-    setEvents(
-      events.map((ev) =>
-        ev.id === id ? { ...ev, status: "rejected" } : ev
-      )
-    );
+  alert("✅ Event approved successfully");
+};
+
+
+const rejectEvent = (id) => {
+  setEvents(
+    events.map((ev) =>
+      ev.id === id ? { ...ev, status: "rejected" } : ev
+    )
+  );
+
+  alert("❌ Event rejected");
+};
+
 
   const handleEdit = (event) => {
     setFormData(event);
@@ -137,13 +151,26 @@ const FacultyEvents = () => {
               onChange={handleChange}
             />
 
-            <input
-              type="time"
-              name="time"
-              required
-              value={formData.time}
-              onChange={handleChange}
-            />
+            <div className="time-row">
+  <input
+    type="time"
+    name="time"
+    value={formData.time}
+    onChange={handleChange}
+    required
+  />
+
+  <span className="to-text">to</span>
+
+  <input
+    type="time"
+    name="endtime"
+    value={formData.endtime}
+    onChange={handleChange}
+    required
+  />
+</div>
+
 
             <input
               name="venue"
@@ -192,12 +219,32 @@ const FacultyEvents = () => {
               <div key={event.id} className="event-card">
                 <h4>{event.name}</h4>
                 <p>
-                  📅 {event.date} ⏰ {event.time}
-                </p>
+  📅 {event.date} ⏰ {event.time} to {event.endtime}
+</p>
+
                 <p>📍 {event.venue}</p>
                 <p>👥 {event.audience}</p>
 
                 {event.description && <p>{event.description}</p>}
+
+                {/*  Registration count */}
+  <p className="registration-count">
+    📝 Registrations: {event.registeredStudents.length}
+  </p>
+
+  {/*  Registered student details */}
+  {event.registeredStudents.length >= 0 && (
+    <div className="registered-students">
+      <h5>Registered Students</h5>
+
+      {event.registeredStudents.map((student, index) => (
+        <div key={index} className="student-row">
+          <span>{student.name}</span>
+          <span>{student.email}</span>
+        </div>
+      ))}
+    </div>
+  )}
 
                 <button onClick={() => handleEdit(event)}>✏ Edit</button>
               </div>
@@ -207,7 +254,7 @@ const FacultyEvents = () => {
         {/* Pending Requests */}
         {hasPendingRequests && (
           <div className="events-box">
-            <h3>Request Processing</h3>
+            <h3>Request Pending</h3>
 
             {events
               .filter((e) => e.status === "pending")

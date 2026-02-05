@@ -199,3 +199,7 @@
     right: 20px;
   }
 }
+
+.clickable {
+  cursor: pointer;
+}

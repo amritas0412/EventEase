@@ -1,13 +1,13 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import '../styles/Welcome.css'
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/Welcome.css";
 
 const Welcome = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div className="welcome-container">
-      
+
       {/* Navbar */}
       <nav className="navbar">
         <div className="logo">
@@ -15,15 +15,18 @@ const Welcome = () => {
         </div>
 
         <div className="nav-links">
-          <button 
+          <button
             className="sign-in"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate("/login")}
           >
             Sign In
           </button>
 
-          <button className="get-started">
-            Get Started
+          <button
+            className="get-started"
+            onClick={() => navigate("/about")}
+          >
+            About Us
           </button>
         </div>
       </nav>
@@ -33,15 +36,22 @@ const Welcome = () => {
         <div className="hero-content">
           <h1>Excellence for All, Excellence from All</h1>
           <p>
-            EventEase helps you discover events, manage clubs, and find 
+            EventEase helps you discover events and find
             placement opportunities, all in one place.
           </p>
-          <button className="explore-btn">Explore Events</button>
+
+          {/* ✅ FIXED BUTTON */}
+          <button
+            className="explore-btn"
+            onClick={() => navigate("/events")}
+          >
+            Explore Events
+          </button>
         </div>
-        
+
         <div className="hero-image">
-          <img 
-            src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=800" 
+          <img
+            src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=800"
             alt="Event Hall"
           />
         </div>
@@ -57,7 +67,7 @@ const Welcome = () => {
       </footer>
 
     </div>
-  )
-}
+  );
+};
 
-export default Welcome
+export default Welcome;
