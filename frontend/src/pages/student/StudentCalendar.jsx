@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../../styles/StudentCalendar.css";
 
 const months = [
@@ -7,76 +7,114 @@ const months = [
 ];
 
 const StudentCalendar = () => {
-  // ✅ MONTH & YEAR STATE
-  const [monthIndex, setMonthIndex] = useState(0); // January
-  const [year, setYear] = useState(2026);
 
-  // Dummy highlighted dates
-  const eventDates = [5, 12, 18, 25];
-  const placementDates = [8, 20, 28];
+  // ✅ MONTH & YEAR STATE
+  const today = new Date();
+  const [monthIndex, setMonthIndex] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+
+  // 🔥 EVENTS FROM DB
+  const [events, setEvents] = useState([]);
+
+  // 📡 FETCH APPROVED EVENTS
+  // useEffect(() => {
+  //   fetch("http://localhost:5050/faculty/events")
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       if (data.success) {
+  //         setEvents(data.events);
+  //       }
+  //     })
+  //     .catch(err =>
+  //       console.error("CALENDAR FETCH ERROR:", err)
+  //     );
+  // }, []);
+useEffect(() => {
+  fetch("http://localhost:5050/faculty/events")
+    .then(res => res.json())
+    .then(data => {
+      console.log("CALENDAR EVENTS:", data.events); // 👈 ADD THIS
+      if (data.success) {
+        setEvents(data.events);
+      }
+    });
+}, []);
+
+  // 🎯 FILTER EVENTS FOR CURRENT MONTH/YEAR
+  const eventDates = events
+    .filter(ev => {
+      const d = new Date(ev.date);
+      return (
+        d.getMonth() === monthIndex &&
+        d.getFullYear() === year
+      );
+    })
+    .map(ev => new Date(ev.date).getDate());
 
   // ✅ DYNAMIC CALCULATIONS
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const startDay = new Date(year, monthIndex, 1).getDay();
 
-  // ✅ NAVIGATION HANDLERS
+  // ✅ NAVIGATION
   const prevMonth = () => {
     if (monthIndex === 0) {
       setMonthIndex(11);
-      setYear(year - 1);
+      setYear(y => y - 1);
     } else {
-      setMonthIndex(monthIndex - 1);
+      setMonthIndex(i => i - 1);
     }
   };
 
   const nextMonth = () => {
     if (monthIndex === 11) {
       setMonthIndex(0);
-      setYear(year + 1);
+      setYear(y => y + 1);
     } else {
-      setMonthIndex(monthIndex + 1);
+      setMonthIndex(i => i + 1);
     }
   };
 
   return (
     <div className="student-calendar-page">
-      {/* ===== HEADER WITH NAVIGATION ===== */}
+
+      {/* ===== HEADER ===== */}
       <div className="calendar-header">
         <button className="nav-btn" onClick={prevMonth}>◀</button>
         <h2>{months[monthIndex]} {year}</h2>
         <button className="nav-btn" onClick={nextMonth}>▶</button>
       </div>
 
-      {/* ===== WEEKDAYS ===== */}
-      {/*<div className="calendar-weekdays">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
-          <div key={day} className="weekday">
-            {day}
-          </div>
-        ))}
-      </div>*/}
-
-      {/* ===== CALENDAR GRID ===== */}
+      {/* ===== GRID ===== */}
       <div className="calendar-grid">
+
         {/* Empty slots */}
         {Array.from({ length: startDay }).map((_, i) => (
-          <div key={`empty-${i}`} className="calendar-day empty"></div>
+          <div
+            key={`empty-${i}`}
+            className="calendar-day empty"
+          />
         ))}
 
         {/* Days */}
         {Array.from({ length: daysInMonth }, (_, i) => {
           const day = i + 1;
+
           let className = "calendar-day";
 
-          if (eventDates.includes(day)) className += " event-day";
-          if (placementDates.includes(day)) className += " placement-day";
+          if (eventDates.includes(day)) {
+            className += " event-day";
+          }
 
           return (
-            <div key={day} className={className}>
+            <div
+              key={day}
+              className={className}
+            >
               {day}
             </div>
           );
         })}
+
       </div>
 
       {/* ===== LEGEND ===== */}
@@ -84,10 +122,8 @@ const StudentCalendar = () => {
         <div>
           <span className="legend-box event"></span> Event
         </div>
-        <div>
-          <span className="legend-box placement"></span> Placement
-        </div>
       </div>
+
     </div>
   );
 };

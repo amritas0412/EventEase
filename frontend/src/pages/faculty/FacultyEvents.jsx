@@ -1,17 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/FacultyEvents.css"; //  FIXED PATH
 
 const FacultyEvents = () => {
   const navigate = useNavigate();
+  const [approvedEvents, setApprovedEvents] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5050/faculty/events")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setApprovedEvents(data.events);
+        }
+      })
+      .catch(err => console.error("FACULTY FETCH ERROR:", err));
+  }, []);
+const fetchApproved = () => {
+  fetch("http://localhost:5050/faculty/events")
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        setApprovedEvents(data.events);
+      }
+    });
+};
+
   const today = new Date().toISOString().split("T")[0];
 
   const emptyForm = {
-    name: "",
+    eventName: "",
     date: "",
-    time: "",
+    startTime: "",
+    endTime: "",
     venue: "",
-    audience: "",
+    eligible: "",
     description: "",
   };
 
@@ -29,30 +52,37 @@ const FacultyEvents = () => {
     setShowForm(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.endtime <= formData.time) {
+    if (formData.endTime <= formData.startTime) {
       alert("❌ End time must be after start time");
       return;
     }
 
+    const payload = { ...formData };
 
-    if (editId) {
-      setEvents(
-        events.map((ev) =>
-          ev.id === editId
-            ? {
-                ...formData,
-                id: editId,
-                status: "pending",
-                registeredStudents: ev.registeredStudents || [],
-              }
-            : ev
-        )
-      );
-      alert("✏ Event updated and sent for approval");
-    } else {
+    console.log("🚀 Sending to backend:", payload);
+
+    try {
+      const res = await fetch("http://localhost:5050/faculty/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        console.error("SERVER ERROR:", err);
+        alert("❌ Failed to save event");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("✅ Server:", data);
+
+
+      // add locally AFTER DB success
       setEvents([
         ...events,
         {
@@ -62,32 +92,37 @@ const FacultyEvents = () => {
           registeredStudents: [],
         },
       ]);
-      alert("📨 Event request sent");
-    }
 
-    resetForm();
+      alert("📨 Event submitted successfully!");
+      resetForm();
+
+    } catch (err) {
+      console.error("🔥 Network error:", err);
+      alert("Backend not reachable");
+    }
   };
+  ;
 
   const approveEvent = (id) => {
-  setEvents(
-    events.map((ev) =>
-      ev.id === id ? { ...ev, status: "approved" } : ev
-    )
-  );
+    setEvents(
+      events.map((ev) =>
+        ev.id === id ? { ...ev, status: "approved" } : ev
+      )
+    );
 
-  alert("✅ Event approved successfully");
-};
+    alert("✅ Event approved successfully");
+  };
 
 
-const rejectEvent = (id) => {
-  setEvents(
-    events.map((ev) =>
-      ev.id === id ? { ...ev, status: "rejected" } : ev
-    )
-  );
+  const rejectEvent = (id) => {
+    setEvents(
+      events.map((ev) =>
+        ev.id === id ? { ...ev, status: "rejected" } : ev
+      )
+    );
 
-  alert("❌ Event rejected");
-};
+    alert("❌ Event rejected");
+  };
 
 
   const handleEdit = (event) => {
@@ -96,7 +131,7 @@ const rejectEvent = (id) => {
     setShowForm(true);
   };
 
-  const hasPendingRequests = events.some((e) => e.status === "pending");
+   const hasPendingRequests = events.some((e) => e.status === "pending");
 
   return (
     <div className="faculty-layout">
@@ -111,34 +146,23 @@ const rejectEvent = (id) => {
             📊 Dashboard
           </li>
           <li className="active">
-            📅 Events <span className="badge">{events.length}</span>
+            📅 Events <span className="badge">{approvedEvents.length}</span>
+
           </li>
         </ul>
       </aside>
 
-      {/* Main Content */}
-      <main className="main-content">
-        <div className="page-header">
-          <h2>Events</h2>
-          <p>Create, edit, and manage department events.</p>
-        </div>
-
-        <button
-          className="add-event-btn"
-          onClick={() => setShowForm(true)}
-        >
-          ➕ Add Event
-        </button>
+      {/* Main Content */} <main className="main-content"> <div className="page-header"> <h2>Events</h2> <p>Create, edit, and manage department events.</p> </div> <button className="add-event-btn" onClick={() => setShowForm(true)} > ➕ Add Event </button>
 
         {showForm && (
           <form className="event-form" onSubmit={handleSubmit}>
             <h3>{editId ? "Edit Event" : "Add New Event"}</h3>
 
             <input
-              name="name"
+              name="eventName"
               placeholder="Event Name"
               required
-              value={formData.name}
+              value={formData.eventName}
               onChange={handleChange}
             />
 
@@ -152,25 +176,24 @@ const rejectEvent = (id) => {
             />
 
             <div className="time-row">
-  <input
-    type="time"
-    name="time"
-    value={formData.time}
-    onChange={handleChange}
-    required
-  />
+              <input
+                type="time"
+                name="startTime"
+                value={formData.startTime}
+                onChange={handleChange}
+                required
+              />
 
-  <span className="to-text">to</span>
+              <span className="to-text">to</span>
 
-  <input
-    type="time"
-    name="endtime"
-    value={formData.endtime}
-    onChange={handleChange}
-    required
-  />
-</div>
-
+              <input
+                type="time"
+                name="endTime"
+                value={formData.endTime}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
             <input
               name="venue"
@@ -181,10 +204,10 @@ const rejectEvent = (id) => {
             />
 
             <input
-              name="audience"
+              name="eligible"
               placeholder="Eligible Branch / Year"
               required
-              value={formData.audience}
+              value={formData.eligible}
               onChange={handleChange}
             />
 
@@ -195,6 +218,7 @@ const rejectEvent = (id) => {
               value={formData.description}
               onChange={handleChange}
             />
+
 
             <div className="form-actions">
               <button type="submit">📨 Submit</button>
@@ -209,70 +233,25 @@ const rejectEvent = (id) => {
         <div className="events-box">
           <h3>Upcoming Events</h3>
 
-          {events.filter((e) => e.status === "approved").length === 0 && (
+          {approvedEvents.length === 0 ? (
             <p>No approved events yet</p>
-          )}
-
-          {events
-            .filter((e) => e.status === "approved")
-            .map((event) => (
-              <div key={event.id} className="event-card">
-                <h4>{event.name}</h4>
-                <p>
-  📅 {event.date} ⏰ {event.time} to {event.endtime}
-</p>
-
-                <p>📍 {event.venue}</p>
-                <p>👥 {event.audience}</p>
-
-                {event.description && <p>{event.description}</p>}
-
-                {/*  Registration count */}
-  <p className="registration-count">
-    📝 Registrations: {event.registeredStudents.length}
-  </p>
-
-  {/*  Registered student details */}
-  {event.registeredStudents.length >= 0 && (
-    <div className="registered-students">
-      <h5>Registered Students</h5>
-
-      {event.registeredStudents.map((student, index) => (
-        <div key={index} className="student-row">
-          <span>{student.name}</span>
-          <span>{student.email}</span>
-        </div>
-      ))}
-    </div>
-  )}
-
-                <button onClick={() => handleEdit(event)}>✏ Edit</button>
+          ) : (
+            approvedEvents.map(event => (
+              <div key={event._id} className="event-card">
+                <h4>{event.eventName}</h4>
+                <p>Date: {event.date}</p>
+                <p>Venue: {event.venue}</p>
+                <p>Time: {event.startTime} - {event.endTime}</p>
               </div>
-            ))}
-        </div>
-
+            ))
+          )}
         {/* Pending Requests */}
-        {hasPendingRequests && (
-          <div className="events-box">
-            <h3>Request Pending</h3>
-
-            {events
-              .filter((e) => e.status === "pending")
-              .map((event) => (
-                <div key={event.id} className="event-card pending">
-                  <h4>{event.name}</h4>
-                  <div className="action-buttons">
-                    <button onClick={() => approveEvent(event.id)}>
-                      ✅ Approve
-                    </button>
-                    <button onClick={() => rejectEvent(event.id)}>
-                      ❌ Reject
-                    </button>
-                  </div>
-                </div>
-              ))}
-          </div>
-        )}
+          {hasPendingRequests && (
+            <div className="events-box">
+              <h3>Request Pending</h3>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );

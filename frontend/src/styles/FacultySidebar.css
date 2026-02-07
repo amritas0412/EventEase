@@ -1,0 +1,44 @@
+.faculty-sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: #f6f3ff;
+  padding: 20px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.logo-icon {
+  background: #7c3aed;
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-item {
+  text-decoration: none;
+  color: #333;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.menu-item.active {
+  background: #7c3aed;
+  color: white;
+}

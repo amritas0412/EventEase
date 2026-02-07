@@ -36,7 +36,7 @@ const Placements = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (formData.endtime <= formData.time) {
+    if (formData.endtime <= formData.startTime) {
   alert("❌ End time must be after start time");
   return;
 }
@@ -127,7 +127,7 @@ const Placements = () => {
   <input
     type="time"
     name="time"
-    value={formData.time}
+    value={formData.startTime}
     onChange={handleChange}
     required
   />

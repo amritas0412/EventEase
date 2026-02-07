@@ -1,0 +1,13 @@
+.calendar-event {
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+}
+
+.calendar-event.approved {
+  background: #7c3aed; /* purple */
+}
+
+.calendar-event.faculty-own {
+  background: #2563eb; /* blue */
+}

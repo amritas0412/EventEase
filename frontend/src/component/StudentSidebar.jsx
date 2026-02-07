@@ -1,7 +1,25 @@
 import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "../styles/StudentSidebar.css";
 
 const StudentSidebar = () => {
+
+  const [eventCount, setEventCount] = useState(0);
+
+  // 🔥 Fetch approved events count
+  useEffect(() => {
+    fetch("http://localhost:5050/faculty/events")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setEventCount(data.events.length);
+        }
+      })
+      .catch(err =>
+        console.error("SIDEBAR COUNT ERROR:", err)
+      );
+  }, []);
+
   return (
     <div className="student-sidebar">
       {/* Logo */}
@@ -12,6 +30,7 @@ const StudentSidebar = () => {
 
       {/* Menu */}
       <nav className="sidebar-menu">
+
         <NavLink
           to="/student/dashboard"
           className={({ isActive }) =>
@@ -28,7 +47,7 @@ const StudentSidebar = () => {
           }
         >
           Events
-          <span className="badge">12</span>
+          <span className="badge">{eventCount}</span>
         </NavLink>
 
         <NavLink
@@ -39,6 +58,7 @@ const StudentSidebar = () => {
         >
           Placements
         </NavLink>
+
       </nav>
 
       {/* Footer */}

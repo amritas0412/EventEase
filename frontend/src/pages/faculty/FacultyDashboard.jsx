@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/FacultyDashboard.css"; // ✅ FIXED PATH
 
@@ -6,6 +6,30 @@ const FacultyDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5050/faculty/events")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setEvents(data.events);
+        }
+      })
+      .catch(err => console.error("FETCH ERROR:", err));
+  }, []);
+const today = new Date().toISOString().split("T")[0];
+
+// Upcoming = today or future
+const upcomingEvents = events
+  .filter(ev => ev.date >= today)
+  .filter(ev =>
+    ev.eventName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+// Past = finished events
+const pastEvents = events.filter(ev => ev.date < today);
+
 
   const handleLogout = () => {
     localStorage.removeItem("role");
@@ -48,7 +72,13 @@ const FacultyDashboard = () => {
                 Total Events Conducted: <strong>—</strong>
               </p>
 
-              <button className="profile-btn">📅 View Calendar</button>
+              <button
+  className="profile-btn"
+  onClick={() => navigate("/faculty/calendar")}
+>
+  📅 View Calendar
+</button>
+
 
               <button
                 className="profile-btn logout"
@@ -74,18 +104,23 @@ const FacultyDashboard = () => {
           </div>
 
           <div className="panel-grid">
-            <div className="event-card dashboard-card">
-              <h4>Event Name</h4>
-              <p>Date</p>
-              <p>Time</p>
-              <p>Venue</p>
-              <p className="muted-text">Conducted by Faculty</p>
-            </div>
-
-            <div className="event-card dashboard-card empty-card">
-              <p>Department events will appear here</p>
-            </div>
+            {upcomingEvents.length === 0 ? (
+              <div className="event-card dashboard-card empty-card">
+                <p>No department events yet</p>
+              </div>
+            ) : (
+              upcomingEvents.map(ev => (
+                <div key={ev._id} className="event-card dashboard-card">
+                  <h4>{ev.eventName}</h4>
+                  <p>📅 {ev.date}</p>
+                  <p>⏰ {ev.startTime} - {ev.endTime}</p>
+                  <p>📍 {ev.venue}</p>
+                  <p className="muted-text">Conducted by Faculty</p>
+                </div>
+              ))
+            )}
           </div>
+
         </section>
 
         {/* Faculty Event History */}
@@ -93,18 +128,23 @@ const FacultyDashboard = () => {
           <div className="panel-header">
             <h3>🕘 Your Event History</h3>
           </div>
-
           <div className="panel-grid">
-            <div className="event-card dashboard-card">
-              <h4>Event Name</h4>
-              <p>Date</p>
-              <p>Feedback</p>
-              <p className="muted-text">Total Registrations: --</p>
-            </div>
-
-            <div className="event-card dashboard-card empty-card">
-              <p>Your conducted events will appear here</p>
-            </div>
+            {pastEvents.length === 0 ? (
+              <div className="event-card dashboard-card empty-card">
+                <p>Your conducted events will appear here</p>
+              </div>
+            ) : (
+              pastEvents.map(ev => (
+                <div key={ev._id} className="event-card dashboard-card">
+                  <h4>{ev.eventName}</h4>
+                  <p>📅 {ev.date}</p>
+                  <p>Feedback: --</p>
+                  <p className="muted-text">
+                    Total Registrations: {ev.registeredStudents?.length || 0}
+                  </p>
+                </div>
+              ))
+            )}
           </div>
         </section>
       </main>

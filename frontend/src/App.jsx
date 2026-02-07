@@ -30,8 +30,15 @@ import AdminEventDetails from "./pages/admin/AdminEventDetails";
 import AdminPlacementDetails from "./pages/admin/AdminPlacementDetails";
 
 /* ================= FACULTY PAGES ================= */
+// import FacultyDashboard from "./pages/faculty/FacultyDashboard";
+// import FacultyEvents from "./pages/faculty/FacultyEvents";
+// import FacultyCalendar from "./pages/faculty/FacultyCalendar";
+import FacultyLayout from "./pages/faculty/FacultyLayout";
+import FacultyCalendar from "./pages/faculty/FacultyCalendar";
 import FacultyDashboard from "./pages/faculty/FacultyDashboard";
 import FacultyEvents from "./pages/faculty/FacultyEvents";
+
+
 
 /* ================= PLACEMENT PAGES ================= */
 import PlacementDashboard from "./pages/placement/PlacementDashboard";
@@ -43,7 +50,7 @@ function App() {
       {/* ---------- PUBLIC ROUTES ---------- */}
       <Route path="/" element={<Welcome />} />
       <Route path="/login" element={<Login />} />
-<Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/about" element={<AboutUs />} />
       <Route path="/events" element={<ExploreEvents />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
@@ -54,12 +61,10 @@ function App() {
         <Route path="events" element={<StudentEvents />} />
         <Route path="events/:id" element={<StudentEventDetails />} />
         <Route path="placements" element={<StudentPlacements />} />
-        <Route
-          path="placements/:id"
-          element={<StudentPlacementDetails />}
-        />
+        <Route path="placements/:id" element={<StudentPlacementDetails />} />
         <Route path="calendar" element={<StudentCalendar />} />
         <Route path="profile" element={<StudentProfile />} />
+
       </Route>
 
       {/* ---------- ADMIN ROUTES ---------- */}
@@ -81,18 +86,25 @@ function App() {
         />
       </Route>
 
-      {/* ---------- FACULTY ROUTES ---------- */}
+      {/* ---------- FACULTY ROUTES ----------*/}
       <Route path="/faculty">
         <Route path="dashboard" element={<FacultyDashboard />} />
         <Route path="events" element={<FacultyEvents />} />
-      </Route>
+        <Route path="calendar" element={<FacultyCalendar />} />
+      </Route> 
+      {/* <Route path="/faculty" element={<FacultyLayout />}>
+        <Route path="dashboard" element={<FacultyDashboard />} />
+        <Route path="events" element={<FacultyEvents />} />
+        <Route path="calendar" element={<FacultyCalendar />} />
+      </Route> */}
+
 
       {/* ---------- PLACEMENT ROUTES ---------- */}
-<Route path="/placement">
-  <Route path="dashboard" element={<PlacementDashboard />} />
-  <Route path="placements" element={<Placements />} />
-  <Route path="companies" element={<CompaniesVisited />} />  
-</Route>
+      <Route path="/placement">
+        <Route path="dashboard" element={<PlacementDashboard />} />
+        <Route path="placements" element={<Placements />} />
+        <Route path="companies" element={<CompaniesVisited />} />
+      </Route>
 
     </Routes>
   );

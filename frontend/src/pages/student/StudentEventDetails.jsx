@@ -1,29 +1,34 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../../styles/StudentEventDetails.css";
 
 const StudentEventDetails = () => {
   const { id } = useParams();
 
-  // Dummy event data
-  const event = {
-    id,
-    title: "Tech Fest 2026",
-    description:
-      "Tech Fest 2026 is a national-level technical festival featuring hackathons, coding contests, and tech talks.",
-    organizer: "Computer Science Department",
-    date: "12 February 2026",
-    time: "10:00 AM - 5:00 PM",
-    location: "Main Auditorium",
-  };
-
-  // ✅ REGISTER STATE
+  const [event, setEvent] = useState(null);
   const [registered, setRegistered] = useState(false);
 
   // ⭐ Feedback state
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [submitted, setSubmitted] = useState(false);
+
+  // ✅ FETCH EVENT BY ID
+  useEffect(() => {
+    fetch(`http://localhost:5050/student/events/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setEvent(data.event);
+        }
+      })
+      .catch(err => console.error("DETAIL FETCH ERROR:", err));
+  }, [id]);
+
+  // ⏳ Loading state
+  if (!event) {
+    return <p className="loading-text">Loading event...</p>;
+  }
 
   // ✅ REGISTER HANDLER
   const handleRegister = () => {
@@ -48,14 +53,16 @@ const StudentEventDetails = () => {
 
   return (
     <div className="event-details-page">
-      <h2 className="event-title">{event.title}</h2>
+      <h2 className="event-title">{event.eventName}</h2>
 
       <div className="event-details-card">
         <p><strong>Description:</strong> {event.description}</p>
-        <p><strong>Organizer:</strong> {event.organizer}</p>
+        <p><strong>Organizer:</strong> Faculty</p>
+
         <p><strong>Date:</strong> {event.date}</p>
-        <p><strong>Time:</strong> {event.time}</p>
-        <p><strong>Location:</strong> {event.location}</p>
+        <p><strong>Time:</strong> {event.startTime} - {event.endTime}</p>
+        <p><strong>Location:</strong> {event.venue}</p>
+
         <p>
           <strong>Status:</strong>{" "}
           {registered ? "Registered" : "Not Registered"}

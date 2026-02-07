@@ -1,28 +1,49 @@
+//import { useNavigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "../../styles/AdminDashboard.css";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [pendingEvents, setPendingEvents] = useState([]);
+  useEffect(() => {
+    fetch("http://localhost:5050/admin/event-requests")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setPendingEvents(data.events);
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
+  const approve = async (id) => {
+    await fetch(`http://localhost:5050/admin/events/${id}/approve`, {
+      method: "PATCH",
+    });
 
+    setPendingEvents(prev => prev.filter(ev => ev._id !== id));
+  };
+
+  const reject = async (id) => {
+    await fetch(`http://localhost:5050/admin/events/${id}/reject`, {
+      method: "PATCH",
+    });
+
+    setPendingEvents(prev => prev.filter(ev => ev._id !== id));
+  };
   const handleLogout = () => {
     navigate("/login");
   };
-
-  // Dummy upcoming events
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: "Tech Fest 2026",
-      date: "12 Feb 2026",
-      organizer: "Aishwariya Garg",
-    },
-    {
-      id: 2,
-      title: "Cultural Night",
-      date: "20 Feb 2026",
-      organizer: "Praveen Kumar",
-    },
-  ];
+  const [approvedEvents, setApprovedEvents] = useState([]);
+  useEffect(() => {
+    fetch("http://localhost:5050/admin/events")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setApprovedEvents(data.events);
+        }
+      });
+  }, []);
 
   // Dummy placement drives
   const upcomingPlacements = [
@@ -55,7 +76,7 @@ const AdminDashboard = () => {
       <div className="admin-cards">
         <div className="admin-card">
           <p>Total Events</p>
-          <h3>12</h3>
+          <h3>{approvedEvents.length}</h3>
         </div>
 
         <div className="admin-card">
@@ -80,28 +101,39 @@ const AdminDashboard = () => {
               <th>Date</th>
               <th>Organizer</th>
               <th>View Registered Students</th>
+              <th>Action</th>   {/* 👈 add this */}
             </tr>
           </thead>
-
           <tbody>
-            {upcomingEvents.map((event) => (
-              <tr key={event.id}>
-                <td>{event.title}</td>
-                <td>{event.date}</td>
-                <td>{event.organizer}</td>
-                <td>
-                  <button
-                    className="details-btn"
-                    onClick={() =>
-                      navigate(`/admin/registered/event/${event.id}`)
-                    }
-                  >
-                    See Details
-                  </button>
-                </td>
+            {approvedEvents.length === 0 ? (
+              <tr>
+                <td colSpan="5">No upcoming events</td>
               </tr>
-            ))}
+            ) : (
+              approvedEvents.map(event => (
+                <tr key={event._id}>
+                  <td>{event.eventName}</td>
+                  <td>{event.date}</td>
+                  <td>Faculty</td>
+
+                  <td>
+                    <button
+  className="details-btn"
+  onClick={() =>
+    navigate(`/admin/registered/event/${event._id}`)
+  }
+>
+  See Details
+</button>
+
+                  </td>
+
+                  <td>Approved</td>
+                </tr>
+              ))
+            )}
           </tbody>
+
         </table>
       </div>
 

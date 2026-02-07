@@ -1,48 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/ManageEvents.css";
 
 const ManageEvents = () => {
   const navigate = useNavigate();
+  const [events, setEvents] = useState([]);
+  useEffect(() => {
+    fetch("http://localhost:5050/admin/event-requests")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setEvents(data.events);
+        }
+      })
+      .catch(err => console.error("FETCH ERROR:", err));
+  }, []);
 
-  // ✅ EVENTS AS STATE (IMPORTANT)
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      name: "AI Workshop",
-      organizer: "Prof. Navin Mathur",
-      date: "12 Feb 2026",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      name: "Web Development Seminar",
-      organizer: "Rajesh Kumar",
-      date: "20 Feb 2026",
-      status: "Pending",
-    },
-  ]);
+  const approveEvent = async (id) => {
+    await fetch(`http://localhost:5050/admin/events/${id}/approve`, {
+      method: "PATCH",
+    });
 
-  //  APPROVE HANDLER
-  const approveEvent = (id) => {
-    setEvents((prevEvents) =>
-      prevEvents.map((event) =>
-        event.id === id
-          ? { ...event, status: "Approved" }
-          : event
-      )
-    );
+    setEvents(prev => prev.filter(ev => ev._id !== id));
   };
 
-  //  REJECT HANDLER
-  const rejectEvent = (id) => {
-    setEvents((prevEvents) =>
-      prevEvents.map((event) =>
-        event.id === id
-          ? { ...event, status: "Rejected" }
-          : event
-      )
-    );
+  const rejectEvent = async (id) => {
+    await fetch(`http://localhost:5050/admin/events/${id}/reject`, {
+      method: "PATCH",
+    });
+
+    setEvents(prev => prev.filter(ev => ev._id !== id));
   };
 
   return (
@@ -64,10 +51,11 @@ const ManageEvents = () => {
 
           <tbody>
             {events.map((event) => (
-              <tr key={event.id}>
-                <td>{event.name}</td>
-                <td>{event.organizer}</td>
+              <tr key={event._id}>
+                <td>{event.eventName}</td>
+                <td>Faculty</td>
                 <td>{event.date}</td>
+
 
                 {/* STATUS */}
                 <td>
@@ -80,18 +68,18 @@ const ManageEvents = () => {
 
                 {/* ACTION BUTTONS */}
                 <td>
-                  {event.status === "Pending" ? (
+                  {event.status === "pending" ? (
                     <>
                       <button
                         className="approve-btn"
-                        onClick={() => approveEvent(event.id)}
+                        onClick={() => approveEvent(event._id)}
                       >
                         Approve
                       </button>
 
                       <button
                         className="reject-btn"
-                        onClick={() => rejectEvent(event.id)}
+                        onClick={() => rejectEvent(event._id)}
                       >
                         Reject
                       </button>
@@ -101,16 +89,14 @@ const ManageEvents = () => {
                   )}
                 </td>
 
-                {/* DETAILS */}
                 <td>
                   <button
                     className="details-btn"
-                    onClick={() =>
-                      navigate(`/admin/events/${event.id}`)
-                    }
+                    onClick={() => navigate(`/admin/events/${event._id}`)}
                   >
                     See Details
                   </button>
+
                 </td>
               </tr>
             ))}

@@ -33,7 +33,7 @@ const AdminRegisteredStudents = () => {
   return (
     <div className="admin-registered-page">
       <div className="page-header">
-        <h2>Registered Students (Event ID: {id})</h2>
+        <h2>Registered Students (Event: {eventName})</h2>
         <button className="back-btn" onClick={() => navigate(-1)}>
           ← Back
         </button>

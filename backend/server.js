@@ -1,94 +1,3 @@
-/*const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const User = require("./User"); 
-
-const app = express();
-
-app.use(cors());            // ✅ allow React to connect
-app.use(express.json());
-
-// MongoDB connection string 
-const mongoURI = "mongodb+srv://dbUser:dbUserPassword@eventeasecluster.ros41nx.mongodb.net/sample_mflix?retryWrites=true&w=majority";
-
-// Connect to MongoDB
-mongoose.connect(mongoURI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log("MongoDB connection error:", err));
-
-// Login API
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Look for the user in MongoDB
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.json({ success: false, message: "User not found" });
-    }
-
-    if (user.password !== password) {
-      return res.json({ success: false, message: "Wrong password" });
-    }
-
-    res.json({ success: true, message: "Login successful" });
-
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
-
-app.listen(3000, () => {
-  console.log("Backend running ");
-});
-
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const Student = require("./Student"); 
-
-const app = express();
-
-app.use(cors());            // ✅ allow React to connect
-app.use(express.json());
-
-// MongoDB connection string 
-const mongoURI = "mongodb+srv://dbUser:dbUserPassword@eventeasecluster.ros41nx.mongodb.net/eventease?retryWrites=true&w=majority";
-
-// Connect to MongoDB
-mongoose.connect(mongoURI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log("MongoDB connection error:", err));
-
-// Login API
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // Look for the user in MongoDB
-    const stud = await Student.findOne({ email });
-
-    if (!stud) {
-      return res.json({ success: false, message: "User not found" });
-    }
-
-    if (stud.password !== password) {
-      return res.json({ success: false, message: "Wrong password" });
-    }
-
-    res.json({ success: true, message: "Login successful" });
-
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
-
-app.listen(5000, () => {
-  console.log("Backend running ");
-});*/
 require("dotenv").config();  // MUST be first
 console.log("MONGO_URI:", process.env.MONGO_URI);
 
@@ -98,6 +7,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
+const Event = require("./Event"); // mongoose model for events
 const Student = require("./Student"); // mongoose model for students
 const Faculty = require("./Faculty"); // mongoose model for faculty
 const PlacementCell = require("./PlacementCell");
@@ -107,10 +17,14 @@ const sendEmail = require("./utils/sendEmail");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.get("/", (req, res) => {
+  console.log("Health check hit");
+  res.send("Backend is alive");
+});
 
 const mongoURI = process.env.MONGO_URI;
-mongoose.connect(process.env.MONGO_URI);
-//const 
+//mongoose.connect(process.env.MONGO_URI);
+
 // Connect to MongoDB
 mongoose.connect(mongoURI)
   .then(() => console.log("MongoDB connected"))
@@ -143,16 +57,40 @@ app.post("/login", async (req, res) => {
       return res.json({ success: false, message: "Wrong password" });
     }
 
-    res.json({ success: true, message: "Login successful" });
+    // ✅ SEND USER DETAILS
+    // res.json({
+    //   success: true,
+    //   message: "Login successful",
+    //   user: {
+    //     name: user.name,
+    //     email: user.email,
+    //     studentId: user.studentId || user.studentID || "",
+    //   },
+    // });
+    res.json({
+  success: true,
+  message: "Login successful",
+  role: role.toLowerCase(),
+  user: {
+    name: user.name || "",
+    email: user.email,
+    studentId: user.studentId || "",
+  },
+});
+
 
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 });
 
-app.listen(5000, () => {
-  console.log("Backend running on port 5000");
+
+app.listen(5050, () => {
+  console.log("Backend running on port 5050");
 });
 
 // Forgot Password
@@ -183,20 +121,18 @@ app.post("/forgot-password", async (req, res) => {
         message: "Email not registered",
       });
     }
-
-    // secure token
     const resetToken = crypto.randomBytes(32).toString("hex");
 
-const hashedToken = crypto
-  .createHash("sha256")
-  .update(resetToken)
-  .digest("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
 
-user.resetToken = hashedToken;
-user.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
-await user.save();
+    user.resetToken = hashedToken;
+    user.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
+    await user.save();
 
-const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
+    const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
 
     const message = `
       <p>You requested a password reset.</p>
@@ -224,7 +160,6 @@ const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
     });
   }
 });
-    
 
 //Reset Password
 app.post("/reset-password/:token", async (req, res) => {
@@ -269,3 +204,130 @@ app.post("/reset-password/:token", async (req, res) => {
   });
 });
 
+app.post("/faculty/events", async (req, res) => {
+  try {
+    console.log("EVENT DATA:", req.body);
+
+    //const event = new Event(req.body);
+    const event = new Event({
+  ...req.body,
+  status: "pending"
+});
+
+    await event.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Event submitted successfully"
+    });
+
+  } catch (err) {
+    console.error("SAVE EVENT ERROR FULL:", err.message, err);
+
+    return res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+app.get("/faculty/events", async (req, res) => {
+  try {
+    // const events = await Event.find();
+    const events = await Event.find({ status: "approved" });
+    res.json({ success: true, events });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+// 🔴 ADMIN: view pending event requests
+app.get("/admin/event-requests", async (req, res) => {
+  try {
+    const events = await Event.find({ status: "pending" });
+    res.json({ success: true, events });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+// ✅ Approve
+app.patch("/admin/events/:id/approve", async (req, res) => {
+  try {
+    await Event.findByIdAndUpdate(req.params.id, {
+      status: "approved"
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// ❌ Reject
+app.patch("/admin/events/:id/reject", async (req, res) => {
+  try {
+    await Event.findByIdAndUpdate(req.params.id, {
+      status: "rejected"
+    });
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+app.get("/admin/events/:id", async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ success: false });
+    }
+
+    res.json({ success: true, event });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+// 🟢 ADMIN: view approved events (for dashboard)
+app.get("/admin/events", async (req, res) => {
+  try {
+    const events = await Event.find({ status: "approved" });
+    res.json({ success: true, events });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+app.get("/admin/events/count", async (req, res) => {
+  const count = await Event.countDocuments({ status: "approved" });
+  res.json({ success: true, count });
+});
+// 🎯 STUDENT: Get single event details
+app.get("/student/events/:id", async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found"
+      });
+    }
+
+    res.json({
+      success: true,
+      event
+    });
+
+  } catch (err) {
+    console.error("STUDENT EVENT FETCH ERROR:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+});
+app.get("/student/profile/:email", async (req, res) => {
+  const student = await Student.findOne({
+    email: req.params.email,
+  }).select("-password");
+
+  res.json({ success: true, student });
+});
