@@ -3,14 +3,17 @@ import { useState, useEffect } from "react";
 import "../../styles/StudentDashboard.css";
 
 const StudentDashboard = () => {
+
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [showProfile, setShowProfile] = useState(false);
 
   // 🔵 FETCHED EVENTS
   const [events, setEvents] = useState([]);
+  const [placements, setPlacements] = useState([]);
   const studentName = localStorage.getItem("name");
   const studentEmail = localStorage.getItem("email");
+  const studentId = localStorage.getItem("studentId");
 
   useEffect(() => {
     fetch("http://localhost:5050/faculty/events")
@@ -25,29 +28,67 @@ const StudentDashboard = () => {
       );
   }, []);
 
-  // 📅 DATE LOGIC
+  useEffect(() => {
+    fetch("http://localhost:5050/placement/all")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setPlacements(data.placements);
+        }
+      })
+      .catch(err =>
+        console.error("PLACEMENTS FETCH ERROR:", err)
+      );
+  }, []);
+
+
+  //  DATE LOGIC
   const today = new Date().toISOString().split("T")[0];
 
   const upcomingEvents = events.filter(ev => ev.date >= today);
 
   const todayEvents = upcomingEvents.filter(ev => ev.date === today);
 
+  const upcomingPlacements = placements.filter(
+    p => p.date >= today && p.status === "approved"
+  );
+
+  const todayPlacements = placements.filter(
+    p => p.date === today && p.status === "approved"
+  );
+
   /* ---------------- STILL DUMMY (for now) ---------------- */
   const registeredEvents = ["Tech Fest 2026", "Cultural Night"];
 
-  const registeredPlacements = [
-    "Google – Software Engineer",
-    "Amazon – Data Analyst",
-  ];
+  const [registeredPlacements, setRegisteredPlacements] = useState([]);
+  useEffect(() => {
+    if (!studentId) return;
+
+    fetch(`http://localhost:5050/student/my-placements/${studentId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setRegisteredPlacements(data.placements);
+        }
+      })
+      .catch(err => console.error("MY PLACEMENTS ERROR:", err));
+  }, [studentId]);
+
 
   /* ---------------- SEARCH LOGIC ---------------- */
   const filteredEvents = registeredEvents.filter(event =>
     event.toLowerCase().includes(search.toLowerCase())
   );
 
-  const filteredPlacements = registeredPlacements.filter(place =>
-    place.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredPlacements = registeredPlacements
+    .map(reg => placements.find(p => p._id === reg.placementId))
+    .filter(Boolean)
+    .filter(p => p.date >= today)
+    .filter(p =>
+      `${p.name} ${p.jobrole}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
 
   return (
     <div className="dashboard-page">
@@ -122,7 +163,6 @@ const StudentDashboard = () => {
             {upcomingEvents.length}
           </div>
           <div className="card-subtext">
-            Approved by admin
           </div>
         </div>
 
@@ -130,9 +170,8 @@ const StudentDashboard = () => {
           <div className="card-title">
             Placements
           </div>
-          <div className="card-number">18</div>
+          <div className="card-number">{upcomingPlacements.length}</div>
           <div className="card-subtext">
-            +3 new drives this month
           </div>
         </div>
       </div>
@@ -141,20 +180,33 @@ const StudentDashboard = () => {
       <div className="dashboard-section">
         <h3>📅 Today</h3>
 
-        {todayEvents.length === 0 ? (
-          <p>No events today</p>
+        {todayEvents.length === 0 && todayPlacements.length === 0 ? (
+          <p>No activities today</p>
         ) : (
-          todayEvents.map(ev => (
-            <div
-              key={ev._id}
-              className="today-event"
-            >
-              <span>{ev.eventName}</span>
-              <span>
-                {ev.startTime} – {ev.endTime}
-              </span>
-            </div>
-          ))
+          <>
+            {/* Events */}
+            {todayEvents.map(ev => (
+              <div
+                key={ev._id}
+                className="today-event"
+              >
+                <span>{ev.eventName}</span>
+                <span>
+                  {ev.startTime} – {ev.endTime}
+                </span>
+              </div>
+            ))}
+
+            {/* Placements */}
+            {todayPlacements.map(p => (
+              <div key={p._id} className="today-event">
+                <span>💼 {p.name}</span>
+                <span className="event-time">
+                  ⏰ {p.time} – {p.endtime}
+                </span>
+              </div>
+            ))}
+          </>
         )}
       </div>
 
@@ -188,14 +240,16 @@ const StudentDashboard = () => {
             <h4>Registered Placements</h4>
             {filteredPlacements.length === 0 ? (
               <p className="empty-text">
-                No matching placements
+                {registeredPlacements.length === 0
+                  ? "You have not registered in any placement"
+                  : "No matching placements"}
               </p>
             ) : (
               <ul>
                 {filteredPlacements.map(
                   (place, index) => (
                     <li key={index}>
-                      {place}
+                      {place?.name} – {place?.jobrole}
                     </li>
                   )
                 )}

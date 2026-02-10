@@ -13,6 +13,8 @@ const Faculty = require("./Faculty"); // mongoose model for faculty
 const PlacementCell = require("./PlacementCell");
 const Admin = require("./Admin");
 const sendEmail = require("./utils/sendEmail");
+const Placement = require("./Placement");
+const Registration = require("./Registration");
 
 const app = express();
 app.use(cors());
@@ -72,9 +74,9 @@ app.post("/login", async (req, res) => {
   message: "Login successful",
   role: role.toLowerCase(),
   user: {
-    name: user.name || "",
+    name: user.studentName || "",
     email: user.email,
-    studentId: user.studentId || "",
+    studentId: user._id || "",
   },
 });
 
@@ -330,4 +332,232 @@ app.get("/student/profile/:email", async (req, res) => {
   }).select("-password");
 
   res.json({ success: true, student });
+});
+
+
+//Placement
+app.post("/placement/create", async (req, res) => {
+  try {
+    const placement = new Placement(req.body);
+    await placement.save();
+
+    res.json({
+      success: true,
+      message: "Placement created",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+app.get("/placement/all", async (req, res) => {
+  try {
+    const placements = await Placement.find();
+
+    const updatedPlacements = await Promise.all(
+      placements.map(async (p) => {
+        const regs = await Registration.find({ placementId: p._id });
+
+        return {
+          ...p._doc,
+          totalRegistrations: regs.length,       // Count
+          registrations: regs.map(r => ({        // Array of students
+            name: r.name,
+            email: r.email,
+          })),
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      placements: updatedPlacements,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
+// Get one placement by id
+app.get("/placement/:id", async (req, res) => {
+  try {
+    const placement = await Placement.findById(req.params.id);
+
+    if (!placement) {
+      return res.status(404).json({
+        success: false,
+        message: "Placement not found",
+      });
+    }
+
+    res.json({ success: true, placement });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.patch("/admin/placement/status/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!id || id === "undefined") {
+      return res.status(400).json({ success: false, message: "Invalid ID" });
+    }
+
+    await Placement.findByIdAndUpdate(id, { status });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false });
+  }
+});
+app.patch("/placement/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (req.body._id) {
+      delete req.body._id;   // VERY IMPORTANT
+    }
+
+    const placement = await Placement.findByIdAndUpdate(
+      id,
+      { ...req.body, status: "pending" },
+      { new: true }
+    );
+
+    res.json({ success: true, placement });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
+// STUDENT REGISTER FOR PLACEMENT
+app.post("/student/register/placement", async (req, res) => {
+  try {
+    const { studentId, placementId } = req.body;
+
+    const registration = new Registration({
+      studentId,
+      placementId,
+      eventId: null,
+    });
+
+    await registration.save();
+
+    res.json({ success: true, message: "Registered successfully" });
+
+    console.log("BODY RECEIVED:", req.body);
+
+  } catch (err) {
+    console.error(err);
+
+    // duplicate registration
+    if (err.code === 11000) {
+      return res.json({
+        success: false,
+        message: "Already registered",
+      });
+    }
+
+    res.status(500).json({ success: false });
+  }
+});
+
+// STUDENT REGISTER FOR EVENT
+app.post("/student/register/event", async (req, res) => {
+  try {
+    const { studentId, eventId } = req.body;
+
+    const registration = new Registration({
+      studentId,
+      eventId,
+      placementId: null,
+    });
+
+    await registration.save();
+
+    res.json({ success: true, message: "Registered successfully" });
+
+  } catch (err) {
+    console.error(err);
+
+    if (err.code === 11000) {
+      return res.json({
+        success: false,
+        message: "Already registered",
+      });
+    }
+
+    res.status(500).json({ success: false });
+  }
+});
+
+app.get("/student/registration/check", async (req, res) => {
+  try {
+    const { studentId, eventId, placementId } = req.query;
+
+    const reg = await Registration.findOne({
+      studentId,
+      eventId: eventId || null,
+      placementId: placementId || null,
+    });
+
+    res.json({ registered: !!reg });
+
+  } catch (err) {
+    res.status(500).json({ registered: false });
+  }
+});
+
+app.get("/student/my-placements/:id", async (req, res) => {
+  try {
+    const data = await Registration.find({
+      studentId: req.params.id,
+    });
+
+    res.json({ success: true, placements: data });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.put("/placement/result/:id", async (req, res) => {
+  const { totalAppeared, totalPlaced } = req.body;
+
+  const placement = await Placement.findByIdAndUpdate(
+    req.params.id,
+    { totalAppeared, totalPlaced },
+    { new: true }
+  );
+
+  res.json({ success: true, placement });
+});
+
+app.get("/placement/:id/registrations", async (req, res) => {
+  try {
+    const placementId = req.params.id;
+    const regs = await Registration.find({ placementId }).lean();
+
+    // Map student info
+    const regsWithDetails = await Promise.all(
+      regs.map(async (r) => {
+        const student = await Student.findById(r.studentId).lean();
+        return {
+          name: student?.name || "Unknown",
+          email: student?.email || "Unknown",
+        };
+      })
+    );
+
+    res.json({ success: true, registrations: regsWithDetails });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
 });

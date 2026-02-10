@@ -183,3 +183,22 @@
   font-weight: 600;
   color: #555;
 }
+
+.registration-info {
+  margin-top: 10px;
+  padding-top: 5px;
+  border-top: 1px solid #ddd;
+}
+
+.registered-students-list {
+  margin-top: 5px;
+  padding-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.student-item {
+  font-size: 0.9rem;
+  color: #333;
+}

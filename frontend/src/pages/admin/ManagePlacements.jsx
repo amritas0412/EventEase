@@ -1,46 +1,61 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/ManagePlacements.css";
 
 const ManagePlacements = () => {
   const navigate = useNavigate();
 
-  //  STATE instead of normal array
-  const [placements, setPlacements] = useState([
-    {
-      id: 1,
-      company: "Google",
-      role: "Software Engineer",
-      type: "Placement",
-      date: "20 March 2026",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      company: "Microsoft",
-      role: "Frontend Intern",
-      type: "Internship",
-      date: "5 April 2026",
-      status: "Pending",
-    },
-  ]);
+  const [placements, setPlacements] = useState([]);
 
   //  APPROVE HANDLER
-  const approvePlacement = (id) => {
-    setPlacements((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status: "Approved" } : item
-      )
-    );
+  const approvePlacement = async (id) => {
+  try {
+    await fetch(`http://localhost:5050/admin/placement/status/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "approved" }),
+    });
+
+    fetchPlacements(); // refresh list
+
+    // remove after 2 seconds
+    setTimeout(() => {
+      setPlacements((prev) => prev.filter((p) => p._id !== id));
+    }, 2000);
+
+  } catch (err) {
+    console.log(err);
+  }
   };
 
   //  REJECT HANDLER
-  const rejectPlacement = (id) => {
-    setPlacements((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status: "Rejected" } : item
-      )
-    );
+  const rejectPlacement = async (id) => {
+  try {
+    await fetch(`http://localhost:5050/admin/placement/status/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "rejected" }),
+    });
+
+    fetchPlacements(); // refresh list
+  } catch (err) {
+    console.log(err);
+  }
+  };
+
+  useEffect(() => {
+    fetchPlacements();
+  }, []);
+
+  const fetchPlacements = async () => {
+    try {
+      const res = await fetch("http://localhost:5050/placement/all");
+      const data = await res.json();
+      setPlacements(data.placements);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -53,7 +68,6 @@ const ManagePlacements = () => {
             <tr>
               <th>Company</th>
               <th>Job Role</th>
-              <th>Type</th>
               <th>Date</th>
               <th>Status</th>
               <th>Action</th>
@@ -63,10 +77,9 @@ const ManagePlacements = () => {
 
           <tbody>
             {placements.map((item) => (
-              <tr key={item.id}>
-                <td>{item.company}</td>
-                <td>{item.role}</td>
-                <td>{item.type}</td>
+              <tr key={item._id}>
+                <td>{item.name}</td>
+                <td>{item.jobrole}</td>
                 <td>{item.date}</td>
 
                 {/* STATUS */}
@@ -86,35 +99,34 @@ const ManagePlacements = () => {
 
                 {/* ACTION BUTTONS */}
                 <td>
-                  {item.status === "Pending" ? (
+                  {item.status?.toLowerCase() === "pending" ? (
                     <>
-                  <button
-                    className="approve-btn"
-                    onClick={() => approvePlacement(item.id)}
-                    //disabled={item.status !== "Pending"}
-                  >
-                    Approve
-                  </button>
+                      <button
+                        className="approve-btn"
+                        onClick={() => approvePlacement(item._id)}
+                      >
+                        Approve
+                      </button>
 
-                  <button
-                    className="reject-btn"
-                    onClick={() => rejectPlacement(item.id)}
-                    //disabled={item.status !== "Pending"}
-                  >
-                    Reject
-                  </button>
-                  </>
+                      <button
+                        className="reject-btn"
+                        onClick={() => rejectPlacement(item._id)}
+                      >
+                        Reject
+                      </button>
+                    </>
                   ) : (
                     <span>-</span>
                   )}
                 </td>
+
 
                 {/* DETAILS */}
                 <td>
                   <button
                     className="details-btn"
                     onClick={() =>
-                      navigate(`/admin/placements/${item.id}`)
+                      navigate(`/admin/placements/${item._id}`)
                     }
                   >
                     See Details

@@ -3,7 +3,6 @@ import Welcome from "./pages/Welcome";
 import Login from "./pages/Login";
 import AboutUs from "./pages/AboutUs";
 import ForgotPassword from "./pages/ForgotPassword";
-import CompaniesVisited from "./pages/placement/CompaniesVisited";
 import ExploreEvents from "./pages/ExploreEvents";
 import ResetPassword from "./pages/ResetPassword";
 
@@ -43,6 +42,8 @@ import FacultyEvents from "./pages/faculty/FacultyEvents";
 /* ================= PLACEMENT PAGES ================= */
 import PlacementDashboard from "./pages/placement/PlacementDashboard";
 import Placements from "./pages/placement/Placements";
+import PlacementCalendar from "./pages/placement/PlacementCalendar";
+import CompaniesVisited from "./pages/placement/CompaniesVisited";
 
 function App() {
   return (
@@ -104,6 +105,7 @@ function App() {
         <Route path="dashboard" element={<PlacementDashboard />} />
         <Route path="placements" element={<Placements />} />
         <Route path="companies" element={<CompaniesVisited />} />
+        <Route path="calendar" element={<PlacementCalendar />} />
       </Route>
 
     </Routes>

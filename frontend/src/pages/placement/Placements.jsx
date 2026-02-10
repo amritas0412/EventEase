@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Placements.css"; // ✅ FIXED PATH
 
@@ -23,6 +23,40 @@ const Placements = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
+  const [prevPlacements, setPrevPlacements] = useState([]);
+
+  const fetchPlacements = async () => {
+    try {
+      const res = await fetch("http://localhost:5050/placement/all");
+      const data = await res.json();
+
+      if (data.success) {
+        // Detect newly rejected placements
+      const newlyRejected = prevPlacements.filter(
+        p => p.status === "pending" && !data.placements.some(np => np._id === p._id)
+      );
+
+      newlyRejected.forEach(r => {
+        alert(`❌ Request for ${r.name} is rejected`);
+      });
+        setEvents(data.placements);
+        setPrevPlacements(data.placements);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlacements();
+
+     // Poll every 5 seconds
+    const interval = setInterval(() => {
+      fetchPlacements();
+    }, 5000);
+
+    return () => clearInterval(interval); // cleanup
+  }, []);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,59 +67,99 @@ const Placements = () => {
     setShowForm(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.endtime <= formData.startTime) {
-  alert("❌ End time must be after start time");
-  return;
-}
-
+    if (formData.endtime <= formData.time) {
+      alert("❌ End time must be after start time");
+      return;
+    }
 
     if (parseInt(formData.stipend, 10) < 0) {
       alert("❌ Stipend cannot be negative");
       return;
     }
 
+    try {
+    let res;
+
+    // ✏ EDIT MODE
     if (editId) {
-      setEvents(events.map(ev =>
-        ev.id === editId
-          ? { ...formData, id: editId, status: "pending", registrations: ev.registrations || [] }
-          : ev
-      ));
-      alert("✏ Placement updated and sent for re-approval");
-    } else {
-      setEvents([
-        ...events,
-        { ...formData, id: Date.now(), status: "pending", registrations: [] },
-      ]);
-      alert("📨 Placement request sent to admin for approval");
+      res = await fetch(`http://localhost:5050/placement/${editId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+    }
+    // ➕ CREATE MODE
+    else {
+      res = await fetch("http://localhost:5050/placement/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
     }
 
-    resetForm();
+    const data = await res.json();
+
+    if (data.success) {
+      alert(editId ? "✏ Updated & sent for approval" : "📨 Placement sent for approval");
+      resetForm();
+      fetchPlacements();
+    } else {
+      alert("❌ Failed");
+    }
+
+    } catch (err) {
+    console.error(err);
+    }
+  };
+    
+  const approvePlacement = async (id) => {
+    await fetch(`http://localhost:5050/placement/${id}/approve`, {
+      method: "PATCH",
+    });
+
+    alert("✅ Approved");
+    fetchPlacements();
   };
 
-  const approvePlacement = (id) =>{
-    setEvents(events.map(ev =>
-      ev.id === id ? { ...ev, status: "approved" } : ev
-    ));
-     alert("✅ Request approved successfully");
-  };
+  const rejectPlacement = async (placement) => {
+  try {
+    const res = await fetch(`http://localhost:5050/placement/${placement._id}/reject`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+    });
 
-  const rejectPlacement = (id) =>{
-    setEvents(events.map(ev =>
-      ev.id === id ? { ...ev, status: "rejected" } : ev
-    ));
-    alert("❌ Request rejected");
-  };
+    const data = await res.json();
+
+    if (data.success) {
+      // Remove from current events immediately
+      setEvents(prev => prev.filter(ev => ev._id !== placement._id));
+
+      // Show alert with company name
+      alert(`❌ Request for ${placement.name} is rejected`);
+
+      // Optionally refresh list from backend
+      fetchPlacements();
+    } else {
+      alert("❌ Failed to reject");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("❌ Something went wrong");
+  }
+};
+
+
   const handleEdit = (event) => {
     setFormData(event);
-    setEditId(event.id);
+    setEditId(event._id);
     setShowForm(true);
   };
 
   const pendingPlacements = events.filter(ev => ev.status === "pending");
-  const approvedPlacements = events.filter(ev => ev.status === "approved");
+  const approvedPlacements = events.filter(ev => ev.status === "approved" && ev.date && ev.date >= today);
 
   return (
     <div className="placement-layout">
@@ -100,7 +174,7 @@ const Placements = () => {
             📊 Dashboard
           </li>
           <li className="active">
-            📅 Placements <span className="badge">{events.length}</span>
+            📅 Placements <span className="badge">{approvedPlacements.length}</span>
           </li>
         </ul>
       </aside>
@@ -124,29 +198,29 @@ const Placements = () => {
             <input name="jobrole" placeholder="Job Role" required value={formData.jobrole} onChange={handleChange} />
             <input type="date" name="date" min={today} required value={formData.date} onChange={handleChange} />
             <div className="time-row">
-  <input
-    type="time"
-    name="time"
-    value={formData.startTime}
-    onChange={handleChange}
-    required
-  />
+            <input
+              type="time"
+              name="time"
+              value={formData.time}
+              onChange={handleChange}
+              required
+            />
 
-  <span className="to-text">to</span>
+            <span className="to-text">to</span>
 
-  <input
-    type="time"
-    name="endtime"
-    value={formData.endtime}
-    onChange={handleChange}
-    required
-  />
-</div>
+            <input
+              type="time"
+              name="endtime"
+              value={formData.endtime}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
             <input name="venue" placeholder="Event Venue" required value={formData.venue} onChange={handleChange} />
             <input name="location" placeholder="Company Location" required value={formData.location} onChange={handleChange} />
             <input name="audience" placeholder="Eligible Branch / Year" required value={formData.audience} onChange={handleChange} />
-            <input type="number" name="stipend" placeholder="Stipend per Month (₹)" min="0" required value={formData.stipend} onChange={handleChange} />
+            <input type="number" name="stipend" placeholder="Stipend per Month (₹)" min="0" step="0.01" required value={formData.stipend} onChange={handleChange} />
 
             <textarea name="description" placeholder="Company Description" rows="5" value={formData.description} onChange={handleChange} />
 
@@ -164,12 +238,12 @@ const Placements = () => {
           {approvedPlacements.length === 0 && <p>No approved placement drives yet</p>}
 
           {approvedPlacements.map(event => (
-            <div key={event.id} className="event-card">
+            <div key={event._id} className="event-card">
               <h4>{event.name}</h4>
               <p>💼 {event.jobrole}</p>
               <p>
-  📅 {event.date} ⏰ {event.time} to {event.endtime}
-</p>
+                📅 {event.date} ⏰ {event.time} to {event.endtime}
+              </p>
 
               <p>🏢 {event.venue}</p>
               <p>🌍 {event.location}</p>
@@ -177,24 +251,21 @@ const Placements = () => {
               <p>💰 ₹{event.stipend} / month</p>
               {event.description && <p>{event.description}</p>}
 
-{/*  Registration count */}
-  <p className="registration-count">
-    📝 Registrations: {event.registrations.length}
-  </p>
+        {/* Registration Info */}
+        <div className="registration-info">
+          <p>📝 Registered Students: {event.registrations.length}</p>
 
-  {/*  Registered student details */}
-  {event.registrations.length >= 0 && (
-    <div className="registered-students">
-      <h5>Registered Students</h5>
-
-      {event.registrations.map((student, index) => (
-        <div key={index} className="student-row">
-          <span>{student.name}</span>
-          <span>{student.email}</span>
+          {event.registrations.length > 0 && (
+            <div className="registered-students-list">
+              {event.registrations.map((student, idx) => (
+                <div key={idx} className="student-item">
+                  <strong>{student.name}</strong> — <span>{student.email}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ))}
-    </div>
-  )}
+
 
               <button onClick={() => handleEdit(event)}>✏ Edit</button>
             </div>
@@ -210,10 +281,6 @@ const Placements = () => {
               <div key={event.id} className="event-card pending">
                 <h4>{event.name}</h4>
                 <p>{event.jobrole}</p>
-                <div className="action-buttons">
-                  <button onClick={() => approvePlacement(event.id)}>✅ Approve</button>
-                  <button onClick={() => rejectPlacement(event.id)}>❌ Reject</button>
-                </div>
               </div>
             ))}
           </div>

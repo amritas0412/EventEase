@@ -1,35 +1,28 @@
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import "../../styles/StudentPlacements.css";
 
 const StudentPlacements = () => {
   const navigate = useNavigate();
 
-  const placements = [
-    {
-      id: 1,
-      company: "Google",
-      role: "Software Engineer",
-      type: "Placement",
-      location: "Bangalore",
-      date: "20 March 2026",
-    },
-    {
-      id: 2,
-      company: "Microsoft",
-      role: "Frontend Intern",
-      type: "Internship",
-      location: "Hyderabad",
-      date: "5 April 2026",
-    },
-    {
-      id: 3,
-      company: "Amazon",
-      role: "Data Analyst",
-      type: "Placement",
-      location: "Pune",
-      date: "18 April 2026",
-    },
-  ];
+  const [placements, setPlacements] = useState([]);
+  const today = new Date().toISOString().split("T")[0];
+
+  useEffect(() => {
+    fetch("http://localhost:5050/placement/all")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // show only approved ones for students
+          const upcoming = data.placements.filter(
+            p => p.status === "approved" && p.date >= today
+          );
+          setPlacements(upcoming);
+        }
+      })
+      .catch(err => console.error("FETCH ERROR:", err));
+  }, []);
+
 
   return (
     <div className="placements-page">
@@ -37,10 +30,9 @@ const StudentPlacements = () => {
 
       <div className="placements-list">
         {placements.map((item) => (
-          <div className="placement-card" key={item.id}>
-            <h3>{item.company}</h3>
-            <p><strong>Role:</strong> {item.role}</p>
-            <p><strong>Type:</strong> {item.type}</p>
+          <div className="placement-card" key={item._id}>
+            <h3>{item.name}</h3>
+            <p><strong>Role:</strong> {item.jobrole}</p>
             <p><strong>Location:</strong> {item.location}</p>
             <p><strong>Date:</strong> {item.date}</p>
 
@@ -48,7 +40,7 @@ const StudentPlacements = () => {
             <button
               className="apply-btn"
               onClick={() =>
-                navigate(`/student/placements/${item.id}`)
+                navigate(`/student/placements/${item._id}`)
               }
             >
               View Details

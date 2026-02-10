@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEffect } from "react";
 import "../../styles/ManageCalendar.css";
 
 const months = [
@@ -14,11 +15,13 @@ const getStartDay = (month, year) =>
   new Date(year, month, 1).getDay();
 
 const ManageCalendar = () => {
-  const [monthIndex, setMonthIndex] = useState(0);
-  const [year, setYear] = useState(2026);
+  const today = new Date();
+
+  const [monthIndex, setMonthIndex] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
 
   const [eventDates, setEventDates] = useState([5, 12, 18, 25]);
-  const [placementDates, setPlacementDates] = useState([8, 20, 28]);
+  const [placementDates, setPlacementDates] = useState([]);
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [inputDate, setInputDate] = useState("");
@@ -57,6 +60,31 @@ const ManageCalendar = () => {
     } else setMonthIndex(monthIndex + 1);
     setSelectedDate(null);
   };
+
+  useEffect(() => {
+  fetch("http://localhost:5050/placement/all")
+    .then(res => res.json())
+    .then(data => {
+      console.log("API DATA:", data);
+
+      if (data.success) {
+        const days = (data.placements || [])
+          .filter(p => {
+            const d = new Date(p.date);
+            return (
+              p.status === "approved" &&
+              d.getMonth() === monthIndex &&
+              d.getFullYear() === year
+            );
+          })
+          .map(p => new Date(p.date).getDate());
+
+        setPlacementDates(days);
+      }
+    })
+    .catch(err => console.error(err));
+}, [monthIndex, year]);
+
 
   return (
     <div className="student-calendar-page">
