@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/FacultyDashboard.css"; // ✅ FIXED PATH
+import FacultyProfile from "./FacultyProfile";
 
 const FacultyDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,21 +15,37 @@ const FacultyDashboard = () => {
       .then(data => {
         if (data.success) {
           setEvents(data.events);
+
+          // ✅ ADD THESE TWO LINES
+          console.log("Logged Email:", localStorage.getItem("email"));
+          console.log("Events:", data.events);
         }
       })
       .catch(err => console.error("FETCH ERROR:", err));
   }, []);
-const today = new Date().toISOString().split("T")[0];
 
-// Upcoming = today or future
-const upcomingEvents = events
-  .filter(ev => ev.date >= today)
-  .filter(ev =>
-    ev.eventName.toLowerCase().includes(searchQuery.toLowerCase())
+  const today = new Date().toISOString().split("T")[0];
+  const loggedInEmail = localStorage.getItem("email");
+  let loggedInFacultyName = "";
+
+  if (loggedInEmail === "btbtc0000_aishvarya@banasthali.in") {
+    loggedInFacultyName = "Dr. Aishvarya Garg";
+  } else if (loggedInEmail === "btbtc0001_prabhat@banasthali.in") {
+    loggedInFacultyName = "Dr. Prabhat Mishra";
+  }
+  // Upcoming = today or future
+  const upcomingEvents = events
+    .filter(ev => ev.date >= today)
+    .filter(ev =>
+      ev.eventName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+  // Past = finished events
+  const pastEvents = events.filter(ev =>
+    new Date(ev.date) < new Date() &&
+    ev.conductedBy?.trim().toLowerCase() ===
+    loggedInEmail?.trim().toLowerCase()
   );
-
-// Past = finished events
-const pastEvents = events.filter(ev => ev.date < today);
 
 
   const handleLogout = () => {
@@ -65,20 +82,15 @@ const pastEvents = events.filter(ev => ev.date < today);
 
           {showProfile && (
             <div className="profile-dropdown">
-              <p className="profile-name">Faculty Name</p>
-              <p className="profile-email">faculty@email.com</p>
 
-              <p className="profile-stat">
-                Total Events Conducted: <strong>—</strong>
-              </p>
+              <FacultyProfile events={pastEvents} />
 
               <button
-  className="profile-btn"
-  onClick={() => navigate("/faculty/calendar")}
->
-  📅 View Calendar
-</button>
-
+                className="profile-btn"
+                onClick={() => navigate("/faculty/calendar")}
+              >
+                📅 View Calendar
+              </button>
 
               <button
                 className="profile-btn logout"
@@ -86,6 +98,7 @@ const pastEvents = events.filter(ev => ev.date < today);
               >
                 🚪 Logout
               </button>
+
             </div>
           )}
         </div>
@@ -115,7 +128,10 @@ const pastEvents = events.filter(ev => ev.date < today);
                   <p>📅 {ev.date}</p>
                   <p>⏰ {ev.startTime} - {ev.endTime}</p>
                   <p>📍 {ev.venue}</p>
-                  <p className="muted-text">Conducted by Faculty</p>
+                  {/* <p className="muted-text">Conducted by {event.facultyName}</p> */}
+                  {/* <p>Conducted by {ev.conductedBy?.name}</p> */}
+                  <p>Conducted by {ev.conductedBy?.name}</p>
+
                 </div>
               ))
             )}

@@ -5,16 +5,28 @@ import "../../styles/ManageEvents.css";
 const ManageEvents = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
+  // useEffect(() => {
+  //   fetch("http://localhost:5050/admin/event-requests")
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       if (data.success) {
+  //         setEvents(data.events);
+  //       }
+  //     })
+  //     .catch(err => console.error("FETCH ERROR:", err));
+  // }, []);
   useEffect(() => {
     fetch("http://localhost:5050/admin/event-requests")
       .then(res => res.json())
       .then(data => {
+        console.log("ADMIN EVENTS:", data.events); // 👈 ADD THIS
         if (data.success) {
           setEvents(data.events);
         }
       })
       .catch(err => console.error("FETCH ERROR:", err));
   }, []);
+
 
   const approveEvent = async (id) => {
     await fetch(`http://localhost:5050/admin/events/${id}/approve`, {
@@ -49,11 +61,13 @@ const ManageEvents = () => {
             </tr>
           </thead>
 
+
           <tbody>
             {events.map((event) => (
               <tr key={event._id}>
                 <td>{event.eventName}</td>
-                <td>Faculty</td>
+                {/* <td>{event.organizerName}</td> */}
+                <td>{event.conductedBy?.name}</td>
                 <td>{event.date}</td>
 
 

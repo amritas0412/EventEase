@@ -28,7 +28,7 @@ const STUDENTS = {
     cgpa: "5",
   },
 
-  "btbtc23237_kumari@banasthali.in": {
+  "btbtc23237_palak@banasthali.in": {
     studentId: "BTBTC23237",
     name: "Palak Gupta",
     email: "btbtc23237_palak@banasthali.in",

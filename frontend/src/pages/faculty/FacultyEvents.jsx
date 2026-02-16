@@ -16,15 +16,15 @@ const FacultyEvents = () => {
       })
       .catch(err => console.error("FACULTY FETCH ERROR:", err));
   }, []);
-const fetchApproved = () => {
-  fetch("http://localhost:5050/faculty/events")
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        setApprovedEvents(data.events);
-      }
-    });
-};
+  const fetchApproved = () => {
+    fetch("http://localhost:5050/faculty/events")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setApprovedEvents(data.events);
+        }
+      });
+  };
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -37,6 +37,10 @@ const fetchApproved = () => {
     eligible: "",
     description: "",
   };
+
+  const upcomingEvents = approvedEvents.filter(
+    event => event.date >= today
+  );
 
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -59,8 +63,11 @@ const fetchApproved = () => {
       alert("❌ End time must be after start time");
       return;
     }
-
-    const payload = { ...formData };
+    const email = localStorage.getItem("email");
+    const payload = {
+      ...formData,
+      conductedBy: email   // ✅ ADD THIS
+    };
 
     console.log("🚀 Sending to backend:", payload);
 
@@ -131,7 +138,7 @@ const fetchApproved = () => {
     setShowForm(true);
   };
 
-   const hasPendingRequests = events.some((e) => e.status === "pending");
+  const hasPendingRequests = events.some((e) => e.status === "pending");
 
   return (
     <div className="faculty-layout">
@@ -146,7 +153,8 @@ const fetchApproved = () => {
             📊 Dashboard
           </li>
           <li className="active">
-            📅 Events <span className="badge">{approvedEvents.length}</span>
+            📅 Events <span className="badge">{upcomingEvents.length}</span>
+
 
           </li>
         </ul>
@@ -236,7 +244,7 @@ const fetchApproved = () => {
           {approvedEvents.length === 0 ? (
             <p>No approved events yet</p>
           ) : (
-            approvedEvents.map(event => (
+            upcomingEvents.map(event => (
               <div key={event._id} className="event-card">
                 <h4>{event.eventName}</h4>
                 <p>Date: {event.date}</p>
@@ -245,7 +253,7 @@ const fetchApproved = () => {
               </div>
             ))
           )}
-        {/* Pending Requests */}
+          {/* Pending Requests */}
           {hasPendingRequests && (
             <div className="events-box">
               <h3>Request Pending</h3>

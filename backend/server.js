@@ -25,7 +25,6 @@ app.get("/", (req, res) => {
 });
 
 const mongoURI = process.env.MONGO_URI;
-//mongoose.connect(process.env.MONGO_URI);
 
 // Connect to MongoDB
 mongoose.connect(mongoURI)
@@ -59,26 +58,16 @@ app.post("/login", async (req, res) => {
       return res.json({ success: false, message: "Wrong password" });
     }
 
-    // ✅ SEND USER DETAILS
-    // res.json({
-    //   success: true,
-    //   message: "Login successful",
-    //   user: {
-    //     name: user.name,
-    //     email: user.email,
-    //     studentId: user.studentId || user.studentID || "",
-    //   },
-    // });
     res.json({
-  success: true,
-  message: "Login successful",
-  role: role.toLowerCase(),
-  user: {
-    name: user.studentName || "",
-    email: user.email,
-    studentId: user._id || "",
-  },
-});
+      success: true,
+      message: "Login successful",
+      role: role.toLowerCase(),
+      user: {
+        name: user.studentName || "",
+        email: user.email,
+        studentId: user._id || "",
+      },
+    });
 
 
   } catch (err) {
@@ -206,59 +195,143 @@ app.post("/reset-password/:token", async (req, res) => {
   });
 });
 
+// app.post("/faculty/events", async (req, res) => {
+//   try {
+//     const faculty = await Faculty.findOne({
+//       email: req.body.conductedBy
+//     });
+
+//     if (!faculty) {
+//       return res.status(404).json({ success: false });
+//     }
+
+//     const event = new Event({
+//       ...req.body,
+//       conductedBy: faculty._id,   // ✅ store ObjectId
+//       status: "pending"
+//     });
+
+//     await event.save();
+
+//     res.status(201).json({
+//       success: true,
+//       message: "Event submitted successfully"
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false });
+//   }
+// });
 app.post("/faculty/events", async (req, res) => {
   try {
-    console.log("EVENT DATA:", req.body);
+    const faculty = await Faculty.findOne({
+      email: req.body.conductedBy
+    });
 
-    //const event = new Event(req.body);
+    if (!faculty) {
+      return res.status(404).json({
+        success: false,
+        message: "Faculty not found"
+      });
+    }
+
     const event = new Event({
-  ...req.body,
-  status: "pending"
-});
+      ...req.body,
+      conductedBy: faculty._id,   // ✅ store ObjectId
+      status: "pending"
+    });
 
     await event.save();
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       message: "Event submitted successfully"
     });
 
   } catch (err) {
-    console.error("SAVE EVENT ERROR FULL:", err.message, err);
-
-    return res.status(500).json({
-      success: false,
-      error: err.message
-    });
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 });
+
+// app.get("/faculty/events", async (req, res) => {
+//   try {
+//     const events = await Event.find({ status: "approved" })
+//       .populate("conductedBy", "name");
+
+//     res.json({ success: true, events });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false });
+//   }
+// });
 app.get("/faculty/events", async (req, res) => {
   try {
-    // const events = await Event.find();
-    const events = await Event.find({ status: "approved" });
+    const events = await Event.find({ status: "approved" })
+      .populate("conductedBy", "name");  // ✅ this fetches faculty name
+
     res.json({ success: true, events });
+
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false });
   }
 });
-// 🔴 ADMIN: view pending event requests
+
+// app.get("/admin/event-requests", async (req, res) => {
+//   try {
+//     const events = await Event.find({ status: "pending" });
+
+//     const eventsWithFaculty = await Promise.all(
+//       events.map(async (event) => {
+//         const faculty = await Faculty.findOne({
+//           email: event.conductedBy
+//         });
+
+//         return {
+//           ...event._doc,
+//           organizerName: faculty ? faculty.name : "Unknown Faculty"
+//         };
+//       })
+//     );
+
+//     res.json({ success: true, events: eventsWithFaculty });
+
+//   } catch (err) {
+//     console.error("ADMIN EVENT FETCH ERROR:", err);
+//     res.status(500).json({ success: false });
+//   }
+// });
 app.get("/admin/event-requests", async (req, res) => {
   try {
-    const events = await Event.find({ status: "pending" });
-    res.json({ success: true, events });
+    const events = await Event.find({ status: "pending" })
+      .populate("conductedBy", "name");   // 👈 THIS IS THE FIX
+
+    res.json({
+      success: true,
+      events
+    });
+
   } catch (err) {
+    console.error("ADMIN EVENT FETCH ERROR:", err);
     res.status(500).json({ success: false });
   }
 });
-// ✅ Approve
+
 app.patch("/admin/events/:id/approve", async (req, res) => {
   try {
-    await Event.findByIdAndUpdate(req.params.id, {
-      status: "approved"
-    });
+    const updatedEvent = await Event.findByIdAndUpdate(
+      req.params.id,
+      { status: "approved" },
+      { new: true }
+    );
 
-    res.json({ success: true });
+    res.json({ success: true, event: updatedEvent });
+
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false });
   }
 });
@@ -288,15 +361,65 @@ app.get("/admin/events/:id", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-// 🟢 ADMIN: view approved events (for dashboard)
+
+// app.get("/admin/events", async (req, res) => {
+//   try {
+//     const events = await Event.find({ status: "approved" });
+
+//     const eventsWithFaculty = await Promise.all(
+//       events.map(async (event) => {
+//         const faculty = await Faculty.findOne({
+//           email: event.conductedBy
+//         });
+
+//         const registrationCount = await Registration.countDocuments({
+//           eventId: event._id
+//         });
+
+//         return {
+//           ...event._doc,
+//           organizerName: faculty ? faculty.name : "Unknown Faculty",
+//           registeredCount: registrationCount
+//         };
+//       })
+//     );
+
+//     res.json({ success: true, events: eventsWithFaculty });
+
+//   } catch (err) {
+//     console.error("ADMIN EVENTS FETCH ERROR:", err);
+//     res.status(500).json({ success: false });
+//   }
+// });
 app.get("/admin/events", async (req, res) => {
   try {
-    const events = await Event.find({ status: "approved" });
-    res.json({ success: true, events });
+    const events = await Event.find({ status: "approved" })
+      .populate("conductedBy", "name");
+
+    const eventsWithCounts = await Promise.all(
+      events.map(async (event) => {
+        const registrationCount = await Registration.countDocuments({
+          eventId: event._id
+        });
+
+        return {
+          ...event._doc,
+          organizerName: event.conductedBy
+            ? event.conductedBy.name
+            : "Unknown Faculty",
+          registeredCount: registrationCount
+        };
+      })
+    );
+
+    res.json({ success: true, events: eventsWithCounts });
+
   } catch (err) {
+    console.error("ADMIN EVENTS FETCH ERROR:", err);
     res.status(500).json({ success: false });
   }
 });
+
 app.get("/admin/events/count", async (req, res) => {
   const count = await Event.countDocuments({ status: "approved" });
   res.json({ success: true, count });
@@ -560,4 +683,34 @@ app.get("/placement/:id/registrations", async (req, res) => {
     console.error(err);
     res.status(500).json({ success: false });
   }
+});
+// 🔴 DELETE STUDENT
+app.delete("/admin/student/:id", async (req, res) => {
+  try {
+    await Student.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+// 🔴 DELETE FACULTY
+app.delete("/admin/faculty/:id", async (req, res) => {
+  try {
+    await Faculty.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+// GET all students
+app.get("/admin/students", async (req, res) => {
+  const students = await Student.find().select("-password");
+  res.json({ success: true, students });
+});
+
+// GET all faculty
+app.get("/admin/faculty", async (req, res) => {
+  const faculty = await Faculty.find().select("-password");
+  res.json({ success: true, faculty });
 });

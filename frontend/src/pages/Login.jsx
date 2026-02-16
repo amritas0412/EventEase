@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 
+
 const Login = () => {
   const navigate = useNavigate();
 
@@ -10,6 +11,15 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+
+  // useEffect(() => {
+  //   const storedRole = localStorage.getItem("role");
+  //   const token = localStorage.getItem("token");
+
+  //   if (token && storedRole) {
+  //     navigate(`/${storedRole}/dashboard`, { replace: true });
+  //   }
+  // }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -34,7 +44,6 @@ const Login = () => {
 }
 
 // 🚦 REDIRECT FIRST
-//const backendRole = (data.user?.role || role).toLowerCase();
 const backendRole = (data.role || role).toLowerCase();
 localStorage.setItem("token", data.token || "");
 localStorage.setItem("role", backendRole);
@@ -42,27 +51,15 @@ localStorage.setItem("email", data.user?.email || "");
 localStorage.setItem("name", data.user?.name || "");
 localStorage.setItem("studentId", data.user?.studentId || "");
 
-if (backendRole === "student") navigate("/student/dashboard");
-else if (backendRole === "admin") navigate("/admin/dashboard");
-else if (backendRole === "faculty") navigate("/faculty/dashboard");
-else if (backendRole.includes("placement")) navigate("/placement/dashboard");
-
-// 🔥 SAVE LOGIN INFO AFTER
-// localStorage.setItem("token", data.token || "");
-// localStorage.setItem("role", backendRole);
-// localStorage.setItem("email", data.user.email || "");
-// localStorage.setItem("name", data.user.name || "");
-// localStorage.setItem("studentId", data.user.studentId || "");
+if (backendRole === "student") navigate("/student/dashboard", { replace: true });
+else if (backendRole === "admin") navigate("/admin/dashboard", { replace: true });
+else if (backendRole === "faculty") navigate("/faculty/dashboard", { replace: true });
+else if (backendRole.includes("placement")) navigate("/placement/dashboard", { replace: true });
 
 setIsError(false);
 setMessage(data.message || "Login successful");
     }
 
-    // } catch (error) {
-    //   console.error("LOGIN ERROR:", error);
-    //   setMessage("Cannot connect to server");
-    //   setIsError(true);
-    // }
     catch (error) {
       console.error("LOGIN ERROR:", error);
       setMessage("Login failed — check credentials or response format");

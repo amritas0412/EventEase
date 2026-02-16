@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema({
@@ -12,6 +11,12 @@ const eventSchema = new mongoose.Schema({
   venue: String,
   eligible: String,
   description: String,
+
+  conductedBy: {
+    type: mongoose.Schema.Types.ObjectId,   // ✅ IMPORTANT
+    ref: "Faculty",                        // ✅ IMPORTANT
+    required: true
+  },
 
   status: {
     type: String,

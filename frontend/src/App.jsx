@@ -5,6 +5,7 @@ import AboutUs from "./pages/AboutUs";
 import ForgotPassword from "./pages/ForgotPassword";
 import ExploreEvents from "./pages/ExploreEvents";
 import ResetPassword from "./pages/ResetPassword";
+// import ProtectedRoute from "./ProtectedRoute";
 
 /* ================= STUDENT PAGES ================= */
 import StudentLayout from "./pages/student/StudentLayout";
@@ -55,6 +56,26 @@ function App() {
       <Route path="/about" element={<AboutUs />} />
       <Route path="/events" element={<ExploreEvents />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
+      {/* <Route path="/admin/dashboard"element={<ProtectedRoute allowedRole="admin">< AdminDashboard/></ProtectedRoute>}/>
+
+      <Route path="/faculty/dashboard"element={<ProtectedRoute allowedRole="faculty"><FacultyDashboard /></ProtectedRoute>}/>
+
+      <Route
+        path="/student/dashboard"
+        element={
+          <ProtectedRoute allowedRole="student">
+            <StudentDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/placement/dashboard"
+        element={
+          <ProtectedRoute allowedRole="placement">
+            <PlacementDashboard />
+          </ProtectedRoute>
+        } 
+      />*/}
 
       {/* ---------- STUDENT ROUTES ---------- */}
       <Route path="/student" element={<StudentLayout />}>
@@ -92,7 +113,7 @@ function App() {
         <Route path="dashboard" element={<FacultyDashboard />} />
         <Route path="events" element={<FacultyEvents />} />
         <Route path="calendar" element={<FacultyCalendar />} />
-      </Route> 
+      </Route>
       {/* <Route path="/faculty" element={<FacultyLayout />}>
         <Route path="dashboard" element={<FacultyDashboard />} />
         <Route path="events" element={<FacultyEvents />} />

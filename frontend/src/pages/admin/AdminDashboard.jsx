@@ -45,8 +45,8 @@ const AdminDashboard = () => {
       .catch(err => console.error(err));
   }, []);
   const approvedPlacementCount = Array.isArray(placements)
-  ? placements.filter(p => p.status === "approved").length
-  : 0;
+    ? placements.filter(p => p.status === "approved").length
+    : 0;
 
   const handleLogout = () => {
     navigate("/login");
@@ -66,8 +66,8 @@ const AdminDashboard = () => {
 
   const upcomingPlacements = Array.isArray(placements)
     ? placements.filter(
-        p => p.status === "approved" && new Date(p.date) >= today
-      )
+      p => p.status === "approved" && new Date(p.date) >= today
+    )
     : [];
 
   return (
@@ -105,14 +105,16 @@ const AdminDashboard = () => {
 
         <table className="admin-table">
           <thead>
-            <tr>
-              <th>Event Name</th>
-              <th>Date</th>
-              <th>Organizer</th>
-              <th>View Registered Students</th>
-              <th>Action</th>   {/* 👈 add this */}
-            </tr>
-          </thead>
+  <tr>
+    <th>Event Name</th>
+    <th>Organizer</th>
+    <th>Date</th>
+    <th>Status</th>
+    <th>Registered Students</th>
+    <th>Action</th>
+  </tr>
+</thead>
+
           <tbody>
             {approvedEvents.length === 0 ? (
               <tr>
@@ -120,25 +122,44 @@ const AdminDashboard = () => {
               </tr>
             ) : (
               approvedEvents.map(event => (
+                // <tr key={event._id}>
+                //   <td>{event.eventName}</td>
+                //   <td>{event.organizerName}</td>
+                //   <td>{event.date}</td>
+                //   <td>{event.status}</td>
+                //   {/* <td>{event.eventName}</td>
+                //   <td>{event.date}</td> */}
+                //   {/* <td>Faculty</td> */}
+
+                //   <td>
+                //     <button
+                //       className="details-btn"
+                //       onClick={() =>
+                //         navigate(`/admin/registered/event/${event._id}`)
+                //       }
+                //     >
+                //       See Details
+                //     </button>
+
+                //   </td>
+
+                //   <td>Approved</td>
+                // </tr>
                 <tr key={event._id}>
-                  <td>{event.eventName}</td>
-                  <td>{event.date}</td>
-                  <td>Faculty</td>
+      <td>{event.eventName}</td>
+      <td>{event.conductedBy?.name}</td>
+      <td>{event.date}</td>
+      <td>{event.status}</td>
+      <td>{event.registeredCount}</td>
+      <td>
+        <button
+          onClick={() => navigate(`/admin/events/${event._id}`)}
+        >
+          See Details
+        </button>
+      </td>
+    </tr>
 
-                  <td>
-                    <button
-  className="details-btn"
-  onClick={() =>
-    navigate(`/admin/registered/event/${event._id}`)
-  }
->
-  See Details
-</button>
-
-                  </td>
-
-                  <td>Approved</td>
-                </tr>
               ))
             )}
           </tbody>
