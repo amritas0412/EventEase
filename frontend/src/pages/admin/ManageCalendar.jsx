@@ -20,7 +20,7 @@ const ManageCalendar = () => {
   const [monthIndex, setMonthIndex] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
 
-  const [eventDates, setEventDates] = useState([5, 12, 18, 25]);
+  const [eventDates, setEventDates] = useState([]);
   const [placementDates, setPlacementDates] = useState([]);
 
   const [selectedDate, setSelectedDate] = useState(null);
@@ -60,30 +60,52 @@ const ManageCalendar = () => {
     } else setMonthIndex(monthIndex + 1);
     setSelectedDate(null);
   };
+  useEffect(() => {
+    fetch("http://localhost:5050/admin/events")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const backendDays = (data.events || [])
+            .filter(e => {
+              const d = new Date(e.date);
+              return (
+                d.getMonth() === monthIndex &&
+                d.getFullYear() === year
+              );
+            })
+            .map(e => new Date(e.date).getDate());
+
+          setEventDates(backendDays);
+
+        }
+      })
+      .catch(err => console.error(err));
+  }, [monthIndex, year]);
+
 
   useEffect(() => {
-  fetch("http://localhost:5050/placement/all")
-    .then(res => res.json())
-    .then(data => {
-      console.log("API DATA:", data);
+    fetch("http://localhost:5050/placement/all")
+      .then(res => res.json())
+      .then(data => {
+        console.log("API DATA:", data);
 
-      if (data.success) {
-        const days = (data.placements || [])
-          .filter(p => {
-            const d = new Date(p.date);
-            return (
-              p.status === "approved" &&
-              d.getMonth() === monthIndex &&
-              d.getFullYear() === year
-            );
-          })
-          .map(p => new Date(p.date).getDate());
+        if (data.success) {
+          const days = (data.placements || [])
+            .filter(p => {
+              const d = new Date(p.date);
+              return (
+                p.status === "approved" &&
+                d.getMonth() === monthIndex &&
+                d.getFullYear() === year
+              );
+            })
+            .map(p => new Date(p.date).getDate());
 
-        setPlacementDates(days);
-      }
-    })
-    .catch(err => console.error(err));
-}, [monthIndex, year]);
+          setPlacementDates(days);
+        }
+      })
+      .catch(err => console.error(err));
+  }, [monthIndex, year]);
 
 
   return (

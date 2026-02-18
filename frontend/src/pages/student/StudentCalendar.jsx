@@ -7,7 +7,6 @@ const months = [
 ];
 
 const StudentCalendar = () => {
-
   // ✅ MONTH & YEAR STATE
   const today = new Date();
   const [monthIndex, setMonthIndex] = useState(today.getMonth());
@@ -15,42 +14,26 @@ const StudentCalendar = () => {
 
   // 🔥 EVENTS FROM DB
   const [events, setEvents] = useState([]);
-
-  // 📡 FETCH APPROVED EVENTS
-  // useEffect(() => {
-  //   fetch("http://localhost:5050/faculty/events")
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       if (data.success) {
-  //         setEvents(data.events);
-  //       }
-  //     })
-  //     .catch(err =>
-  //       console.error("CALENDAR FETCH ERROR:", err)
-  //     );
-  // }, []);
-useEffect(() => {
-  fetch("http://localhost:5050/faculty/events")
-    .then(res => res.json())
-    .then(data => {
-      console.log("CALENDAR EVENTS:", data.events); // 👈 ADD THIS
-      if (data.success) {
-        setEvents(data.events);
-      }
-    });
-}, []);
-
-  // 🎯 FILTER EVENTS FOR CURRENT MONTH/YEAR
+  useEffect(() => {
+    fetch("http://localhost:5050/admin/events")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setEvents(data.events);
+        }
+      })
+      .catch(err => console.error(err));
+  }, [monthIndex, year]);
   const eventDates = events
     .filter(ev => {
       const d = new Date(ev.date);
       return (
+        ev.status === "approved" &&   // 🔥 Important
         d.getMonth() === monthIndex &&
         d.getFullYear() === year
       );
     })
     .map(ev => new Date(ev.date).getDate());
-
   // ✅ DYNAMIC CALCULATIONS
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const startDay = new Date(year, monthIndex, 1).getDay();

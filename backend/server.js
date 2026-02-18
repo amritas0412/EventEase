@@ -58,16 +58,29 @@ app.post("/login", async (req, res) => {
       return res.json({ success: false, message: "Wrong password" });
     }
 
+    // res.json({
+    //   success: true,
+    //   message: "Login successful",
+    //   role: role.toLowerCase(),
+    //   user: {
+    //     name: user.studentName || "",
+    //     email: user.email,
+    //     studentId: user._id || "",
+    //   },
+    // });
     res.json({
       success: true,
-      message: "Login successful",
-      role: role.toLowerCase(),
+      role: role.toLowerCase(),   // 🔥 add this
       user: {
-        name: user.studentName || "",
+        _id: user._id,
         email: user.email,
-        studentId: user._id || "",
-      },
+        name: user.name,
+        department: user.department,
+        designation: user.designation
+      }
     });
+
+
 
 
   } catch (err) {
@@ -194,35 +207,6 @@ app.post("/reset-password/:token", async (req, res) => {
     message: "Password reset successful",
   });
 });
-
-// app.post("/faculty/events", async (req, res) => {
-//   try {
-//     const faculty = await Faculty.findOne({
-//       email: req.body.conductedBy
-//     });
-
-//     if (!faculty) {
-//       return res.status(404).json({ success: false });
-//     }
-
-//     const event = new Event({
-//       ...req.body,
-//       conductedBy: faculty._id,   // ✅ store ObjectId
-//       status: "pending"
-//     });
-
-//     await event.save();
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Event submitted successfully"
-//     });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false });
-//   }
-// });
 app.post("/faculty/events", async (req, res) => {
   try {
     const faculty = await Faculty.findOne({
@@ -255,18 +239,6 @@ app.post("/faculty/events", async (req, res) => {
   }
 });
 
-// app.get("/faculty/events", async (req, res) => {
-//   try {
-//     const events = await Event.find({ status: "approved" })
-//       .populate("conductedBy", "name");
-
-//     res.json({ success: true, events });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false });
-//   }
-// });
 app.get("/faculty/events", async (req, res) => {
   try {
     const events = await Event.find({ status: "approved" })
@@ -280,30 +252,6 @@ app.get("/faculty/events", async (req, res) => {
   }
 });
 
-// app.get("/admin/event-requests", async (req, res) => {
-//   try {
-//     const events = await Event.find({ status: "pending" });
-
-//     const eventsWithFaculty = await Promise.all(
-//       events.map(async (event) => {
-//         const faculty = await Faculty.findOne({
-//           email: event.conductedBy
-//         });
-
-//         return {
-//           ...event._doc,
-//           organizerName: faculty ? faculty.name : "Unknown Faculty"
-//         };
-//       })
-//     );
-
-//     res.json({ success: true, events: eventsWithFaculty });
-
-//   } catch (err) {
-//     console.error("ADMIN EVENT FETCH ERROR:", err);
-//     res.status(500).json({ success: false });
-//   }
-// });
 app.get("/admin/event-requests", async (req, res) => {
   try {
     const events = await Event.find({ status: "pending" })
@@ -361,36 +309,6 @@ app.get("/admin/events/:id", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-
-// app.get("/admin/events", async (req, res) => {
-//   try {
-//     const events = await Event.find({ status: "approved" });
-
-//     const eventsWithFaculty = await Promise.all(
-//       events.map(async (event) => {
-//         const faculty = await Faculty.findOne({
-//           email: event.conductedBy
-//         });
-
-//         const registrationCount = await Registration.countDocuments({
-//           eventId: event._id
-//         });
-
-//         return {
-//           ...event._doc,
-//           organizerName: faculty ? faculty.name : "Unknown Faculty",
-//           registeredCount: registrationCount
-//         };
-//       })
-//     );
-
-//     res.json({ success: true, events: eventsWithFaculty });
-
-//   } catch (err) {
-//     console.error("ADMIN EVENTS FETCH ERROR:", err);
-//     res.status(500).json({ success: false });
-//   }
-// });
 app.get("/admin/events", async (req, res) => {
   try {
     const events = await Event.find({ status: "approved" })
@@ -714,3 +632,16 @@ app.get("/admin/faculty", async (req, res) => {
   const faculty = await Faculty.find().select("-password");
   res.json({ success: true, faculty });
 });
+
+app.get("/events/approved", async (req, res) => {
+  try {
+    const events = await Event.find({ status: "approved" })
+      .populate("conductedBy", "_id name");
+
+
+    res.json({ success: true, events });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+

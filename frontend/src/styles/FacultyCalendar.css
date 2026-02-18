@@ -4,10 +4,26 @@
   color: white;
 }
 
-.calendar-event.approved {
-  background: #7c3aed; /* purple */
+.calendar-day.event-day {
+  background: #b3a3e0;; /* purple */
+  color: white;
 }
 
-.calendar-event.faculty-own {
+.calendar-day.faculty-day {
   background: #2563eb; /* blue */
+  color: white;
 }
+.legend-box.faculty {
+  background: #2563eb;   /* same blue as faculty-day */
+}
+.student-calendar-page {
+  padding: 30px;
+  background: #f7f4ff;
+  min-height: 100vh;
+}
+
+.calendar-header h2 {
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+

@@ -12,10 +12,21 @@
 .faculty-layout {
   display: flex;
   min-height: 100vh;
-  background: #f6f8fc;
 }
 
 .faculty-content {
   flex: 1;
   padding: 30px;
+  background: #f5f6fa;
 }
+.faculty-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.faculty-content {
+  flex: 1;
+  padding: 30px;
+  background: #f5f6fa;
+}
+

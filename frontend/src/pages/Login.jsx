@@ -12,15 +12,6 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
 
-  // useEffect(() => {
-  //   const storedRole = localStorage.getItem("role");
-  //   const token = localStorage.getItem("token");
-
-  //   if (token && storedRole) {
-  //     navigate(`/${storedRole}/dashboard`, { replace: true });
-  //   }
-  // }, [navigate]);
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -37,27 +28,29 @@ const Login = () => {
 
 
       setMessage(data.message);
-    if (!data.success || !data.user) {
-  setIsError(true);
-  setMessage(data.message || "Login failed");
-  return;
-}
+      if (!data.success || !data.user) {
+        setIsError(true);
+        setMessage(data.message || "Login failed");
+        return;
+      }
 
-// 🚦 REDIRECT FIRST
-const backendRole = (data.role || role).toLowerCase();
-localStorage.setItem("token", data.token || "");
-localStorage.setItem("role", backendRole);
-localStorage.setItem("email", data.user?.email || "");
-localStorage.setItem("name", data.user?.name || "");
-localStorage.setItem("studentId", data.user?.studentId || "");
+      // 🚦 REDIRECT FIRST
+      const backendRole = (data.role || role).toLowerCase();
+      localStorage.setItem("token", data.token || "");
+      localStorage.setItem("role", backendRole);
+      localStorage.setItem("email", data.user?.email || "");
+      localStorage.setItem("name", data.user?.name || "");
+      localStorage.setItem("facultyId", data.user?._id || "");
+      localStorage.setItem("studentId", data.user?.studentId || "");
+      
 
-if (backendRole === "student") navigate("/student/dashboard", { replace: true });
-else if (backendRole === "admin") navigate("/admin/dashboard", { replace: true });
-else if (backendRole === "faculty") navigate("/faculty/dashboard", { replace: true });
-else if (backendRole.includes("placement")) navigate("/placement/dashboard", { replace: true });
+      if (backendRole === "student") navigate("/student/dashboard", { replace: true });
+      else if (backendRole === "admin") navigate("/admin/dashboard", { replace: true });
+      else if (backendRole === "faculty") navigate("/faculty/dashboard", { replace: true });
+      else if (backendRole.includes("placement")) navigate("/placement/dashboard", { replace: true });
 
-setIsError(false);
-setMessage(data.message || "Login successful");
+      setIsError(false);
+      setMessage(data.message || "Login successful");
     }
 
     catch (error) {
