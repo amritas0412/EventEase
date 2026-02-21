@@ -71,3 +71,34 @@
     grid-template-columns: 1fr;
   }
 }
+.past-event-card {
+  border-left: 4px solid #10b981;
+  background: #f0fdf4;
+}
+
+.feedback-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.feedback-btn:hover {
+  background: #059669;
+}
+.registered-btn {
+  background: #94a3b8;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: not-allowed;
+}
+
+.status-registered {
+  color: #10b981;
+  font-weight: 600;
+  margin-bottom: 6px;
+}

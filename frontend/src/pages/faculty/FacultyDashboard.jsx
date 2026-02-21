@@ -8,6 +8,7 @@ const FacultyDashboard = () => {
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
+  const facultyId = localStorage.getItem("facultyId");
 
   useEffect(() => {
     fetch("http://localhost:5050/faculty/events")
@@ -26,27 +27,23 @@ const FacultyDashboard = () => {
 
   const today = new Date().toISOString().split("T")[0];
   const loggedInEmail = localStorage.getItem("email");
-  let loggedInFacultyName = "";
 
-  if (loggedInEmail === "btbtc0000_aishvarya@banasthali.in") {
-    loggedInFacultyName = "Dr. Aishvarya Garg";
-  } else if (loggedInEmail === "btbtc0001_prabhat@banasthali.in") {
-    loggedInFacultyName = "Dr. Prabhat Mishra";
-  }
-  // Upcoming = today or future
   const upcomingEvents = events
+    .filter(ev => ev.status === "approved")
     .filter(ev => ev.date >= today)
     .filter(ev =>
       ev.eventName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+  const pendingEvents = events
+    .filter(ev => ev.conductedBy?._id === facultyId)
+    .filter(ev => ev.status === "pending");
+
   // Past = finished events
   const pastEvents = events.filter(ev =>
     new Date(ev.date) < new Date() &&
-    ev.conductedBy?.trim().toLowerCase() ===
-    loggedInEmail?.trim().toLowerCase()
+    ev.conductedBy?._id === facultyId
   );
-
 
   const handleLogout = () => {
     localStorage.removeItem("role");
@@ -113,7 +110,9 @@ const FacultyDashboard = () => {
               placeholder="Search Events"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+
             />
+
           </div>
 
           <div className="panel-grid">
@@ -128,15 +127,58 @@ const FacultyDashboard = () => {
                   <p>📅 {ev.date}</p>
                   <p>⏰ {ev.startTime} - {ev.endTime}</p>
                   <p>📍 {ev.venue}</p>
-                  {/* <p className="muted-text">Conducted by {event.facultyName}</p> */}
-                  {/* <p>Conducted by {ev.conductedBy?.name}</p> */}
+                  {/* <p>Conducted by {ev.conductedBy?.name}</p>
+                  <button
+                    className="profile-btn"
+                    onClick={() => navigate(`/faculty/event/${ev._id}/students`)}
+                  >
+                    View Registered Students
+                  </button> */}
                   <p>Conducted by {ev.conductedBy?.name}</p>
+
+                  {ev.conductedBy?._id === facultyId && (
+                    <>
+                      {/* <p className="muted-text">
+                        Registered: {ev.registeredStudents?.length || 0}
+                      </p> */}
+                      <p className="muted-text">
+  Registered: {ev.registeredCount || 0}
+</p>
+                      <button
+                        className="profile-btn"
+                        onClick={() => navigate(`/faculty/event/${ev._id}/students`)}
+                      >
+                        View Registered Students
+                      </button>
+                    </>
+                  )}
 
                 </div>
               ))
             )}
           </div>
+        </section>
+        {/* Pending Requests */}
+        <section className="panel">
+          <div className="panel-header">
+            <h3>⏳ Request Processing</h3>
+          </div>
 
+          <div className="panel-grid">
+            {pendingEvents.length === 0 ? (
+              <div className="event-card dashboard-card empty-card">
+                <p>No pending requests</p>
+              </div>
+            ) : (
+              pendingEvents.map(ev => (
+                <div key={ev._id} className="event-card dashboard-card pending-card">
+                  <h4>{ev.eventName}</h4>
+                  <p>📅 {ev.date}</p>
+                  <p className="status-text">Status: Pending Approval</p>
+                </div>
+              ))
+            )}
+          </div>
         </section>
 
         {/* Faculty Event History */}

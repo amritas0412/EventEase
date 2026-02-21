@@ -196,3 +196,12 @@
     right: 20px;
   }
 }
+.pending-card {
+  border-left: 4px solid orange;
+  background: #fffaf0;
+}
+
+.status-text {
+  color: orange;
+  font-weight: 600;
+}

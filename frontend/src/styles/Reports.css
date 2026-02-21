@@ -1,4 +1,4 @@
-.reports-page {
+/* .reports-page {
   padding: 30px;
 }
 
@@ -54,4 +54,89 @@
   margin-top: 10px;
   color: #888;
   font-size: 14px;
+} */
+.reports-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.report-filter {
+  margin-bottom: 25px;
+}
+
+.report-filter select {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-left: 10px;
+}
+
+.report-summary-cards {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.summary-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  flex: 1;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.avg-rating {
+  font-size: 28px;
+  font-weight: bold;
+  color: #f59e0b;
+}
+
+.review-count {
+  font-size: 26px;
+  font-weight: bold;
+  color: #4f46e5;
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.feedback-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.feedback-card:hover {
+  transform: translateY(-3px);
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.event-name {
+  font-weight: 600;
+}
+
+.rating-stars {
+  color: #f59e0b;
+  font-size: 18px;
+}
+
+.feedback-text {
+  font-style: italic;
+  color: #555;
+}
+
+.no-feedback {
+  color: #888;
 }

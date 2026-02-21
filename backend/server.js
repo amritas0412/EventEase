@@ -15,6 +15,7 @@ const Admin = require("./Admin");
 const sendEmail = require("./utils/sendEmail");
 const Placement = require("./Placement");
 const Registration = require("./Registration");
+const Feedback = require("./Feedback");
 
 const app = express();
 app.use(cors());
@@ -32,6 +33,63 @@ mongoose.connect(mongoURI)
   .catch(err => console.log("MongoDB connection error:", err));
 
 // Login API
+// app.post("/login", async (req, res) => {
+//   const { email, password, role } = req.body;
+
+//   try {
+//     let user;
+
+//     if (role === "Student") {
+//       user = await Student.findOne({ email });
+//     } else if (role === "Faculty") {
+//       user = await Faculty.findOne({ email });
+//     } else if (role === "Placement Cell") {
+//       user = await PlacementCell.findOne({ email });
+//     } else if (role === "Admin") {
+//       user = await Admin.findOne({ email });
+//     } else {
+//       return res.json({ success: false, message: "Role not supported" });
+//     }
+
+//     if (!user) {
+//       return res.json({ success: false, message: "User not found" });
+//     }
+
+//     if (user.password !== password) {
+//       return res.json({ success: false, message: "Wrong password" });
+//     }
+
+//     // res.json({
+//     //   success: true,
+//     //   role: role.toLowerCase(),   // 🔥 add this
+//     //   user: {
+//     //     _id: user._id,
+//     //     email: user.email,
+//     //     name: user.name,
+//     //     department: user.department,
+//     //     designation: user.designation
+//     //   }
+//     // });
+// res.json({
+//   success: true,
+//   role: role.toLowerCase(),
+//   user: {
+//     _id: user._id,
+//     email: user.email,
+//     name: user.name,
+//     department: user.department,
+//     designation: user.designation,
+//     studentId: user.studentId || null   // 🔥 ADD THIS
+//   }
+// });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// });
 app.post("/login", async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -40,49 +98,32 @@ app.post("/login", async (req, res) => {
 
     if (role === "Student") {
       user = await Student.findOne({ email });
-    } else if (role === "Faculty") {
-      user = await Faculty.findOne({ email });
-    } else if (role === "Placement Cell") {
-      user = await PlacementCell.findOne({ email });
-    } else if (role === "Admin") {
-      user = await Admin.findOne({ email });
-    } else {
-      return res.json({ success: false, message: "Role not supported" });
     }
 
+    else if (role === "Faculty") {
+      user = await Faculty.findOne({ email });
+    }
+
+    else if (role === "Admin") {
+      user = await Admin.findOne({ email });
+    }
+else if (role === "Placement Cell") {   // 🔥 ADD THIS
+      user = await PlacementCell.findOne({ email });
+    }
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
-
-    if (user.password !== password) {
-      return res.json({ success: false, message: "Wrong password" });
-    }
-
-    // res.json({
-    //   success: true,
-    //   message: "Login successful",
-    //   role: role.toLowerCase(),
-    //   user: {
-    //     name: user.studentName || "",
-    //     email: user.email,
-    //     studentId: user._id || "",
-    //   },
-    // });
+    // password check here...
     res.json({
       success: true,
-      role: role.toLowerCase(),   // 🔥 add this
+      role: role.toLowerCase(),
       user: {
         _id: user._id,
         email: user.email,
         name: user.name,
-        department: user.department,
-        designation: user.designation
+        studentId: user.studentId || null
       }
     });
-
-
-
-
   } catch (err) {
     console.error(err);
     res.status(500).json({
@@ -239,19 +280,56 @@ app.post("/faculty/events", async (req, res) => {
   }
 });
 
+// app.get("/faculty/events", async (req, res) => {
+//   try {
+//     const events = await Event.find({ status: "approved" })
+//       .populate("conductedBy", "name");  // ✅ this fetches faculty name
+
+//     res.json({ success: true, events });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false });
+//   }
+// });
+// app.get("/faculty/events", async (req, res) => {
+//   try {
+//     const events = await Event.find()
+//       .populate("conductedBy", "name");
+
+//     res.json({ success: true, events });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false });
+//   }
+// });
 app.get("/faculty/events", async (req, res) => {
   try {
-    const events = await Event.find({ status: "approved" })
-      .populate("conductedBy", "name");  // ✅ this fetches faculty name
+    const events = await Event.find()
+      .populate("conductedBy", "name");
 
-    res.json({ success: true, events });
+    // Attach registration count to each event
+    const eventsWithCount = await Promise.all(
+      events.map(async (event) => {
+        const count = await Registration.countDocuments({
+          eventId: event._id
+        });
+
+        return {
+          ...event.toObject(),
+          registeredCount: count
+        };
+      })
+    );
+
+    res.json({ success: true, events: eventsWithCount });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false });
   }
 });
-
 app.get("/admin/event-requests", async (req, res) => {
   try {
     const events = await Event.find({ status: "pending" })
@@ -342,10 +420,11 @@ app.get("/admin/events/count", async (req, res) => {
   const count = await Event.countDocuments({ status: "approved" });
   res.json({ success: true, count });
 });
-// 🎯 STUDENT: Get single event details
+
 app.get("/student/events/:id", async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id);
+    const event = await Event.findById(req.params.id)
+      .populate("conductedBy", "name");   // 🔥 THIS IS THE FIX
 
     if (!event) {
       return res.status(404).json({
@@ -367,6 +446,7 @@ app.get("/student/events/:id", async (req, res) => {
     });
   }
 });
+
 app.get("/student/profile/:email", async (req, res) => {
   const student = await Student.findOne({
     email: req.params.email,
@@ -509,32 +589,41 @@ app.post("/student/register/placement", async (req, res) => {
   }
 });
 
-// STUDENT REGISTER FOR EVENT
 app.post("/student/register/event", async (req, res) => {
   try {
     const { studentId, eventId } = req.body;
 
+    if (!studentId || !eventId) {
+      return res.status(400).json({ message: "Missing data" });
+    }
+
+    // 🔥 FIX IS HERE
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(400).json({ message: "Student not found" });
+    }
+
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(400).json({ message: "Event not found" });
+    }
+
     const registration = new Registration({
-      studentId,
-      eventId,
-      placementId: null,
+      studentId: student._id,
+      name: student.name,
+      eventName: event.eventName,
+      date: event.date,
+      conductedBy: event.conductedBy,
+      eventId: event._id
     });
 
     await registration.save();
 
-    res.json({ success: true, message: "Registered successfully" });
+    res.json({ success: true });
 
   } catch (err) {
     console.error(err);
-
-    if (err.code === 11000) {
-      return res.json({
-        success: false,
-        message: "Already registered",
-      });
-    }
-
-    res.status(500).json({ success: false });
+    res.status(500).json({ message: "Registration failed" });
   }
 });
 
@@ -644,4 +733,188 @@ app.get("/events/approved", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+app.post("/events/register", async (req, res) => {
+  try {
+    const { eventId, studentId } = req.body;
 
+    // Prevent duplicate registration
+    const existing = await Registration.findOne({ eventId, studentId });
+    if (existing) {
+      return res.json({ success: false, message: "Already registered" });
+    }
+
+    const registration = new Registration({
+      eventId,
+      studentId
+    });
+
+    await registration.save();
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("REGISTER ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});
+// app.get("/student/my-registrations/:studentId", async (req, res) => {
+//   try {
+//     const { studentId } = req.params;
+
+//     const registrations = await Registration.find({
+//       studentId,
+//       eventId: { $ne: null }
+//     });
+
+//     res.json({
+//       success: true,
+//       registrations
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server error"
+//     });
+//   }
+// });
+app.get("/student/my-registrations/:studentId", async (req, res) => {
+  try {
+    const registrations = await Registration.find({
+      studentId: req.params.studentId
+    });
+
+    res.json({
+      success: true,
+      registrations
+    });
+
+  } catch (err) {
+    console.error("MY REG ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});
+app.get("/faculty/event/:id/students", async (req, res) => {
+  try {
+    const eventObjectId = new mongoose.Types.ObjectId(req.params.id);
+
+    const registrations = await Registration.find({
+      eventId: eventObjectId
+    }).populate("studentId", "name email studentId");  // ✅ THIS LINE IS KEY
+
+    console.log("EVENT ID:", req.params.id);
+    console.log("FOUND:", registrations);
+
+    res.json({
+      success: true,
+      students: registrations
+    });
+
+  } catch (err) {
+    console.error("FACULTY STUDENTS ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});
+app.get("/admin/dashboard-stats", async (req, res) => {
+  try {
+    const totalStudents = await Student.countDocuments();
+    const totalFaculty = await Faculty.countDocuments();
+    const totalPlacementCell = await PlacementCell.countDocuments();
+
+    const totalUsers = 
+      totalStudents + 
+      totalFaculty + 
+      totalPlacementCell;
+
+    res.json({
+      success: true,
+      totalUsers,
+      totalStudents,
+      totalFaculty,
+      totalPlacementCell
+    });
+
+  } catch (err) {
+    console.error("ADMIN STATS ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});
+app.post("/student/register-event", async (req, res) => {
+  try {
+    const { studentId, eventId } = req.body;
+
+    // 🔥 CHECK IF ALREADY REGISTERED
+    const existing = await Registration.findOne({
+      studentId,
+      eventId
+    });
+
+    if (existing) {
+      return res.json({
+        success: false,
+        message: "Already registered"
+      });
+    }
+
+    const newRegistration = new Registration({
+      studentId,
+      eventId
+    });
+
+    await newRegistration.save();
+
+    res.json({
+      success: true,
+      message: "Registration successful"
+    });
+
+  } catch (err) {
+    console.error("REGISTER ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});
+app.post("/student/feedback", async (req, res) => {
+  try {
+    const { eventId, studentId, rating, comment } = req.body;
+
+    const feedback = new Feedback({
+      eventId,
+      studentId,
+      rating,
+      comment
+    });
+
+    await feedback.save();
+
+    res.json({ success: true });
+
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.json({
+        success: false,
+        message: "Feedback already submitted"
+      });
+    }
+
+    console.error("FEEDBACK ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});
+app.get("/admin/reports", async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find()
+      .populate("eventId", "eventName")
+      .populate("placementId", "company role")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      feedbacks
+    });
+
+  } catch (err) {
+    console.error("REPORT ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});

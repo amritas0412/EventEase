@@ -7,6 +7,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [showProfile, setShowProfile] = useState(false);
+  const [registeredEvents, setRegisteredEvents] = useState([]);
 
   // 🔵 FETCHED EVENTS
   const [events, setEvents] = useState([]);
@@ -40,6 +41,30 @@ const StudentDashboard = () => {
         console.error("PLACEMENTS FETCH ERROR:", err)
       );
   }, []);
+  useEffect(() => {
+    const studentId = localStorage.getItem("studentId");
+
+    if (!studentId) {
+      console.log("No studentId found");
+      return;
+    }
+
+    fetch(`http://localhost:5050/student/my-registrations/${studentId}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("REG DATA:", data);
+
+        if (data && data.success && Array.isArray(data.registrations)) {
+          setRegisteredEvents(data.registrations);
+        } else {
+          setRegisteredEvents([]);
+        }
+      })
+      .catch(err => {
+        console.error("REG FETCH ERROR:", err);
+        setRegisteredEvents([]);
+      });
+  }, []);
 
 
   //  DATE LOGIC
@@ -57,9 +82,6 @@ const StudentDashboard = () => {
     p => p.date === today && p.status === "approved"
   );
 
-  /* ---------------- STILL DUMMY (for now) ---------------- */
-  const registeredEvents = ["Tech Fest 2026", "Cultural Night"];
-
   const [registeredPlacements, setRegisteredPlacements] = useState([]);
   useEffect(() => {
     if (!studentId) return;
@@ -74,10 +96,8 @@ const StudentDashboard = () => {
       .catch(err => console.error("MY PLACEMENTS ERROR:", err));
   }, [studentId]);
 
-
-  /* ---------------- SEARCH LOGIC ---------------- */
-  const filteredEvents = registeredEvents.filter(event =>
-    event.toLowerCase().includes(search.toLowerCase())
+  const filteredEvents = registeredEvents.filter(reg =>
+    reg.eventName?.toLowerCase().includes(search.toLowerCase())
   );
 
   const filteredPlacements = registeredPlacements
@@ -114,16 +134,16 @@ const StudentDashboard = () => {
 
             {showProfile && (
               <div className="profile-dropdown">
-                
+
                 {/* <p className="profile-name clickable">
                   {studentName || "Student"}
                 </p> */}
                 <p
-  className="profile-name clickable"
-  onClick={() => navigate("/student/profile")}
->
-  {studentName || "Student"}
-</p>
+                  className="profile-name clickable"
+                  onClick={() => navigate("/student/profile")}
+                >
+                  {studentName || "Student"}
+                </p>
 
 
                 <p className="profile-email">
@@ -218,21 +238,20 @@ const StudentDashboard = () => {
           {/* EVENTS */}
           <div>
             <h4>Registered Events</h4>
+
             {filteredEvents.length === 0 ? (
-              <p className="empty-text">
-                No matching events
-              </p>
+
+              <p>No registered events</p>
             ) : (
               <ul>
-                {filteredEvents.map(
-                  (event, index) => (
-                    <li key={index}>
-                      {event}
-                    </li>
-                  )
-                )}
+                {filteredEvents.map((reg) => (
+                  <li key={reg._id}>
+                    {reg.eventName} — {reg.date}
+                  </li>
+                ))}
               </ul>
             )}
+
           </div>
 
           {/* PLACEMENTS */}

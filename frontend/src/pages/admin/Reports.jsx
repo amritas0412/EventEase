@@ -1,85 +1,171 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../../styles/Reports.css";
 
 const Reports = () => {
-  // Dummy student feedback data (ANONYMOUS)
-  const feedbacks = [
-    {
-      event: "Tech Fest 2026",
-      rating: 5,
-      feedback: "Excellent event with great speakers.",
-    },
-    {
-      event: "Tech Fest 2026",
-      rating: 4,
-      feedback: "Very informative but sessions were long.",
-    },
-    {
-      event: "Cultural Night",
-      rating: 3,
-      feedback: "Enjoyable but sound system needs improvement.",
-    },
-    {
-      event: "TCS",
-      rating: 4,
-      feedback: "Nice Experience.",
-    },
-    {
-      event: "Placement Drive",
-      rating: 5,
-      feedback: "", // optional feedback
-    },
-  ];
-
+  const [feedbacks, setFeedbacks] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState("All");
 
-  // Filter feedback by event
+  useEffect(() => {
+    fetch("http://localhost:5050/admin/reports")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setFeedbacks(data.feedbacks);
+        }
+      });
+  }, []);
+
+  const eventNames = [
+    "All",
+    ...new Set(feedbacks.map(f => f.eventId?.eventName))
+  ];
+
   const filteredFeedback =
     selectedEvent === "All"
       ? feedbacks
-      : feedbacks.filter((f) => f.event === selectedEvent);
-
+      : feedbacks.filter(
+        f => f.eventId?.eventName === selectedEvent
+      );
+  // ✅ Calculate Average Rating Safely
+  const avgRating =
+    filteredFeedback.length > 0
+      ? (
+        filteredFeedback.reduce(
+          (acc, curr) => acc + curr.rating,
+          0
+        ) / filteredFeedback.length
+      ).toFixed(1)
+      : 0;
   return (
-    <div className="reports-page">
-      <h2>Reports & Feedback</h2>
+    //   <div className="reports-page">
+    //     <h2>Reports & Feedback</h2>
 
-      {/* ===== FILTER ===== */}
+    //     {/* ===== FILTER ===== */}
+    //     <div className="report-filter">
+    //       <label>Filter by Event:</label>
+    //       <select
+    //         value={selectedEvent}
+    //         onChange={(e) => setSelectedEvent(e.target.value)}
+    //       >
+    //         {eventNames.map((event, index) => (
+    //           <option key={index} value={event}>
+    //             {event}
+    //           </option>
+    //         ))}
+    //       </select>
+    //     </div>
+
+    //     {/* ===== FEEDBACK LIST ===== */}
+    //     {filteredFeedback.length > 0 && (
+    //       <div className="report-summary">
+    //         <p>
+    //           <strong>Average Rating:</strong> ⭐ {avgRating}
+    //         </p>
+    //         <p>
+    //           <strong>Total Reviews:</strong> {filteredFeedback.length}
+    //         </p>
+    //       </div>
+    //     )}
+    //     <div className="feedback-list">
+    //       {filteredFeedback.map((item) => (
+    //         <div key={item._id} className="feedback-card">
+    //           <div className="feedback-header">
+    //             <span className="event-name">
+    //               {item.eventId?.eventName}
+    //             </span>
+    //             <span className="rating">
+    //               {"★".repeat(item.rating)}
+    //               {"☆".repeat(5 - item.rating)}
+    //             </span>
+    //           </div>
+
+    //           {item.comment ? (
+    //             <p className="feedback-text">
+    //               "{item.comment}"
+    //             </p>
+    //           ) : (
+    //             <p className="no-feedback">
+    //               No written feedback
+    //             </p>
+    //           )}
+    //         </div>
+    //       ))}
+
+    //       {filteredFeedback.length === 0 && (
+    //         <p className="no-feedback">
+    //           No feedback available
+    //         </p>
+    //       )}
+    //     </div>
+    //   </div>
+    <div className="reports-page">
+      <h2 className="reports-title">Reports & Feedback</h2>
+
+      {/* FILTER */}
       <div className="report-filter">
         <label>Filter by Event:</label>
         <select
           value={selectedEvent}
           onChange={(e) => setSelectedEvent(e.target.value)}
         >
-          <option value="All">All Events</option>
-          <option value="Tech Fest 2026">Tech Fest 2026</option>
-          <option value="Cultural Night">Cultural Night</option>
-          <option value="Placement Drive">Placement Drive</option>
-          <option value="TCS">TCS</option>
+          {eventNames.map((event, index) => (
+            <option key={index} value={event}>
+              {event}
+            </option>
+          ))}
         </select>
       </div>
 
-      {/* ===== FEEDBACK LIST ===== */}
+      {/* SUMMARY CARDS */}
+      {filteredFeedback.length > 0 && (
+        <div className="report-summary-cards">
+          <div className="summary-card">
+            <h4>Average Rating</h4>
+            <div className="avg-rating">
+              ⭐ {avgRating}
+            </div>
+          </div>
+
+          <div className="summary-card">
+            <h4>Total Reviews</h4>
+            <div className="review-count">
+              {filteredFeedback.length}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* FEEDBACK LIST */}
       <div className="feedback-list">
-        {filteredFeedback.map((item, index) => (
-          <div key={index} className="feedback-card">
+        {filteredFeedback.map((item) => (
+          <div key={item._id} className="feedback-card">
             <div className="feedback-header">
-              <span className="event-name">{item.event}</span>
-              <span className="rating">
+              <span className="event-name">
+                {item.eventId?.eventName ||
+                  item.placementId?.company}
+              </span>
+              <span className="rating-stars">
                 {"★".repeat(item.rating)}
                 {"☆".repeat(5 - item.rating)}
               </span>
             </div>
 
-            {item.feedback ? (
-              <p className="feedback-text">"{item.feedback}"</p>
+            {item.comment ? (
+              <p className="feedback-text">
+                "{item.comment}"
+              </p>
             ) : (
-              <p className="no-feedback">No written feedback</p>
+              <p className="no-feedback">
+                No written feedback
+              </p>
             )}
           </div>
         ))}
 
         {filteredFeedback.length === 0 && (
-          <p className="no-feedback">No feedback available</p>
+          <p className="no-feedback">
+            No feedback available
+          </p>
         )}
       </div>
     </div>

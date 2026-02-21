@@ -7,7 +7,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [pendingEvents, setPendingEvents] = useState([]);
   const [placements, setPlacements] = useState([]);
-
+const [stats, setStats] = useState({});
   useEffect(() => {
     fetch("http://localhost:5050/admin/event-requests")
       .then(res => res.json())
@@ -18,6 +18,15 @@ const AdminDashboard = () => {
       })
       .catch(err => console.error(err));
   }, []);
+  useEffect(() => {
+  fetch("http://localhost:5050/admin/dashboard-stats")
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        setStats(data);
+      }
+    });
+}, []);
   const approve = async (id) => {
     await fetch(`http://localhost:5050/admin/events/${id}/approve`, {
       method: "PATCH",
@@ -95,7 +104,7 @@ const AdminDashboard = () => {
 
         <div className="admin-card">
           <p>Registered Users</p>
-          <h3>123</h3>
+          <h3>{stats.totalUsers || 0}</h3>
         </div>
       </div>
 
@@ -122,29 +131,6 @@ const AdminDashboard = () => {
               </tr>
             ) : (
               approvedEvents.map(event => (
-                // <tr key={event._id}>
-                //   <td>{event.eventName}</td>
-                //   <td>{event.organizerName}</td>
-                //   <td>{event.date}</td>
-                //   <td>{event.status}</td>
-                //   {/* <td>{event.eventName}</td>
-                //   <td>{event.date}</td> */}
-                //   {/* <td>Faculty</td> */}
-
-                //   <td>
-                //     <button
-                //       className="details-btn"
-                //       onClick={() =>
-                //         navigate(`/admin/registered/event/${event._id}`)
-                //       }
-                //     >
-                //       See Details
-                //     </button>
-
-                //   </td>
-
-                //   <td>Approved</td>
-                // </tr>
                 <tr key={event._id}>
       <td>{event.eventName}</td>
       <td>{event.conductedBy?.name}</td>

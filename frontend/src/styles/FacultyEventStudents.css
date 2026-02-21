@@ -1,0 +1,67 @@
+.students-page {
+  padding: 40px;
+  background: #f5f7fb;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.students-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.students-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.students-count {
+  background: #2563eb;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.students-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.students-table thead {
+  background: #1e293b;
+  color: white;
+}
+
+.students-table th {
+  padding: 14px;
+  text-align: left;
+  font-weight: 500;
+}
+
+.students-table td {
+  padding: 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.students-table tr:hover {
+  background: #f1f5f9;
+  transition: 0.2s;
+}
+
+.empty-state {
+  background: white;
+  padding: 40px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  color: #64748b;
+  font-size: 16px;
+}

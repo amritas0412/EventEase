@@ -16,6 +16,7 @@ import StudentCalendar from "./pages/student/StudentCalendar";
 import StudentProfile from "./pages/student/StudentProfile";
 import StudentEventDetails from "./pages/student/StudentEventDetails";
 import StudentPlacementDetails from "./pages/student/StudentPlacementDetails";
+import StudentFeedback from "./pages/student/StudentFeedback";
 
 /* ================= ADMIN PAGES ================= */
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -29,16 +30,13 @@ import AdminRegisteredStudents from "./pages/admin/AdminRegisteredStudents";
 import AdminEventDetails from "./pages/admin/AdminEventDetails";
 import AdminPlacementDetails from "./pages/admin/AdminPlacementDetails";
 
+
 /* ================= FACULTY PAGES ================= */
-// import FacultyDashboard from "./pages/faculty/FacultyDashboard";
-// import FacultyEvents from "./pages/faculty/FacultyEvents";
-// import FacultyCalendar from "./pages/faculty/FacultyCalendar";
 import FacultyLayout from "./pages/faculty/FacultyLayout";
 import FacultyCalendar from "./pages/faculty/FacultyCalendar";
 import FacultyDashboard from "./pages/faculty/FacultyDashboard";
 import FacultyEvents from "./pages/faculty/FacultyEvents";
-
-
+import FacultyEventStudents from "./pages/faculty/FacultyEventStudents";
 
 /* ================= PLACEMENT PAGES ================= */
 import PlacementDashboard from "./pages/placement/PlacementDashboard";
@@ -57,7 +55,6 @@ function App() {
       <Route path="/events" element={<ExploreEvents />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
     
-
       {/* ---------- STUDENT ROUTES ---------- */}
       <Route path="/student" element={<StudentLayout />}>
         <Route path="dashboard" element={<StudentDashboard />} />
@@ -67,7 +64,7 @@ function App() {
         <Route path="placements/:id" element={<StudentPlacementDetails />} />
         <Route path="calendar" element={<StudentCalendar />} />
         <Route path="profile" element={<StudentProfile />} />
-
+        <Route path="events/:id/feedback" element={<StudentFeedback />} />
       </Route>
 
       {/* ---------- ADMIN ROUTES ---------- */}
@@ -94,12 +91,8 @@ function App() {
         <Route path="dashboard" element={<FacultyDashboard />} />
         <Route path="events" element={<FacultyEvents />} />
         <Route path="calendar" element={<FacultyCalendar />} />
+        <Route path="event/:id/students" element={<FacultyEventStudents />} />
       </Route>
-{/* <Route path="/faculty" element={<FacultyLayout />}>
-  <Route path="dashboard" element={<FacultyDashboard />} />
-  <Route path="events" element={<FacultyEvents />} />
-  <Route path="calendar" element={<FacultyCalendar />} />
-</Route> */}
 
       {/* ---------- PLACEMENT ROUTES ---------- */}
       <Route path="/placement">

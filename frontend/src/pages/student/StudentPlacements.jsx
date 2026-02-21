@@ -22,6 +22,29 @@ const StudentPlacements = () => {
       })
       .catch(err => console.error("FETCH ERROR:", err));
   }, []);
+// useEffect(() => {
+//   fetch("http://localhost:5050/placement/all")
+//     .then(res => res.json())
+//     .then(data => {
+//       console.log("PLACEMENT DATA:", data); // debug
+
+//       if (data && data.success && Array.isArray(data.placements)) {
+//         const upcoming = data.placements.filter(
+//   p =>
+//     (!p.status || p.status === "approved") &&
+//     p.date >= today
+// );
+
+//         setPlacements(upcoming);
+//       } else {
+//         setPlacements([]);
+//       }
+//     })
+//     .catch(err => {
+//       console.error("FETCH ERROR:", err);
+//       setPlacements([]);
+//     });
+// }, []);
 
 
   return (
