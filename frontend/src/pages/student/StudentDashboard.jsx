@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import "../../styles/StudentDashboard.css";
 
 const StudentDashboard = () => {
@@ -101,11 +102,11 @@ const StudentDashboard = () => {
   );
 
   const filteredPlacements = registeredPlacements
-    .map(reg => placements.find(p => p._id === reg.placementId))
+    .map(reg => reg.placementId)
     .filter(Boolean)
-    .filter(p => p.date >= today)
+    .filter(p => p.date && p.date >= today)
     .filter(p =>
-      `${p.name} ${p.jobrole}`
+      `${p.name || ""} ${p.jobrole || ""}`
         .toLowerCase()
         .includes(search.toLowerCase())
     );

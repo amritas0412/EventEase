@@ -17,6 +17,7 @@ import StudentProfile from "./pages/student/StudentProfile";
 import StudentEventDetails from "./pages/student/StudentEventDetails";
 import StudentPlacementDetails from "./pages/student/StudentPlacementDetails";
 import StudentFeedback from "./pages/student/StudentFeedback";
+import StudentPlacementFeedback from "./pages/student/StudentPlacementFeedback";
 
 /* ================= ADMIN PAGES ================= */
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -43,6 +44,8 @@ import PlacementDashboard from "./pages/placement/PlacementDashboard";
 import Placements from "./pages/placement/Placements";
 import PlacementCalendar from "./pages/placement/PlacementCalendar";
 import CompaniesVisited from "./pages/placement/CompaniesVisited";
+import UpcomingDrives from "./pages/placement/UpcomingDrives";
+import PendingRequests from "./pages/placement/PendingRequests";
 
 function App() {
   return (
@@ -65,6 +68,7 @@ function App() {
         <Route path="calendar" element={<StudentCalendar />} />
         <Route path="profile" element={<StudentProfile />} />
         <Route path="events/:id/feedback" element={<StudentFeedback />} />
+        <Route path="feedback/:placementId" element={<StudentPlacementFeedback />} />
       </Route>
 
       {/* ---------- ADMIN ROUTES ---------- */}
@@ -81,7 +85,7 @@ function App() {
         <Route path="calendar" element={<ManageCalendar />} />
         <Route path="reports" element={<Reports />} />
         <Route
-          path="registered/:type/:id"
+          path="registered/placement/:id"
           element={<AdminRegisteredStudents />}
         />
       </Route>
@@ -100,6 +104,8 @@ function App() {
         <Route path="placements" element={<Placements />} />
         <Route path="companies" element={<CompaniesVisited />} />
         <Route path="calendar" element={<PlacementCalendar />} />
+        <Route path="upcoming-drives" element={<UpcomingDrives />} />
+        <Route path="pending-requests" element={<PendingRequests />} />
       </Route>
 
     </Routes>

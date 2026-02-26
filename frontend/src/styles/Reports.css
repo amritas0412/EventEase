@@ -140,3 +140,11 @@
 .no-feedback {
   color: #888;
 }
+
+.report-breakdown {
+  margin-bottom: 32px; /* space below the table */
+}
+
+.feedback-list {
+  margin-top: 24px; /* space above feedback cards */
+}

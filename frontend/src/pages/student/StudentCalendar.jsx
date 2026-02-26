@@ -7,6 +7,8 @@ const months = [
 ];
 
 const StudentCalendar = () => {
+  const [placements, setPlacements] = useState([]);
+
   // ✅ MONTH & YEAR STATE
   const today = new Date();
   const [monthIndex, setMonthIndex] = useState(today.getMonth());
@@ -24,6 +26,18 @@ const StudentCalendar = () => {
       })
       .catch(err => console.error(err));
   }, [monthIndex, year]);
+
+  useEffect(() => {
+    fetch("http://localhost:5050/placement/all")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setPlacements(data.placements);
+        }
+      })
+      .catch(err => console.error(err));
+  }, []);
+
   const eventDates = events
     .filter(ev => {
       const d = new Date(ev.date);
@@ -34,11 +48,23 @@ const StudentCalendar = () => {
       );
     })
     .map(ev => new Date(ev.date).getDate());
-  // ✅ DYNAMIC CALCULATIONS
+
+  const placementDates = placements
+    .filter(pl => {
+      const d = new Date(pl.date);
+      return (
+        pl.status === "approved" &&
+        d.getMonth() === monthIndex &&
+        d.getFullYear() === year
+      );
+    })
+    .map(pl => new Date(pl.date).getDate());
+
+  // DYNAMIC CALCULATIONS
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const startDay = new Date(year, monthIndex, 1).getDay();
 
-  // ✅ NAVIGATION
+  // NAVIGATION
   const prevMonth = () => {
     if (monthIndex === 0) {
       setMonthIndex(11);
@@ -84,7 +110,14 @@ const StudentCalendar = () => {
 
           let className = "calendar-day";
 
-          if (eventDates.includes(day)) {
+          const hasEvent = eventDates.includes(day);
+          const hasPlacement = placementDates.includes(day);
+
+          if (hasEvent && hasPlacement) { 
+            className += " both-day";
+          } else if (hasPlacement) {
+            className += " placement-day";
+          } else if (hasEvent) {
             className += " event-day";
           }
 
@@ -104,6 +137,9 @@ const StudentCalendar = () => {
       <div className="calendar-legend">
         <div>
           <span className="legend-box event"></span> Event
+        </div>
+        <div>
+          <span className="legend-box placement"></span> Placement
         </div>
       </div>
 

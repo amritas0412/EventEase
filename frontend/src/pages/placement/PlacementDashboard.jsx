@@ -13,6 +13,7 @@ const PlacementDashboard = () => {
   const totalDrives = Array.isArray(placements)
     ? placements.filter(d => d.status !== "rejected").length
     : 0;
+  const [feedbackMap, setFeedbackMap] = useState({});
 
   useEffect(() => {
     fetch("http://localhost:5050/placement/all")  
@@ -24,9 +25,35 @@ const PlacementDashboard = () => {
       .catch((err) => console.log(err));
   }, []);
 
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      const map = {};
+
+      for (const drive of completedDrives) {
+        try {
+          const res = await fetch(
+            `http://localhost:5050/placement/feedback-summary/${drive._id}`
+          );
+          const data = await res.json();
+
+          if (data.success) {
+            map[drive._id] = data;
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      setFeedbackMap(map);
+    };
+
+    if (completedDrives.length > 0) {
+      fetchFeedbacks();
+    }
+  }, [placements]);
+  
   // Drives that already occurred (history)
   const completedDrives = Array.isArray(placements)
-    ? placements.filter((d) => new Date(d.date) < today)
+    ? placements.filter((d) => new Date(d.date) < today && d.status === "approved")
     : [];
 
   const upcomingDrives = Array.isArray(placements)
@@ -142,13 +169,17 @@ const PlacementDashboard = () => {
 
         {/* Summary Cards */}
         <section className="stats">
-          <div className="card">
+          <div className="card clickable"
+            onClick={() => navigate("/placement/upcoming-drives")}>
             <h3>📅 Upcoming Drives</h3>
             <h2>{upcomingDrives}</h2>
             <p>Approved placement drives</p>
           </div>
 
-          <div className="card">
+          <div 
+            className="card clickable"
+            onClick={() => navigate("/placement/pending-requests")}
+          >
             <h3>⏳ Pending Requests</h3>
             <h2>{pendingRequests}</h2>
             <p>Awaiting admin approval</p>
@@ -174,13 +205,19 @@ const PlacementDashboard = () => {
               completedDrives.map((drive, index) => (
                 <div key={index} className="event-card dashboard-card">
                   <h4>{drive.name}</h4>
-                  <p>Date: {new Date(drive.date).toLocaleDateString()}</p>
+                  <p>Date: {new Date(drive.date).toLocaleDateString("en-GB")}</p>
                   <p className="muted-text">
                     Total Registrations: {drive.totalRegistrations || "0"}
                   </p>
                   <p>Total Appeared: {drive.totalAppeared}</p>
                   <p>Total Placed: {drive.totalPlaced}</p>
-                  <p>Feedback: {drive.feedback || "—"}</p>
+                  <p>
+                    Feedback:{" "}
+                    {feedbackMap[drive._id]?.totalFeedbacks > 0
+                      ? `⭐ ${feedbackMap[drive._id].avgRating} 
+                        (${feedbackMap[drive._id].totalFeedbacks} reviews)`
+                      : "—"}
+                  </p>
                   <button
                     onClick={() => {
                     setCurrentDriveId(drive._id);          // store which drive

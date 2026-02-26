@@ -16,6 +16,7 @@ const sendEmail = require("./utils/sendEmail");
 const Placement = require("./Placement");
 const Registration = require("./Registration");
 const Feedback = require("./Feedback");
+const PlacementFeedback = require("./PlacementFeedback");
 
 const app = express();
 app.use(cors());
@@ -477,14 +478,15 @@ app.get("/placement/all", async (req, res) => {
 
     const updatedPlacements = await Promise.all(
       placements.map(async (p) => {
-        const regs = await Registration.find({ placementId: p._id });
+        const regs = await Registration.find({ placementId: p._id })
+          .populate("studentId", "name email");
 
         return {
           ...p._doc,
           totalRegistrations: regs.length,       // Count
           registrations: regs.map(r => ({        // Array of students
-            name: r.name,
-            email: r.email,
+            name: r.studentId?.name || "Unknown",
+            email: r.studentId?.email || "Unknown",
           })),
         };
       })
@@ -648,7 +650,8 @@ app.get("/student/my-placements/:id", async (req, res) => {
   try {
     const data = await Registration.find({
       studentId: req.params.id,
-    });
+      placementId: { $ne: null }
+    }).populate("placementId");
 
     res.json({ success: true, placements: data });
   } catch (err) {
@@ -801,7 +804,7 @@ app.get("/faculty/event/:id/students", async (req, res) => {
 
     const registrations = await Registration.find({
       eventId: eventObjectId
-    }).populate("studentId", "name email studentId");  // ✅ THIS LINE IS KEY
+    }).populate("studentId", "name email studentId");  //  THIS LINE IS KEY
 
     console.log("EVENT ID:", req.params.id);
     console.log("FOUND:", registrations);
@@ -844,7 +847,7 @@ app.post("/student/register-event", async (req, res) => {
   try {
     const { studentId, eventId } = req.body;
 
-    // 🔥 CHECK IF ALREADY REGISTERED
+    // CHECK IF ALREADY REGISTERED
     const existing = await Registration.findOne({
       studentId,
       eventId
@@ -901,7 +904,7 @@ app.post("/student/feedback", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-app.get("/admin/reports", async (req, res) => {
+/*app.get("/admin/reports", async (req, res) => {
   try {
     const feedbacks = await Feedback.find()
       .populate("eventId", "eventName")
@@ -915,6 +918,113 @@ app.get("/admin/reports", async (req, res) => {
 
   } catch (err) {
     console.error("REPORT ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});*/
+
+app.post("/student/placement-feedback", async (req, res) => {
+  try {
+    const { placementId, studentId, rating, comment } = req.body;
+
+    // basic validation
+    if (!placementId || !studentId || !rating) {
+      return res.json({
+        success: false,
+        message: "Missing required fields"
+      });
+    }
+
+    const existing = await PlacementFeedback.findOne({
+      placementId,
+      studentId
+    });
+
+    if (existing) {
+      return res.json({
+        success: false,
+        message: "Feedback already submitted for this drive"
+      });
+    }
+
+    // create feedback
+    const feedback = new PlacementFeedback({
+      placementId,
+      studentId,
+      rating,
+      comment
+    });
+
+    await feedback.save();
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("PLACEMENT FEEDBACK ERROR:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+});
+
+app.get("/admin/reports", async (req, res) => {
+  try {
+    // ===== EVENT FEEDBACKS =====
+    const eventFeedbacks = await Feedback.find()
+      .populate("eventId", "eventName")
+      .lean();
+
+    const formattedEvents = eventFeedbacks.map(f => ({
+      ...f,
+      type: "event"
+    }));
+
+    // ===== PLACEMENT FEEDBACKS =====
+    const placementFeedbacks = await PlacementFeedback.find()
+      .populate("placementId", "name jobrole company")
+      .lean();
+
+    const formattedPlacements = placementFeedbacks.map(f => ({
+      ...f,
+      type: "placement"
+    }));
+
+    // ===== MERGE + SORT =====
+    const allFeedbacks = [...formattedEvents, ...formattedPlacements]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    res.json({
+      success: true,
+      feedbacks: allFeedbacks
+    });
+
+  } catch (err) {
+    console.error("REPORT ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.get("/placement/feedback-summary/:id", async (req, res) => {
+  try {
+    const placementId = req.params.id;
+
+    const feedbacks = await PlacementFeedback.find({ placementId });
+
+    const total = feedbacks.length;
+
+    const avg =
+      total > 0
+        ? (
+            feedbacks.reduce((sum, f) => sum + f.rating, 0) / total
+          ).toFixed(1)
+        : 0;
+
+    res.json({
+      success: true,
+      totalFeedbacks: total,
+      avgRating: avg,
+    });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false });
   }
 });

@@ -18,12 +18,6 @@ const ManagePlacements = () => {
     });
 
     fetchPlacements(); // refresh list
-
-    // remove after 2 seconds
-    setTimeout(() => {
-      setPlacements((prev) => prev.filter((p) => p._id !== id));
-    }, 2000);
-
   } catch (err) {
     console.log(err);
   }

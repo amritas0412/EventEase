@@ -3,7 +3,7 @@ import "../../styles/Reports.css";
 
 const Reports = () => {
   const [feedbacks, setFeedbacks] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState("All");
+  const [selectedItem, setSelectedItem] = useState("All");
 
   useEffect(() => {
     fetch("http://localhost:5050/admin/reports")
@@ -17,15 +17,27 @@ const Reports = () => {
 
   const eventNames = [
     "All",
-    ...new Set(feedbacks.map(f => f.eventId?.eventName))
+    ...new Set(
+      feedbacks.map(
+        f => 
+          f.type === "event"
+            ? f.eventId?.eventName 
+            : f.placementId?.name || f.placementId?.company
+      )
+    )
   ];
 
   const filteredFeedback =
-    selectedEvent === "All"
+    selectedItem === "All"
       ? feedbacks
-      : feedbacks.filter(
-        f => f.eventId?.eventName === selectedEvent
-      );
+      : feedbacks.filter(f => {
+        const name = 
+          f.type === "event"
+            ? f.eventId?.eventName
+            : f.placementId?.name || f.placementId.company;
+          
+        return name === selectedItem;
+      });
   // ✅ Calculate Average Rating Safely
   const avgRating =
     filteredFeedback.length > 0
@@ -36,6 +48,32 @@ const Reports = () => {
         ) / filteredFeedback.length
       ).toFixed(1)
       : 0;
+
+  const getItemName = (f) =>
+    f.type === "event"
+      ? f.eventId?.eventName
+      : f.placementId?.name || f.placementId?.company;
+
+  const avgByItem = Object.values(
+    filteredFeedback.reduce((acc, curr) => {
+      const name = getItemName(curr);
+      if (!name) return acc;
+
+      if (!acc[name]) {
+        acc[name] = { name, total: 0, count: 0 };
+      }
+
+      acc[name].total += curr.rating;
+      acc[name].count += 1;
+
+      return acc;
+    }, {})
+  ).map(item => ({
+    name: item.name,
+    avg: (item.total / item.count).toFixed(1),
+    count: item.count
+  }));
+
   return (
     //   <div className="reports-page">
     //     <h2>Reports & Feedback</h2>
@@ -103,10 +141,10 @@ const Reports = () => {
 
       {/* FILTER */}
       <div className="report-filter">
-        <label>Filter by Event:</label>
+        <label>Filter by Event / Placement:</label>
         <select
-          value={selectedEvent}
-          onChange={(e) => setSelectedEvent(e.target.value)}
+          value={selectedItem}
+          onChange={(e) => setSelectedItem(e.target.value)}
         >
           {eventNames.map((event, index) => (
             <option key={index} value={event}>
@@ -135,14 +173,42 @@ const Reports = () => {
         </div>
       )}
 
+      {/* ===== AVERAGE PER EVENT/PLACEMENT ===== */}
+      {avgByItem.length > 0 && (
+        <div className="report-breakdown">
+          <h3>Average Rating by Event / Placement</h3>
+
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Drive</th>
+                <th>Average Rating</th>
+                <th>Total Reviews</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {avgByItem.map((item, index) => (
+                <tr key={index}>
+                  <td>{item.name}</td>
+                  <td>⭐ {item.avg}</td>
+                  <td>{item.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {/* FEEDBACK LIST */}
       <div className="feedback-list">
         {filteredFeedback.map((item) => (
           <div key={item._id} className="feedback-card">
             <div className="feedback-header">
               <span className="event-name">
-                {item.eventId?.eventName ||
-                  item.placementId?.company}
+                {item.type === "event"
+                  ? item.eventId?.eventName
+                  : item.placementId?.name || item.placementId?.company}
               </span>
               <span className="rating-stars">
                 {"★".repeat(item.rating)}

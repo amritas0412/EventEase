@@ -1,39 +1,28 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "../../styles/AdminRegisteredStudents.css";
 
 const AdminRegisteredStudents = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Dummy registered students data
-  const students = [
-    {
-      id: 1,
-      name: "Ritika Bhandari",
-      email: "ritika@gmail.com",
-      //department: "CSE",
-      year: "3rd Year",
-    },
-    {
-      id: 2,
-      name: "Aashi Verma",
-      email: "aashi@gmail.com",
-      //department: "IT",
-      year: "4th Year",
-    },
-    {
-      id: 3,
-      name: "Neha Sharma",
-      email: "neha@gmail.com",
-      //department: "ECE",
-      year: "3rd Year",
-    },
-  ];
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    fetch(`http://localhost:5050/placement/${id}/registrations`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setStudents(data.registrations);
+        }
+      })
+      .catch(err => console.error("FETCH STUDENTS ERROR:", err));
+  }, [id]);
 
   return (
     <div className="admin-registered-page">
       <div className="page-header">
-        <h2>Registered Students (Event: {eventName})</h2>
+        <h2>Registered Students</h2>
         <button className="back-btn" onClick={() => navigate(-1)}>
           ← Back
         </button>
@@ -44,20 +33,22 @@ const AdminRegisteredStudents = () => {
           <tr>
             <th>Name</th>
             <th>Email</th>
-            {/*<th>Department</th>*/}
-            <th>Year</th>
           </tr>
         </thead>
 
         <tbody>
-          {students.map((student) => (
-            <tr key={student.id}>
-              <td>{student.name}</td>
-              <td>{student.email}</td>
-              {/*<td>{student.department}</td>*/}
-              <td>{student.year}</td>
+          {students.length === 0 ? (
+            <tr>
+              <td colSpan="2">No students registered</td>
             </tr>
-          ))}
+          ) : (
+            students.map((student, index) => (
+              <tr key={index}>
+                <td>{student.name}</td>
+                <td>{student.email}</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

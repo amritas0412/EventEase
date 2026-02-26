@@ -161,6 +161,27 @@ const Placements = () => {
   const pendingPlacements = events.filter(ev => ev.status === "pending");
   const approvedPlacements = events.filter(ev => ev.status === "approved" && ev.date && ev.date >= today);
 
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const handleViewStudents = async (placementId) => {
+  try {
+    setLoadingStudents(true);
+
+    const res = await fetch(
+      `http://localhost:5050/placement/${placementId}/registrations`
+    );
+    const data = await res.json();
+
+    setSelectedStudents(data.registrations || []);
+    setShowModal(true);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingStudents(false);
+  }
+};
+
   return (
     <div className="placement-layout">
       {/* Sidebar */}
@@ -242,7 +263,13 @@ const Placements = () => {
               <h4>{event.name}</h4>
               <p>💼 {event.jobrole}</p>
               <p>
-                📅 {event.date} ⏰ {event.time} to {event.endtime}
+                📅 {" "}
+                  {new Date(event.date).toLocaleDateString("en-GB"/*, {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  }*/)}{" "}
+                ⏰ {event.time} to {event.endtime}
               </p>
 
               <p>🏢 {event.venue}</p>
@@ -250,24 +277,27 @@ const Placements = () => {
               <p>🎓 {event.audience}</p>
               <p>💰 ₹{event.stipend} / month</p>
               {event.description && <p>{event.description}</p>}
+        
 
         {/* Registration Info */}
         <div className="registration-info">
-          <p>📝 Registered Students: {event.registrations.length}</p>
-
-          {event.registrations.length > 0 && (
-            <div className="registered-students-list">
-              {event.registrations.map((student, idx) => (
-                <div key={idx} className="student-item">
-                  <strong>{student.name}</strong> — <span>{student.email}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <p>📝 Registered Students: {event.registrations?.length || 0}</p>
+          <button
+            className="view-btn"
+            onClick={() => handleViewStudents(event._id)}
+          >
+            👥 View Students
+          </button>
         </div>
 
-
-              <button onClick={() => handleEdit(event)}>✏ Edit</button>
+        <div className="action-row">
+          <button
+            className="edit-btn"
+            onClick={() => handleEdit(event)}
+          >
+            ✏ Edit
+          </button>
+        </div>
             </div>
           ))}
         </div>
@@ -283,6 +313,51 @@ const Placements = () => {
                 <p>{event.jobrole}</p>
               </div>
             ))}
+          </div>
+        )}
+
+        {showModal && (
+          <div 
+            className="popup-backdrop"
+            onClick={() => setShowModal(false)}
+          >
+            <div 
+              className="popup-card"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="popup-header">
+                <h3>Registered Students</h3>
+                <button
+                  className="popup-close"
+                  onClick={() => setShowModal(false)}
+                >
+                  ✖
+                </button>
+              </div>
+
+              {loadingStudents ? (
+                <p>Loading...</p>
+              ) : selectedStudents.length === 0 ? (
+                <p>No students registered</p>
+              ) : (
+                <table className="students-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedStudents.map((s, index) => (
+                      <tr key={index}>
+                        <td>{s.name}</td>
+                        <td>{s.email}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </div>
         )}
       </main>

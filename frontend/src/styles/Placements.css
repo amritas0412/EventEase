@@ -188,6 +188,10 @@
   margin-top: 10px;
   padding-top: 5px;
   border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
 .registered-students-list {
@@ -201,4 +205,78 @@
 .student-item {
   font-size: 0.9rem;
   color: #333;
+}
+
+.view-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.popup-backdrop {
+  position: fixed;
+  inset: 0;                /* 🔥 stronger than top/left */
+  width: 100vw;
+  height: 100vh;
+
+  display: grid;           /* 🔥 more reliable than flex */
+  place-items: center;
+
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+
+  z-index: 99999;
+}
+
+.popup-card {
+  background: #fff;
+  width: 500px;
+  max-width: 92vw;
+  max-height: 75vh;
+  overflow-y: auto;
+
+  border-radius: 16px;
+  padding: 22px;
+
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+
+  animation: popupScale 0.25s ease;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.popup-close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+@keyframes popupScale {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+.action-row {
+  margin-top: 14px;
+}
+
+.view-btn:hover {
+  background: #1d4ed8;
 }

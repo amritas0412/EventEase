@@ -6,25 +6,10 @@ const StudentPlacementDetails = () => {
   const { id } = useParams();
 
   const [registered, setRegistered] = useState(false);
-  const [completed] = useState(true);
-
-  const [rating, setRating] = useState(0);
-  const [feedback, setFeedback] = useState("");
-  const [submitted, setSubmitted] = useState(false);
 
   const [placement, setPlacement] = useState(null);
 
   const studentId = localStorage.getItem("studentId");
-
-  const handleSubmitFeedback = () => {
-    if (rating === 0) {
-      alert("Please select a rating");
-      return;
-    }
-
-    console.log({ id, rating, feedback });
-    setSubmitted(true);
-  };
 
   useEffect(() => {
     fetch(`http://localhost:5050/placement/${id}`)
@@ -111,40 +96,6 @@ const StudentPlacementDetails = () => {
         </button>
       </div>
 
-      {/* ===== FEEDBACK ===== */}
-      {registered && completed && (
-        <div className="feedback-section">
-          <h3>Feedback</h3>
-
-          {submitted ? (
-            <p>Thank you for your feedback!</p>
-          ) : (
-            <>
-              <div className="star-rating">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <span
-                    key={s}
-                    className={s <= rating ? "star active" : "star"}
-                    onClick={() => setRating(s)}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-
-              <textarea
-                placeholder="Optional feedback"
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-              />
-
-              <button onClick={handleSubmitFeedback}>
-                Submit Feedback
-              </button>
-            </>
-          )}
-        </div>
-      )}
     </div>
   );
 };
