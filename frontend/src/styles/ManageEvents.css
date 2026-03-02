@@ -128,3 +128,54 @@
     font-size: 12px;
   }
 }
+.admin-section {
+  margin-top: 40px;
+  padding: 25px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+.admin-table thead {
+  background: #f4f6fb;
+  font-weight: 600;
+}
+
+.admin-table th {
+  padding: 14px;
+  font-size: 14px;
+  color: #555;
+}
+.performance-wrapper {
+  position: relative;
+  background: #eee;
+  height: 10px;
+  border-radius: 6px;
+  width: 100px;
+}
+
+.performance-bar {
+  background: linear-gradient(90deg, #4caf50, #2e7d32);
+  height: 100%;
+  border-radius: 6px;
+}
+.rating-cell {
+  font-size: 15px;
+}
+
+.rating-cell .star {
+  color: #f4b400;
+  margin-right: 4px;
+}
+button {
+  background: #6c63ff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  background: #574bff;
+}

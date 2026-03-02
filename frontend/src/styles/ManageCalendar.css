@@ -4,7 +4,13 @@
   min-height: 100vh;
   font-family: "Segoe UI", sans-serif;
 }
-
+.calendar-controls {
+  display: flex;
+  justify-content: center;   /* centers horizontally */
+  align-items: center;
+  gap: 16px;                 /* spacing between items */
+  margin: 20px 0;
+}
 /* HEADER */
 .calendar-header {
   display: flex;

@@ -34,63 +34,6 @@ mongoose.connect(mongoURI)
   .catch(err => console.log("MongoDB connection error:", err));
 
 // Login API
-// app.post("/login", async (req, res) => {
-//   const { email, password, role } = req.body;
-
-//   try {
-//     let user;
-
-//     if (role === "Student") {
-//       user = await Student.findOne({ email });
-//     } else if (role === "Faculty") {
-//       user = await Faculty.findOne({ email });
-//     } else if (role === "Placement Cell") {
-//       user = await PlacementCell.findOne({ email });
-//     } else if (role === "Admin") {
-//       user = await Admin.findOne({ email });
-//     } else {
-//       return res.json({ success: false, message: "Role not supported" });
-//     }
-
-//     if (!user) {
-//       return res.json({ success: false, message: "User not found" });
-//     }
-
-//     if (user.password !== password) {
-//       return res.json({ success: false, message: "Wrong password" });
-//     }
-
-//     // res.json({
-//     //   success: true,
-//     //   role: role.toLowerCase(),   // 🔥 add this
-//     //   user: {
-//     //     _id: user._id,
-//     //     email: user.email,
-//     //     name: user.name,
-//     //     department: user.department,
-//     //     designation: user.designation
-//     //   }
-//     // });
-// res.json({
-//   success: true,
-//   role: role.toLowerCase(),
-//   user: {
-//     _id: user._id,
-//     email: user.email,
-//     name: user.name,
-//     department: user.department,
-//     designation: user.designation,
-//     studentId: user.studentId || null   // 🔥 ADD THIS
-//   }
-// });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({
-//       success: false,
-//       message: "Server error",
-//     });
-//   }
-// });
 app.post("/login", async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -108,7 +51,7 @@ app.post("/login", async (req, res) => {
     else if (role === "Admin") {
       user = await Admin.findOne({ email });
     }
-else if (role === "Placement Cell") {   // 🔥 ADD THIS
+    else if (role === "Placement Cell") {   // 🔥 ADD THIS
       user = await PlacementCell.findOne({ email });
     }
     if (!user) {
@@ -249,6 +192,37 @@ app.post("/reset-password/:token", async (req, res) => {
     message: "Password reset successful",
   });
 });
+// app.post("/faculty/events", async (req, res) => {
+//   try {
+//     const faculty = await Faculty.findOne({
+//       email: req.body.conductedBy
+//     });
+
+//     if (!faculty) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Faculty not found"
+//       });
+//     }
+
+//     const event = new Event({
+//       ...req.body,
+//       conductedBy: faculty._id,   // ✅ store ObjectId
+//       status: "pending"
+//     });
+
+//     await event.save();
+
+//     res.status(201).json({
+//       success: true,
+//       message: "Event submitted successfully"
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false });
+//   }
+// });
 app.post("/faculty/events", async (req, res) => {
   try {
     const faculty = await Faculty.findOne({
@@ -262,9 +236,27 @@ app.post("/faculty/events", async (req, res) => {
       });
     }
 
+    const {
+      eventName,
+      date,
+      startTime,
+      endTime,
+      venue,
+      eligible,
+      description,
+      maxParticipants   // 👈 ADD THIS
+    } = req.body;
+
     const event = new Event({
-      ...req.body,
-      conductedBy: faculty._id,   // ✅ store ObjectId
+      eventName,
+      date,
+      startTime,
+      endTime,
+      venue,
+      eligible,
+      description,
+      maxParticipants: maxParticipants || null,  // 👈 STORE LIMIT
+      conductedBy: faculty._id,
       status: "pending"
     });
 
@@ -281,54 +273,43 @@ app.post("/faculty/events", async (req, res) => {
   }
 });
 
-// app.get("/faculty/events", async (req, res) => {
-//   try {
-//     const events = await Event.find({ status: "approved" })
-//       .populate("conductedBy", "name");  // ✅ this fetches faculty name
-
-//     res.json({ success: true, events });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false });
-//   }
-// });
-// app.get("/faculty/events", async (req, res) => {
-//   try {
-//     const events = await Event.find()
-//       .populate("conductedBy", "name");
-
-//     res.json({ success: true, events });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false });
-//   }
-// });
 app.get("/faculty/events", async (req, res) => {
   try {
-    const events = await Event.find()
-      .populate("conductedBy", "name");
+    const events = await Event.find().populate("conductedBy");
 
-    // Attach registration count to each event
-    const eventsWithCount = await Promise.all(
+    const enrichedEvents = await Promise.all(
       events.map(async (event) => {
-        const count = await Registration.countDocuments({
-          eventId: event._id
+
+        // Registration count
+        const registeredCount = await Registration.countDocuments({
+          eventId: event._id,
         });
 
+        // Feedbacks
+        const feedbacks = await Feedback.find({
+          eventId: event._id,
+        });
+
+        const avg =
+          feedbacks.length > 0
+            ? feedbacks.reduce((sum, f) => sum + f.rating, 0) /
+            feedbacks.length
+            : 0;
+
         return {
-          ...event.toObject(),
-          registeredCount: count
+          ...event._doc,
+          registeredCount,
+          feedbackCount: feedbacks.length,
+          averageRating: avg,
         };
       })
     );
 
-    res.json({ success: true, events: eventsWithCount });
+    res.json({ success: true, events: enrichedEvents });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
   }
 });
 app.get("/admin/event-requests", async (req, res) => {
@@ -393,23 +374,34 @@ app.get("/admin/events", async (req, res) => {
     const events = await Event.find({ status: "approved" })
       .populate("conductedBy", "name");
 
-    const eventsWithCounts = await Promise.all(
+    const eventsWithStats = await Promise.all(
       events.map(async (event) => {
+
         const registrationCount = await Registration.countDocuments({
           eventId: event._id
         });
 
+        const feedbacks = await Feedback.find({
+          eventId: event._id
+        });
+
+        const feedbackCount = feedbacks.length;
+
+        const averageRating =
+          feedbackCount > 0
+            ? feedbacks.reduce((sum, f) => sum + f.rating, 0) / feedbackCount
+            : 0;
+
         return {
           ...event._doc,
-          organizerName: event.conductedBy
-            ? event.conductedBy.name
-            : "Unknown Faculty",
-          registeredCount: registrationCount
+          registeredCount: registrationCount,
+          feedbackCount,
+          averageRating
         };
       })
     );
 
-    res.json({ success: true, events: eventsWithCounts });
+    res.json({ success: true, events: eventsWithStats });
 
   } catch (err) {
     console.error("ADMIN EVENTS FETCH ERROR:", err);
@@ -591,6 +583,43 @@ app.post("/student/register/placement", async (req, res) => {
   }
 });
 
+// app.post("/student/register/event", async (req, res) => {
+//   try {
+//     const { studentId, eventId } = req.body;
+
+//     if (!studentId || !eventId) {
+//       return res.status(400).json({ message: "Missing data" });
+//     }
+
+//     // 🔥 FIX IS HERE
+//     const student = await Student.findById(studentId);
+//     if (!student) {
+//       return res.status(400).json({ message: "Student not found" });
+//     }
+
+//     const event = await Event.findById(eventId);
+//     if (!event) {
+//       return res.status(400).json({ message: "Event not found" });
+//     }
+
+//     const registration = new Registration({
+//       studentId: student._id,
+//       name: student.name,
+//       eventName: event.eventName,
+//       date: event.date,
+//       conductedBy: event.conductedBy,
+//       eventId: event._id
+//     });
+
+//     await registration.save();
+
+//     res.json({ success: true });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Registration failed" });
+//   }
+// });
 app.post("/student/register/event", async (req, res) => {
   try {
     const { studentId, eventId } = req.body;
@@ -599,7 +628,6 @@ app.post("/student/register/event", async (req, res) => {
       return res.status(400).json({ message: "Missing data" });
     }
 
-    // 🔥 FIX IS HERE
     const student = await Student.findById(studentId);
     if (!student) {
       return res.status(400).json({ message: "Student not found" });
@@ -609,6 +637,31 @@ app.post("/student/register/event", async (req, res) => {
     if (!event) {
       return res.status(400).json({ message: "Event not found" });
     }
+    // ✅ 1️⃣ CHECK DUPLICATE REGISTRATION (ADD HERE)
+    const alreadyRegistered = await Registration.findOne({
+      studentId,
+      eventId
+    });
+
+    if (alreadyRegistered) {
+      return res.status(400).json({
+        message: "Already registered"
+      });
+    }
+    // 🔥 ADD THIS PART HERE
+    //  if (event.maxParticipants !== null){
+    if (event.maxParticipants && event.maxParticipants > 0){
+      const totalRegistrations = await Registration.countDocuments({
+        eventId: event._id
+      });
+
+      if (totalRegistrations >= event.maxParticipants) {
+        return res.status(400).json({
+          message: "Event is full"
+        });
+      }
+    }
+    // 🔥 END OF ADDED PART
 
     const registration = new Registration({
       studentId: student._id,
@@ -760,28 +813,7 @@ app.post("/events/register", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-// app.get("/student/my-registrations/:studentId", async (req, res) => {
-//   try {
-//     const { studentId } = req.params;
 
-//     const registrations = await Registration.find({
-//       studentId,
-//       eventId: { $ne: null }
-//     });
-
-//     res.json({
-//       success: true,
-//       registrations
-//     });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({
-//       success: false,
-//       message: "Server error"
-//     });
-//   }
-// });
 app.get("/student/my-registrations/:studentId", async (req, res) => {
   try {
     const registrations = await Registration.find({
@@ -825,9 +857,9 @@ app.get("/admin/dashboard-stats", async (req, res) => {
     const totalFaculty = await Faculty.countDocuments();
     const totalPlacementCell = await PlacementCell.countDocuments();
 
-    const totalUsers = 
-      totalStudents + 
-      totalFaculty + 
+    const totalUsers =
+      totalStudents +
+      totalFaculty +
       totalPlacementCell;
 
     res.json({
@@ -904,23 +936,6 @@ app.post("/student/feedback", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-/*app.get("/admin/reports", async (req, res) => {
-  try {
-    const feedbacks = await Feedback.find()
-      .populate("eventId", "eventName")
-      .populate("placementId", "company role")
-      .sort({ createdAt: -1 });
-
-    res.json({
-      success: true,
-      feedbacks
-    });
-
-  } catch (err) {
-    console.error("REPORT ERROR:", err);
-    res.status(500).json({ success: false });
-  }
-});*/
 
 app.post("/student/placement-feedback", async (req, res) => {
   try {
@@ -1014,8 +1029,8 @@ app.get("/placement/feedback-summary/:id", async (req, res) => {
     const avg =
       total > 0
         ? (
-            feedbacks.reduce((sum, f) => sum + f.rating, 0) / total
-          ).toFixed(1)
+          feedbacks.reduce((sum, f) => sum + f.rating, 0) / total
+        ).toFixed(1)
         : 0;
 
     res.json({
@@ -1025,6 +1040,91 @@ app.get("/placement/feedback-summary/:id", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ success: false });
+  }
+});
+
+const getRegisteredStudents = async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+
+    const registrations = await Registration.find({ eventId })
+      .populate("studentId");
+
+    if (!registrations.length) {
+      return res.json([]);
+    }
+
+    const students = registrations.map(reg => reg.studentId);
+
+    res.json(students);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+app.get(
+  "/faculty/events/:eventId/registered-students",
+  getRegisteredStudents
+);
+app.get("/admin/events/:id", async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id)
+      .populate("conductedBy", "name");
+
+    if (!event) {
+      return res.status(404).json({ success: false });
+    }
+
+    // Registration count
+    const registrationCount = await Registration.countDocuments({
+      eventId: event._id
+    });
+
+    // Feedbacks
+    const feedbacks = await Feedback.find({
+      eventId: event._id
+    });
+
+    const feedbackCount = feedbacks.length;
+
+    const averageRating =
+      feedbackCount > 0
+        ? feedbacks.reduce((sum, f) => sum + f.rating, 0) /
+        feedbackCount
+        : 0;
+
+    const performance =
+      registrationCount > 0
+        ? ((feedbackCount / registrationCount) * 100).toFixed(0)
+        : 0;
+
+    res.json({
+      success: true,
+      event,
+      registeredCount: registrationCount,
+      feedbackCount,
+      averageRating,
+      performance,
+      feedbacks
+    });
+
+  } catch (err) {
+    console.error("ADMIN EVENT DETAILS ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.get("/faculty/events/calendar", async (req, res) => {
+  try {
+    const events = await Event.find()
+      .populate("conductedBy", "_id name");
+
+    res.json({ success: true, events });
+
+  } catch (err) {
     res.status(500).json({ success: false });
   }
 });

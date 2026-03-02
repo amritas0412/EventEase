@@ -134,7 +134,13 @@ const ManageCalendar = () => {
       </div>
 
       {/* CALENDAR */}
-      <div className="calendar-grid">
+      <div className="calendar-grid">{/* Weekday Headers */}
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
+          <div key={day} className="calendar-weekday">
+            {day}
+          </div>
+        ))}
+
         {Array.from({ length: startDay }).map((_, i) => (
           <div key={`empty-${i}`} className="calendar-day empty"></div>
         ))}

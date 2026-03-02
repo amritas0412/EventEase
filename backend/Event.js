@@ -11,7 +11,10 @@ const eventSchema = new mongoose.Schema({
   venue: String,
   eligible: String,
   description: String,
-
+  maxParticipants: {
+    type: Number,
+    default: null   // null = unlimited
+  },
   conductedBy: {
     type: mongoose.Schema.Types.ObjectId,   // ✅ IMPORTANT
     ref: "Faculty",                        // ✅ IMPORTANT
@@ -22,7 +25,13 @@ const eventSchema = new mongoose.Schema({
     type: String,
     enum: ["pending", "approved", "rejected"],
     default: "pending"
-  }
+  },
+  registeredStudents: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ]
 });
 
 module.exports = mongoose.model("Event", eventSchema);

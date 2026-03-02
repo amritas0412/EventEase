@@ -19,16 +19,16 @@
 
 /* ================= EVENT CARD ================= */
 .event-card {
-  background: #ffffff;
-  border-radius: 16px; /* smoother */
-  padding: 26px; /* ✅ MORE SPACE INSIDE BOX */
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  transition: 0.2s ease;
+  border-left: 5px solid #6c63ff;
 }
 
 .event-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
 }
 
 .event-card h3 {
@@ -66,10 +66,12 @@
   .events-page {
     padding-left: 20px; /* sidebar usually collapses */
   }
-
-  .events-list {
-    grid-template-columns: 1fr;
-  }
+.events-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
+  margin-top: 20px;
+}
 }
 .past-event-card {
   border-left: 4px solid #10b981;
@@ -101,4 +103,19 @@
   color: #10b981;
   font-weight: 600;
   margin-bottom: 6px;
+}
+.student-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.student-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.student-content {
+  flex: 1;
+  padding: 30px 30px;
+  background: #f6f4fa;
 }

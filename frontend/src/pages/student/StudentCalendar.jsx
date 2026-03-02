@@ -95,7 +95,12 @@ const StudentCalendar = () => {
 
       {/* ===== GRID ===== */}
       <div className="calendar-grid">
-
+{/* Weekday Headers */}
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
+          <div key={day} className="calendar-weekday">
+            {day}
+          </div>
+        ))}
         {/* Empty slots */}
         {Array.from({ length: startDay }).map((_, i) => (
           <div

@@ -28,6 +28,15 @@ const FacultyEvents = () => {
 
   const today = new Date().toISOString().split("T")[0];
 
+  // const emptyForm = {
+  //   eventName: "",
+  //   date: "",
+  //   startTime: "",
+  //   endTime: "",
+  //   venue: "",
+  //   eligible: "",
+  //   description: "",
+  // };
   const emptyForm = {
     eventName: "",
     date: "",
@@ -36,8 +45,8 @@ const FacultyEvents = () => {
     venue: "",
     eligible: "",
     description: "",
+    maxParticipants: ""
   };
-
   const upcomingEvents = approvedEvents.filter(
     event => event.date >= today
   );
@@ -226,7 +235,13 @@ const FacultyEvents = () => {
               value={formData.description}
               onChange={handleChange}
             />
-
+            <input
+              type="number"
+              name="maxParticipants"
+              placeholder="Max Participants"
+              value={formData.maxParticipants}
+              onChange={handleChange}
+            />
 
             <div className="form-actions">
               <button type="submit">📨 Submit</button>

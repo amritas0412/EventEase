@@ -1,16 +1,75 @@
-# React + Vite
+📅 EventEase – Event & Placement Management System
+EventEase is a full-stack web application built to manage academic events and placements efficiently.
+It provides separate dashboards for Admin, Faculty, Students, and Placement Cell with role-based access control.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🚀 Key Features:
+👨‍🏫 Faculty Panel
+    Create new events (approval-based system)
+    Set maximum participant limit for events
+    Track pending and approved requests
+    View event history
+    View registered students for each event
+    Calendar with color-coded indicators:
+        🟡 Pending Approval
+        🔵 My Approved Events
+        🟣 Other Faculty Approved Events
 
-Currently, two official plugins are available:
+🎓 Student Panel
+    View approved events
+    Register for events 
+    Prevent duplicate registrations
+    Automatic participant limit enforcement
+    Registration status checking
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🏢 Placement Cell Panel
+    Add new placement drives
+    Manage company details
+    View student applications
+    No participant limitation for placement drives
+    Monitor placement records
 
-## React Compiler
+👨‍💼 Admin Panel
+    Approve / Reject faculty event requests
+    Manage placements
+    View calendar overview
+    Generate reports
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+🛠 Tech Stack
+Frontend
+    React.js
+    React Router
+    CSS
+    Fetch API
+Backend
+    Node.js
+    Express.js
+    MongoDB
+    Mongoose
 
-## Expanding the ESLint configuration
+🧠 Event Participant Limitation Logic
+    Faculty can define maxParticipants while creating an event.
+    If maxParticipants is not specified, the event allows unlimited registrations.
+    During student registration:
+    Duplicate registrations are prevented.
+    If the maximum seat limit is reached, further registrations are blocked.
+    Only approved events are visible and open for student registration.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+📊 Status Workflow
+    Faculty submits a new event → Status: pending
+    Admin reviews the event request.
+    If approved → Status: approved
+    Students can register only for events with approved status.
+
+🔐 Security & Validation
+    Duplicate registration validation.
+    Event capacity enforcement.
+    Status-based filtering (pending / approved / rejected).
+    Faculty ownership verification.
+    Backend-side validation before saving any data.
+
+📌 Future Enhancements
+    JWT-based authentication system.
+    Real-time seat availability counter.
+    Email notification system.
+    Advanced analytics dashboard.
+    Pagination and search filters for large datasets.

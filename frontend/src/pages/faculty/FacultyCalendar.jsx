@@ -13,7 +13,7 @@ const FacultyCalendar = () => {
   const [events, setEvents] = useState([]);
   const facultyId = localStorage.getItem("facultyId");
   useEffect(() => {
-    fetch("http://localhost:5050/admin/events")
+    fetch("http://localhost:5050/faculty/events/calendar")
       .then(res => res.json())
       .then(data => {
         if (data.success) {
@@ -21,7 +21,7 @@ const FacultyCalendar = () => {
         }
       })
       .catch(err => console.error(err));
-  }, [monthIndex, year]);
+  }, []); // Load all events once
 
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const startDay = new Date(year, monthIndex, 1).getDay();
@@ -49,32 +49,46 @@ const FacultyCalendar = () => {
       </div>
 
       <div className="calendar-grid">
+        {/* Weekday Headers */}
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
+          <div key={day} className="calendar-weekday">
+            {day}
+          </div>
+        ))}
         {Array.from({ length: startDay }).map((_, i) => (
           <div key={`e-${i}`} className="calendar-day empty"></div>
         ))}
         {Array.from({ length: daysInMonth }, (_, i) => {
           const day = i + 1;
+          // 
           const dayEvents = events.filter(e => {
-            const d = new Date(e.date);
-            return (
-              d.getDate() === day &&
-              d.getMonth() === monthIndex &&
-              d.getFullYear() === year
-            );
-          });
+  const d = new Date(e.date);
+  return (
+    d.getDate() === day &&
+    d.getMonth() === monthIndex &&
+    d.getFullYear() === year
+  );
+});
 
-          const hasMyEvent = dayEvents.some(
-            e => e.conductedBy?._id === facultyId
-          );
+const myEvents = dayEvents.filter(
+  e => e.conductedBy?._id === facultyId
+);
 
-          const hasOtherEvent = dayEvents.length > 0;
-          let cls = "calendar-day";
-          if (hasMyEvent) {
-            cls += " faculty-day";     // Blue
-          } else if (hasOtherEvent) {
-            cls += " event-day";       // Purple
-          }
+const hasMyApproved = myEvents.some(e => e.status === "approved");
+const hasMyPending = myEvents.some(e => e.status === "pending");
+const hasOtherApproved = dayEvents.some(
+  e => e.status === "approved" && e.conductedBy?._id !== facultyId
+);
 
+let cls = "calendar-day";
+
+if (hasMyPending) {
+  cls += " pending-day";        // 🟡 Yellow
+} else if (hasMyApproved) {
+  cls += " faculty-day";        // 🔵 Blue
+} else if (hasOtherApproved) {
+  cls += " event-day";          // 🟣 Purple
+}
           return (
             <div key={day} className={cls}>
               {day}
@@ -89,6 +103,9 @@ const FacultyCalendar = () => {
         </div>
         <div>
           <span className="legend-box faculty"></span> My Event
+        </div>
+        <div>
+          <span className="legend-box pending"></span> Pending Approval
         </div>
       </div>
     </div>

@@ -3,15 +3,13 @@
   border-radius: 10px;
   color: white;
 }
-
-.calendar-day.event-day {
-  background: #b3a3e0;; /* purple */
-  color: white;
-}
-
-.calendar-day.faculty-day {
-  background: #2563eb; /* blue */
-  color: white;
+.calendar-legend {
+  display: flex;
+  justify-content: center;   /* centers horizontally */
+  align-items: center;
+  gap: 30px;                 /* space between items */
+  margin-top: 25px;
+  font-weight: 500;
 }
 .legend-box.faculty {
   background: #2563eb;   /* same blue as faculty-day */
@@ -26,4 +24,64 @@
   font-size: 26px;
   margin-bottom: 20px;
 }
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+.calendar-weekday {
+  font-weight: 600;
+  text-align: center;
+  padding: 8px 0;
+}
 
+.weekday {
+  padding: 10px 0;
+}
+
+.weekday {
+  padding: 8px 0;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;   /* slightly increase for better balance */
+  max-width: 700px;
+  margin: 0 auto;
+}
+.calendar-weekdays {
+  max-width: 540px;
+  margin: 0 auto;
+}
+.calendar-day {
+  background: #eaeaea;
+  border-radius: 12px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  transition: 0.2s ease;
+  cursor: default;
+}
+
+.calendar-day:hover {
+  transform: translateY(-2px);
+}
+.pending-day {
+  background-color: #f4c430;   /* Yellow */
+  color: #000;
+}
+
+.faculty-day {
+  background-color: #4a6cf7;   /* Blue */
+  color: white;
+}
+
+.event-day {
+  background-color: #8e6dfd;   /* Purple */
+  color: white;
+}
+.legend-box.pending {
+  background: #f4c430;
+}

@@ -12,53 +12,6 @@ const Login = () => {
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
 
-//   const handleLogin = async (e) => {
-//     e.preventDefault();
-
-//     try {
-//       const response = await fetch("http://localhost:5050/login", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ email, password, role }),
-//       });
-
-//       const data = await response.json();
-//       //console.log("LOGIN RESPONSE:", data);
-//       console.log("FULL LOGIN DATA:", data);
-
-
-//       setMessage(data.message);
-//       if (!data.success || !data.user) {
-//         setIsError(true);
-//         setMessage(data.message || "Login failed");
-//         return;
-//       }
-
-//       // 🚦 REDIRECT FIRST
-//       const backendRole = (data.role || role).toLowerCase();
-//       localStorage.setItem("token", data.token || "");
-//       localStorage.setItem("role", backendRole);
-//       localStorage.setItem("email", data.user?.email || "");
-//       localStorage.setItem("name", data.user?.name || "");
-//       localStorage.setItem("facultyId", data.user?._id || "");
-//       localStorage.setItem("studentId", data.user?.studentId || "");
-      
-
-//       if (backendRole === "student") navigate("/student/dashboard", { replace: true });
-//       else if (backendRole === "admin") navigate("/admin/dashboard", { replace: true });
-//       else if (backendRole === "faculty") navigate("/faculty/dashboard", { replace: true });
-//       else if (backendRole.includes("placement")) navigate("/placement/dashboard", { replace: true });
-
-//       setIsError(false);
-//       setMessage(data.message || "Login successful");
-//     }
-
-//     catch (error) {
-//       console.error("LOGIN ERROR:", error);
-//       setMessage("Login failed — check credentials or response format");
-//       setIsError(true);
-//     }
-//   };
 const handleLogin = async (e) => {
   e.preventDefault();
 
@@ -87,9 +40,6 @@ const handleLogin = async (e) => {
     localStorage.setItem("email", data.user.email || "");
     localStorage.setItem("name", data.user.name || "");
 
-    // if (backendRole === "student") {
-    //   localStorage.setItem("studentId", data.user.studentId || "");
-    // }
 if (backendRole === "student") {
   localStorage.setItem("studentId", data.user._id);   // ✅ use _id
 }

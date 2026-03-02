@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/FacultyDashboard.css"; // ✅ FIXED PATH
 import FacultyProfile from "./FacultyProfile";
+import axios from "axios";
 
 const FacultyDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedStudents, setSelectedStudents] = useState([]);
   const facultyId = localStorage.getItem("facultyId");
 
   useEffect(() => {
@@ -40,16 +43,34 @@ const FacultyDashboard = () => {
     .filter(ev => ev.status === "pending");
 
   // Past = finished events
-  const pastEvents = events.filter(ev =>
-    new Date(ev.date) < new Date() &&
-    ev.conductedBy?._id === facultyId
-  );
+ const pastEvents = events.filter(ev =>
+  new Date(ev.date) < new Date() &&
+  String(ev.conductedBy?._id) === String(facultyId) &&
+  ev.status?.toLowerCase() === "approved"
+);
 
   const handleLogout = () => {
     localStorage.removeItem("role");
     navigate("/login");
   };
+  const handleViewStudents = async (eventId) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5050/faculty/events/${eventId}/registered-students`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        }
+      );
 
+      setSelectedStudents(res.data);
+      setShowModal(true);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
   return (
     <div className="faculty-layout">
       {/* Sidebar */}
@@ -127,23 +148,12 @@ const FacultyDashboard = () => {
                   <p>📅 {ev.date}</p>
                   <p>⏰ {ev.startTime} - {ev.endTime}</p>
                   <p>📍 {ev.venue}</p>
-                  {/* <p>Conducted by {ev.conductedBy?.name}</p>
-                  <button
-                    className="profile-btn"
-                    onClick={() => navigate(`/faculty/event/${ev._id}/students`)}
-                  >
-                    View Registered Students
-                  </button> */}
                   <p>Conducted by {ev.conductedBy?.name}</p>
-
                   {ev.conductedBy?._id === facultyId && (
                     <>
-                      {/* <p className="muted-text">
-                        Registered: {ev.registeredStudents?.length || 0}
-                      </p> */}
                       <p className="muted-text">
-  Registered: {ev.registeredCount || 0}
-</p>
+                        Registered: {ev.registeredCount || 0}
+                      </p>
                       <button
                         className="profile-btn"
                         onClick={() => navigate(`/faculty/event/${ev._id}/students`)}
@@ -196,14 +206,51 @@ const FacultyDashboard = () => {
                 <div key={ev._id} className="event-card dashboard-card">
                   <h4>{ev.eventName}</h4>
                   <p>📅 {ev.date}</p>
-                  <p>Feedback: --</p>
-                  <p className="muted-text">
-                    Total Registrations: {ev.registeredStudents?.length || 0}
+                  <p>
+                    Feedback: {ev.feedbackCount > 0
+                      ? `⭐ ${ev.averageRating.toFixed(1)} (${ev.feedbackCount})`
+                      : "No Reviews"}
                   </p>
+                  <p className="muted-text">
+                    Total Registrations: {ev.registeredCount || 0}
+                  </p>
+                  <button
+                    onClick={() => handleViewStudents(ev._id)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded mt-3"
+                  >
+                    View Registered Students
+                  </button>
                 </div>
               ))
             )}
           </div>
+          {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+              <div className="bg-white p-6 rounded w-96">
+                <h2 className="text-xl font-bold mb-4">
+                  Registered Students
+                </h2>
+
+                {selectedStudents.length === 0 ? (
+                  <p>No students registered</p>
+                ) : (
+                  selectedStudents.map(student => (
+                    <div key={student._id} className="border-b py-2">
+                      <p><strong>{student.name}</strong></p>
+                      <p>{student.email}</p>
+                    </div>
+                  ))
+                )}
+
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </main>
     </div>

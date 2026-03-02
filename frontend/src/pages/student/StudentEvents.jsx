@@ -1,54 +1,3 @@
-// import { useNavigate } from "react-router-dom";
-// import { useEffect, useState } from "react";
-// import "../../styles/StudentEvents.css";
-
-// const StudentEvents = () => {
-//   const navigate = useNavigate();
-//   const [events, setEvents] = useState([]);
-
-//   // 🔥 Fetch approved events from DB
-//   useEffect(() => {
-//     fetch("http://localhost:5050/faculty/events")
-//       .then(res => res.json())
-//       .then(data => {
-//         if (data.success) {
-//           setEvents(data.events);
-//         }
-//       })
-//       .catch(err => console.error("STUDENT FETCH ERROR:", err));
-//   }, []);
-
-//   return (
-//     <div>
-//       <h2 className="events-title">Events</h2>
-
-//       <div className="events-list">
-//         {events.length === 0 ? (
-//           <p>No approved events yet.</p>
-//         ) : (
-//           events.map(event => (
-//             <div className="event-card" key={event._id}>
-//               <h3>{event.eventName}</h3>
-//               <p>Date: {event.date}</p>
-//               <p>Location: {event.venue}</p>
-
-//               <button
-//                 className="event-btn"
-//                 onClick={() =>
-//                   navigate(`/student/events/${event._id}`)
-//                 }
-//               >
-//                 View Details
-//               </button>
-//             </div>
-//           ))
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default StudentEvents;
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../../styles/StudentEvents.css";
@@ -87,9 +36,12 @@ const StudentEvents = () => {
   const upcomingEvents = events.filter(e => e.date >= today);
   const pastEvents = events.filter(e => e.date < today);
 
+  // return (
+  //   <div>
+  //     <h2 className="events-title">Upcoming Events</h2>
   return (
-    <div>
-      <h2 className="events-title">Upcoming Events</h2>
+  <div className="student-events-page">
+    <h2 className="events-title">Upcoming Events</h2>
 
       <div className="events-list">
         {upcomingEvents.map(event => {
@@ -122,34 +74,6 @@ const StudentEvents = () => {
           );
         })}
       </div>
-      {/* ---------- PAST EVENTS SECTION ----------
-
-      <h2 className="events-title" style={{ marginTop: "40px" }}>
-        Completed Events
-      </h2>
-
-      <div className="events-list">
-        {pastEvents.length === 0 ? (
-          <p>No completed events yet.</p>
-        ) : (
-          pastEvents.map(event => (
-            <div className="event-card past-event-card" key={event._id}>
-              <h3>{event.eventName}</h3>
-              <p>Date: {event.date}</p>
-              <p>Location: {event.venue}</p>
-
-              <button
-                className="feedback-btn"
-                onClick={() =>
-                  navigate(`/student/events/${event._id}/feedback`)
-                }
-              >
-                Give Feedback
-              </button>
-            </div>
-          ))
-        )}
-      </div> */}
       {/* ---------- PAST EVENTS SECTION ---------- */}
 
       <h2 className="events-title" style={{ marginTop: "40px" }}>

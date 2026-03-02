@@ -5,16 +5,6 @@ import "../../styles/ManageEvents.css";
 const ManageEvents = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
-  // useEffect(() => {
-  //   fetch("http://localhost:5050/admin/event-requests")
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       if (data.success) {
-  //         setEvents(data.events);
-  //       }
-  //     })
-  //     .catch(err => console.error("FETCH ERROR:", err));
-  // }, []);
   useEffect(() => {
     fetch("http://localhost:5050/admin/event-requests")
       .then(res => res.json())
@@ -43,7 +33,28 @@ const ManageEvents = () => {
 
     setEvents(prev => prev.filter(ev => ev._id !== id));
   };
+  const [approvedEvents, setApprovedEvents] = useState([]);
 
+  useEffect(() => {
+    fetch("http://localhost:5050/admin/events")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setApprovedEvents(data.events);
+        }
+      });
+  }, []);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const pastEvents = approvedEvents.filter(event => {
+    const eventDate = new Date(event.date);
+    eventDate.setHours(0, 0, 0, 0);
+
+    return (
+      event.status === "approved" &&
+      eventDate < today
+    );
+  });
   return (
     <div className="manage-events-page">
       <h2 className="page-title">Events</h2>
@@ -66,7 +77,6 @@ const ManageEvents = () => {
             {events.map((event) => (
               <tr key={event._id}>
                 <td>{event.eventName}</td>
-                {/* <td>{event.organizerName}</td> */}
                 <td>{event.conductedBy?.name}</td>
                 <td>{event.date}</td>
 
@@ -117,7 +127,93 @@ const ManageEvents = () => {
           </tbody>
         </table>
       </div>
+      {/* ===== PAST EVENTS ===== */}
+      <div className="admin-section">
+        <h3>Past Events Performance</h3>
+
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Event Name</th>
+              <th>Organizer</th>
+              <th>Date</th>
+              <th>Total Registrations</th>
+              <th>Avg Rating</th>
+              <th>Reviews</th>
+              <th>Performance</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {pastEvents.length === 0 ? (
+              <tr>
+                <td colSpan="8">No past events available</td>
+              </tr>
+            ) : (
+              pastEvents.map(event => {
+
+                // const performance =
+                //   event.registeredCount > 0
+                //     ? (
+                //       (event.feedbackCount / event.registeredCount) * 100
+                //     ).toFixed(0)
+                //     : 0;
+                const performance =
+                  event.registeredCount > 0
+                    ? (
+                      ((event.feedbackCount || 0) / event.registeredCount) * 100
+                    ).toFixed(0)
+                    : 0;
+
+                return (
+                  <tr key={event._id}>
+                    <td>{event.eventName}</td>
+                    <td>{event.conductedBy?.name}</td>
+                    <td>{event.date}</td>
+                    <td>{event.registeredCount || 0}</td>
+                    {/* <td>
+                      {event.feedbackCount > 0
+                        ? `⭐ ${event.averageRating.toFixed(1)}`
+                        : "—"}
+                    </td> */}
+                    <td className="rating-cell">
+                      {event.feedbackCount > 0
+                        ? <>
+                          <span className="star">⭐</span>
+                          <strong>{event.averageRating.toFixed(1)}</strong>
+                        </>
+                        : "—"}
+                    </td>
+                    <td>{event.feedbackCount || 0}</td>
+                    {/* <td>{performance}% Feedback</td> */}
+                    <td>
+                      <div className="performance-wrapper">
+                        <div
+                          className="performance-bar"
+                          style={{ width: `${performance}%` }}
+                        ></div>
+                        <span>{performance}%</span>
+                      </div>
+                    </td>
+                    <td>
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/events/${event._id}`)
+                        }
+                      >
+                        See Details
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
+
   );
 };
 

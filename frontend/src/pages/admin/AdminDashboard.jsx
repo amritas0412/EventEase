@@ -1,4 +1,4 @@
-//import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../../styles/AdminDashboard.css";
@@ -7,7 +7,8 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [pendingEvents, setPendingEvents] = useState([]);
   const [placements, setPlacements] = useState([]);
-const [stats, setStats] = useState({});
+  const [stats, setStats] = useState({});
+
   useEffect(() => {
     fetch("http://localhost:5050/admin/event-requests")
       .then(res => res.json())
@@ -19,14 +20,14 @@ const [stats, setStats] = useState({});
       .catch(err => console.error(err));
   }, []);
   useEffect(() => {
-  fetch("http://localhost:5050/admin/dashboard-stats")
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        setStats(data);
-      }
-    });
-}, []);
+    fetch("http://localhost:5050/admin/dashboard-stats")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setStats(data);
+        }
+      });
+  }, []);
   const approve = async (id) => {
     await fetch(`http://localhost:5050/admin/events/${id}/approve`, {
       method: "PATCH",
@@ -70,9 +71,27 @@ const [stats, setStats] = useState({});
         }
       });
   }, []);
-
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
+  const upcomingEvents = approvedEvents.filter(event => {
+    const eventDate = new Date(event.date);
+    eventDate.setHours(0, 0, 0, 0);
+
+    return (
+      event.status === "approved" &&
+      eventDate >= today
+    );
+  });
+  // const pastEvents = approvedEvents.filter(event => {
+  //   const eventDate = new Date(event.date);
+  //   eventDate.setHours(0, 0, 0, 0);
+
+  //   return (
+  //     event.status === "approved" &&
+  //     eventDate < today
+  //   );
+  // });
   const upcomingPlacements = Array.isArray(placements)
     ? placements.filter(
       p => p.status === "approved" && new Date(p.date) >= today
@@ -114,37 +133,37 @@ const [stats, setStats] = useState({});
 
         <table className="admin-table">
           <thead>
-  <tr>
-    <th>Event Name</th>
-    <th>Organizer</th>
-    <th>Date</th>
-    <th>Status</th>
-    <th>Registered Students</th>
-    <th>Action</th>
-  </tr>
-</thead>
+            <tr>
+              <th>Event Name</th>
+              <th>Organizer</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Registered Students</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
           <tbody>
-            {approvedEvents.length === 0 ? (
+            {upcomingEvents.length === 0 ? (
               <tr>
                 <td colSpan="5">No upcoming events</td>
               </tr>
             ) : (
-              approvedEvents.map(event => (
+              upcomingEvents.map(event => (
                 <tr key={event._id}>
-      <td>{event.eventName}</td>
-      <td>{event.conductedBy?.name}</td>
-      <td>{event.date}</td>
-      <td>{event.status}</td>
-      <td>{event.registeredCount}</td>
-      <td>
-        <button
-          onClick={() => navigate(`/admin/events/${event._id}`)}
-        >
-          See Details
-        </button>
-      </td>
-    </tr>
+                  <td>{event.eventName}</td>
+                  <td>{event.conductedBy?.name}</td>
+                  <td>{event.date}</td>
+                  <td>{event.status}</td>
+                  <td>{event.registeredCount}</td>
+                  <td>
+                    <button
+                      onClick={() => navigate(`/admin/events/${event._id}`)}
+                    >
+                      See Details
+                    </button>
+                  </td>
+                </tr>
 
               ))
             )}
@@ -152,7 +171,68 @@ const [stats, setStats] = useState({});
 
         </table>
       </div>
+      {/* ===== PAST EVENTS =====
+      <div className="admin-section">
+        <h3>Past Events Performance</h3>
 
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Event Name</th>
+              <th>Organizer</th>
+              <th>Date</th>
+              <th>Total Registrations</th>
+              <th>Avg Rating</th>
+              <th>Total Reviews</th>
+              <th>Performance</th>
+              <th>Report</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {pastEvents.length === 0 ? (
+              <tr>
+                <td colSpan="8">No past events available</td>
+              </tr>
+            ) : (
+              pastEvents.map(event => {
+
+                const performance =
+                  event.registeredCount > 0
+                    ? (
+                      (event.feedbackCount / event.registeredCount) * 100
+                    ).toFixed(0)
+                    : 0;
+
+                return (
+                  <tr key={event._id}>
+                    <td>{event.eventName}</td>
+                    <td>{event.conductedBy?.name}</td>
+                    <td>{event.date}</td>
+                    <td>{event.registeredCount || 0}</td>
+                    <td>
+                      {event.feedbackCount > 0
+                        ? `⭐ ${event.averageRating.toFixed(1)}`
+                        : "—"}
+                    </td>
+                    <td>{event.feedbackCount || 0}</td>
+                    <td>{performance}% Feedback</td>
+                    <td>
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/events/${event._id}`)
+                        }
+                      >
+                        View Report
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div> */}
       {/* ===== UPCOMING PLACEMENTS ===== */}
       <div className="admin-section">
         <h3>Upcoming Placements</h3>
