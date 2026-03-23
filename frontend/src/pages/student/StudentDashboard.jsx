@@ -66,12 +66,24 @@ const StudentDashboard = () => {
         setRegisteredEvents([]);
       });
   }, []);
-
-
-  //  DATE LOGIC
+  // 1️⃣ FIRST define filteredEvents
+  // const filteredEvents = registrations.filter(reg => reg.eventName);
+  const filteredEvents = registeredEvents.filter(reg =>
+    reg.eventName?.toLowerCase().includes(search.toLowerCase())
+  );
   const today = new Date().toISOString().split("T")[0];
 
-  const upcomingEvents = events.filter(ev => ev.date >= today);
+  const upcomingEvents = filteredEvents
+    .filter(ev => ev.date >= today)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const pastEvents = filteredEvents
+    .filter(ev => ev.date < today)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+  //  DATE LOGIC
+  // const today = new Date().toISOString().split("T")[0];
+
+  // const upcomingEvents = events.filter(ev => ev.date >= today);
 
   const todayEvents = upcomingEvents.filter(ev => ev.date === today);
 
@@ -97,9 +109,7 @@ const StudentDashboard = () => {
       .catch(err => console.error("MY PLACEMENTS ERROR:", err));
   }, [studentId]);
 
-  const filteredEvents = registeredEvents.filter(reg =>
-    reg.eventName?.toLowerCase().includes(search.toLowerCase())
-  );
+
 
   const filteredPlacements = registeredPlacements
     .map(reg => reg.placementId)
@@ -234,10 +244,9 @@ const StudentDashboard = () => {
       {/* ================= MY REGISTRATIONS ================= */}
       <div className="dashboard-section">
         <h3>📝 My Registrations</h3>
-
         <div className="registrations-grid">
           {/* EVENTS */}
-          <div>
+          {/*<div>
             <h4>Registered Events</h4>
 
             {filteredEvents.length === 0 ? (
@@ -253,8 +262,43 @@ const StudentDashboard = () => {
               </ul>
             )}
 
-          </div>
+          </div>*/}
+          {/* EVENTS */}
+          <div>
+            <h4>Registered Events</h4>
 
+            {/* Upcoming */}
+            <div className="registration-block">
+              <h5>📅 Upcoming</h5>
+
+              {upcomingEvents.length === 0 ? (
+                <p className="empty-text">No upcoming events</p>
+              ) : (
+                upcomingEvents.map((reg) => (
+                  <div key={reg._id} className="registration-card upcoming">
+                    <strong>{reg.eventName}</strong>
+                    <p>📅 {reg.date}</p>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Past */}
+            <div className="registration-block">
+              <h5>🕘 Past</h5>
+
+              {pastEvents.length === 0 ? (
+                <p className="empty-text">No past events</p>
+              ) : (
+                pastEvents.map((reg) => (
+                  <div key={reg._id} className="registration-card past">
+                    <strong>{reg.eventName}</strong>
+                    <p>📅 {reg.date}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
           {/* PLACEMENTS */}
           <div>
             <h4>Registered Placements</h4>

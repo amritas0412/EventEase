@@ -138,9 +138,9 @@ const StudentProfile = () => {
 
         {/* ================= ACTION ================= */}
         <div className="profile-actions">
-          <button className="update-profile-btn">
+          {/* <button className="update-profile-btn">
             Update Profile
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

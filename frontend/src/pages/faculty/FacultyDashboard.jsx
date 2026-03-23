@@ -43,11 +43,11 @@ const FacultyDashboard = () => {
     .filter(ev => ev.status === "pending");
 
   // Past = finished events
- const pastEvents = events.filter(ev =>
-  new Date(ev.date) < new Date() &&
-  String(ev.conductedBy?._id) === String(facultyId) &&
-  ev.status?.toLowerCase() === "approved"
-);
+  const pastEvents = events.filter(ev =>
+    new Date(ev.date) < new Date() &&
+    String(ev.conductedBy?._id) === String(facultyId) &&
+    ev.status?.toLowerCase() === "approved"
+  );
 
   const handleLogout = () => {
     localStorage.removeItem("role");
@@ -142,13 +142,55 @@ const FacultyDashboard = () => {
                 <p>No department events yet</p>
               </div>
             ) : (
+              // upcomingEvents.map(ev => (
+              //   <div key={ev._id} className="event-card dashboard-card">
+              //     <h4>{ev.eventName}</h4>
+              //     <p>📅 {ev.date}</p>
+              //     <p>⏰ {ev.startTime} - {ev.endTime}</p>
+              //     <p>📍 {ev.venue}</p>
+              //     {ev.conductedBy ? (
+              //       <p>Conducted by {ev.conductedBy.name}</p>
+              //     ) : (
+              //       <p className="admin-label">📌 Admin Scheduled Event</p>
+              //     )}
+              //     {ev.conductedBy?._id === facultyId && (
+              //       <>
+              //         <p className="muted-text">
+              //           Registered: {ev.registeredCount || 0}
+              //         </p>
+              //         <button
+              //           className="profile-btn"
+              //           onClick={() => navigate(`/faculty/event/${ev._id}/students`)}
+              //         >
+              //           View Registered Students
+              //         </button>
+              //       </>
+              //     )}
+
+              //   </div>
+              // )
               upcomingEvents.map(ev => (
                 <div key={ev._id} className="event-card dashboard-card">
                   <h4>{ev.eventName}</h4>
-                  <p>📅 {ev.date}</p>
-                  <p>⏰ {ev.startTime} - {ev.endTime}</p>
-                  <p>📍 {ev.venue}</p>
-                  <p>Conducted by {ev.conductedBy?.name}</p>
+
+                  <p>📅 {new Date(ev.date).toLocaleDateString()}</p>
+
+                  {/* 🔥 ONLY for faculty events */}
+                  {ev.conductedBy && (
+                    <>
+                      {ev.startTime && <p>⏰ {ev.startTime} - {ev.endTime}</p>}
+                      {ev.venue && <p>📍 {ev.venue}</p>}
+                    </>
+                  )}
+
+                  {/* 🔥 Label */}
+                  {ev.conductedBy ? (
+                    <p>Conducted by {ev.conductedBy.name}</p>
+                  ) : (
+                    <p className="admin-label">📌 Admin Scheduled Event</p>
+                  )}
+
+                  {/* 🔥 Faculty-only controls */}
                   {ev.conductedBy?._id === facultyId && (
                     <>
                       <p className="muted-text">
@@ -162,9 +204,9 @@ const FacultyDashboard = () => {
                       </button>
                     </>
                   )}
-
                 </div>
-              ))
+              )
+              )
             )}
           </div>
         </section>

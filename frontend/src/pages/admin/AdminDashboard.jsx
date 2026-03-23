@@ -8,7 +8,12 @@ const AdminDashboard = () => {
   const [pendingEvents, setPendingEvents] = useState([]);
   const [placements, setPlacements] = useState([]);
   const [stats, setStats] = useState({});
-
+  const [showDropdown, setShowDropdown] = useState(false);
+  useEffect(() => {
+    const closeDropdown = () => setShowDropdown(false);
+    document.addEventListener("click", closeDropdown);
+    return () => document.removeEventListener("click", closeDropdown);
+  }, []);
   useEffect(() => {
     fetch("http://localhost:5050/admin/event-requests")
       .then(res => res.json())
@@ -83,15 +88,7 @@ const AdminDashboard = () => {
       eventDate >= today
     );
   });
-  // const pastEvents = approvedEvents.filter(event => {
-  //   const eventDate = new Date(event.date);
-  //   eventDate.setHours(0, 0, 0, 0);
 
-  //   return (
-  //     event.status === "approved" &&
-  //     eventDate < today
-  //   );
-  // });
   const upcomingPlacements = Array.isArray(placements)
     ? placements.filter(
       p => p.status === "approved" && new Date(p.date) >= today
@@ -104,9 +101,31 @@ const AdminDashboard = () => {
       <div className="admin-topbar">
         <h2>Admin Dashboard</h2>
 
-        <button className="admin-logout-btn" onClick={handleLogout}>
+        {/* <button className="admin-logout-btn" onClick={handleLogout}>
           Logout
-        </button>
+        </button> */}
+        <div className="profile-container">
+          <div
+            className="profile-icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDropdown(!showDropdown);
+            }}
+          >
+            👤
+          </div>
+
+          {showDropdown && (
+            <div className="profile-dropdown">
+              <p className="profile-email">
+                {localStorage.getItem("email")}
+              </p>
+              <button className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ===== STATS ===== */}
@@ -152,10 +171,10 @@ const AdminDashboard = () => {
               upcomingEvents.map(event => (
                 <tr key={event._id}>
                   <td>{event.eventName}</td>
-                  <td>{event.conductedBy?.name}</td>
-                  <td>{event.date}</td>
+                  <td>{event.conductedBy ? event.conductedBy.name : "Admin"}</td>
+                  <td>{new Date(event.date).toLocaleDateString()}</td>
                   <td>{event.status}</td>
-                  <td>{event.registeredCount}</td>
+                  <td>{event.registeredCount || 0}</td>
                   <td>
                     <button
                       onClick={() => navigate(`/admin/events/${event._id}`)}
@@ -171,68 +190,7 @@ const AdminDashboard = () => {
 
         </table>
       </div>
-      {/* ===== PAST EVENTS =====
-      <div className="admin-section">
-        <h3>Past Events Performance</h3>
 
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Event Name</th>
-              <th>Organizer</th>
-              <th>Date</th>
-              <th>Total Registrations</th>
-              <th>Avg Rating</th>
-              <th>Total Reviews</th>
-              <th>Performance</th>
-              <th>Report</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {pastEvents.length === 0 ? (
-              <tr>
-                <td colSpan="8">No past events available</td>
-              </tr>
-            ) : (
-              pastEvents.map(event => {
-
-                const performance =
-                  event.registeredCount > 0
-                    ? (
-                      (event.feedbackCount / event.registeredCount) * 100
-                    ).toFixed(0)
-                    : 0;
-
-                return (
-                  <tr key={event._id}>
-                    <td>{event.eventName}</td>
-                    <td>{event.conductedBy?.name}</td>
-                    <td>{event.date}</td>
-                    <td>{event.registeredCount || 0}</td>
-                    <td>
-                      {event.feedbackCount > 0
-                        ? `⭐ ${event.averageRating.toFixed(1)}`
-                        : "—"}
-                    </td>
-                    <td>{event.feedbackCount || 0}</td>
-                    <td>{performance}% Feedback</td>
-                    <td>
-                      <button
-                        onClick={() =>
-                          navigate(`/admin/events/${event._id}`)
-                        }
-                      >
-                        View Report
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div> */}
       {/* ===== UPCOMING PLACEMENTS ===== */}
       <div className="admin-section">
         <h3>Upcoming Placements</h3>

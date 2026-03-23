@@ -34,6 +34,48 @@ mongoose.connect(mongoURI)
   .catch(err => console.log("MongoDB connection error:", err));
 
 // Login API
+// app.post("/login", async (req, res) => {
+//   const { email, password, role } = req.body;
+
+//   try {
+//     let user;
+
+//     if (role === "Student") {
+//       user = await Student.findOne({ email });
+//     }
+
+//     else if (role === "Faculty") {
+//       user = await Faculty.findOne({ email });
+//     }
+
+//     else if (role === "Admin") {
+//       user = await Admin.findOne({ email });
+//     }
+//     else if (role === "Placement Cell") {   // 🔥 ADD THIS
+//       user = await PlacementCell.findOne({ email });
+//     }
+//     if (!user) {
+//       return res.json({ success: false, message: "User not found" });
+//     }
+//     // password check here...
+//     res.json({
+//       success: true,
+//       role: role.toLowerCase(),
+//       user: {
+//         _id: user._id,
+//         email: user.email,
+//         name: user.name,
+//         studentId: user.studentId || null
+//       }
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server error",
+//     });
+//   }
+// });
 app.post("/login", async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -42,22 +84,28 @@ app.post("/login", async (req, res) => {
 
     if (role === "Student") {
       user = await Student.findOne({ email });
-    }
-
-    else if (role === "Faculty") {
+    } else if (role === "Faculty") {
       user = await Faculty.findOne({ email });
-    }
-
-    else if (role === "Admin") {
+    } else if (role === "Admin") {
       user = await Admin.findOne({ email });
-    }
-    else if (role === "Placement Cell") {   // 🔥 ADD THIS
+    } else if (role === "Placement Cell") {
       user = await PlacementCell.findOne({ email });
     }
+
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
-    // password check here...
+
+    // ✅ 🔥 PASSWORD CHECK (YOU MISSED THIS)
+    
+const isMatch = password === user.password;
+if (!isMatch) {
+  return res.json({
+    success: false,
+    message: "Incorrect password"
+  });
+}
+
     res.json({
       success: true,
       role: role.toLowerCase(),
@@ -68,6 +116,7 @@ app.post("/login", async (req, res) => {
         studentId: user.studentId || null
       }
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({
@@ -76,7 +125,6 @@ app.post("/login", async (req, res) => {
     });
   }
 });
-
 
 app.listen(5050, () => {
   console.log("Backend running on port 5050");
@@ -192,37 +240,7 @@ app.post("/reset-password/:token", async (req, res) => {
     message: "Password reset successful",
   });
 });
-// app.post("/faculty/events", async (req, res) => {
-//   try {
-//     const faculty = await Faculty.findOne({
-//       email: req.body.conductedBy
-//     });
 
-//     if (!faculty) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Faculty not found"
-//       });
-//     }
-
-//     const event = new Event({
-//       ...req.body,
-//       conductedBy: faculty._id,   // ✅ store ObjectId
-//       status: "pending"
-//     });
-
-//     await event.save();
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Event submitted successfully"
-//     });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false });
-//   }
-// });
 app.post("/faculty/events", async (req, res) => {
   try {
     const faculty = await Faculty.findOne({
@@ -583,43 +601,6 @@ app.post("/student/register/placement", async (req, res) => {
   }
 });
 
-// app.post("/student/register/event", async (req, res) => {
-//   try {
-//     const { studentId, eventId } = req.body;
-
-//     if (!studentId || !eventId) {
-//       return res.status(400).json({ message: "Missing data" });
-//     }
-
-//     // 🔥 FIX IS HERE
-//     const student = await Student.findById(studentId);
-//     if (!student) {
-//       return res.status(400).json({ message: "Student not found" });
-//     }
-
-//     const event = await Event.findById(eventId);
-//     if (!event) {
-//       return res.status(400).json({ message: "Event not found" });
-//     }
-
-//     const registration = new Registration({
-//       studentId: student._id,
-//       name: student.name,
-//       eventName: event.eventName,
-//       date: event.date,
-//       conductedBy: event.conductedBy,
-//       eventId: event._id
-//     });
-
-//     await registration.save();
-
-//     res.json({ success: true });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Registration failed" });
-//   }
-// });
 app.post("/student/register/event", async (req, res) => {
   try {
     const { studentId, eventId } = req.body;
@@ -1126,5 +1107,28 @@ app.get("/faculty/events/calendar", async (req, res) => {
 
   } catch (err) {
     res.status(500).json({ success: false });
+  }
+});
+app.post("/admin/add-event", async (req, res) => {
+  try {
+    console.log("BODY:", req.body);
+
+   const newEvent = new Event({
+  eventName: req.body.eventName,
+  date: new Date(req.body.date),
+  status: "approved",
+  conductedBy: req.body.adminId || null  // ✅ temporary fix
+});
+
+    await newEvent.save();
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error("ADD EVENT ERROR:", err);  // 🔥 THIS WILL SHOW REAL ISSUE
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });

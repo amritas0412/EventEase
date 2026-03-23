@@ -27,6 +27,7 @@ const ExploreEvents = () => {
   // UPCOMING
   const upcomingEvents = events.filter(
     e =>
+      e.conductedBy &&  
       e.date >= today &&
       e.eventName.toLowerCase().includes(search.toLowerCase())
   );
@@ -34,6 +35,7 @@ const ExploreEvents = () => {
   // PAST
   const pastEvents = events.filter(
     e =>
+      e.conductedBy &&  
       e.date < today &&
       e.eventName.toLowerCase().includes(search.toLowerCase())
   );

@@ -19,9 +19,9 @@ const Reports = () => {
     "All",
     ...new Set(
       feedbacks.map(
-        f => 
+        f =>
           f.type === "event"
-            ? f.eventId?.eventName 
+            ? f.eventId?.eventName
             : f.placementId?.name || f.placementId?.company
       )
     )
@@ -31,11 +31,11 @@ const Reports = () => {
     selectedItem === "All"
       ? feedbacks
       : feedbacks.filter(f => {
-        const name = 
+        const name =
           f.type === "event"
             ? f.eventId?.eventName
             : f.placementId?.name || f.placementId.company;
-          
+
         return name === selectedItem;
       });
   // ✅ Calculate Average Rating Safely
@@ -75,67 +75,6 @@ const Reports = () => {
   }));
 
   return (
-    //   <div className="reports-page">
-    //     <h2>Reports & Feedback</h2>
-
-    //     {/* ===== FILTER ===== */}
-    //     <div className="report-filter">
-    //       <label>Filter by Event:</label>
-    //       <select
-    //         value={selectedEvent}
-    //         onChange={(e) => setSelectedEvent(e.target.value)}
-    //       >
-    //         {eventNames.map((event, index) => (
-    //           <option key={index} value={event}>
-    //             {event}
-    //           </option>
-    //         ))}
-    //       </select>
-    //     </div>
-
-    //     {/* ===== FEEDBACK LIST ===== */}
-    //     {filteredFeedback.length > 0 && (
-    //       <div className="report-summary">
-    //         <p>
-    //           <strong>Average Rating:</strong> ⭐ {avgRating}
-    //         </p>
-    //         <p>
-    //           <strong>Total Reviews:</strong> {filteredFeedback.length}
-    //         </p>
-    //       </div>
-    //     )}
-    //     <div className="feedback-list">
-    //       {filteredFeedback.map((item) => (
-    //         <div key={item._id} className="feedback-card">
-    //           <div className="feedback-header">
-    //             <span className="event-name">
-    //               {item.eventId?.eventName}
-    //             </span>
-    //             <span className="rating">
-    //               {"★".repeat(item.rating)}
-    //               {"☆".repeat(5 - item.rating)}
-    //             </span>
-    //           </div>
-
-    //           {item.comment ? (
-    //             <p className="feedback-text">
-    //               "{item.comment}"
-    //             </p>
-    //           ) : (
-    //             <p className="no-feedback">
-    //               No written feedback
-    //             </p>
-    //           )}
-    //         </div>
-    //       ))}
-
-    //       {filteredFeedback.length === 0 && (
-    //         <p className="no-feedback">
-    //           No feedback available
-    //         </p>
-    //       )}
-    //     </div>
-    //   </div>
     <div className="reports-page">
       <h2 className="reports-title">Reports & Feedback</h2>
 
@@ -203,7 +142,11 @@ const Reports = () => {
       {/* FEEDBACK LIST */}
       <div className="feedback-list">
         {filteredFeedback.map((item) => (
-          <div key={item._id} className="feedback-card">
+          <div
+            key={item._id}
+            className="feedback-card"
+            data-rating={item.rating}   // 🔥 ADD THIS
+          >
             <div className="feedback-header">
               <span className="event-name">
                 {item.type === "event"

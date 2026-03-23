@@ -16,7 +16,7 @@ const getStartDay = (month, year) =>
 
 const ManageCalendar = () => {
   const today = new Date();
-
+  const [events, setEvents] = useState([]);
   const [monthIndex, setMonthIndex] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
 
@@ -29,19 +29,66 @@ const ManageCalendar = () => {
   const daysInMonth = getDaysInMonth(monthIndex, year);
   const startDay = getStartDay(monthIndex, year);
 
-  const addEvent = () => {
+  const addEvent = async () => {
     const day = Number(inputDate);
-    if (day >= 1 && day <= daysInMonth && !eventDates.includes(day)) {
-      setEventDates([...eventDates, day]);
-      setInputDate("");
+
+    if (!day || day < 1 || day > daysInMonth) return;
+
+    // 🔥 ask event name
+    const eventName = prompt("Enter Event Name:");
+    if (!eventName) return;
+
+    const fullDate = new Date(year, monthIndex, day);
+
+    try {
+      const res = await fetch("http://localhost:5050/admin/add-event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          eventName,
+          date: fullDate.toISOString()
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setEventDates(prev => [...prev, day]);
+        setInputDate("");
+      }
+
+    } catch (err) {
+      console.error(err);
     }
   };
-
-  const addPlacement = () => {
+  const addPlacement = async () => {
     const day = Number(inputDate);
-    if (day >= 1 && day <= daysInMonth && !placementDates.includes(day)) {
-      setPlacementDates([...placementDates, day]);
+
+    if (!day || day < 1 || day > daysInMonth) return;
+
+    const fullDate = new Date(year, monthIndex, day);
+
+    try {
+      await fetch("http://localhost:5050/admin/add-placement", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          company: "Admin Company",
+          role: "Role",
+          date: fullDate
+        })
+      });
+
       setInputDate("");
+
+      window.location.reload();
+
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -65,6 +112,18 @@ const ManageCalendar = () => {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
+          // const backendDays = (data.events || [])
+          //   .filter(e => {
+          //     const d = new Date(e.date);
+          //     return (
+          //       d.getMonth() === monthIndex &&
+          //       d.getFullYear() === year
+          //     );
+          //   })
+          //   .map(e => new Date(e.date).getDate());
+          // setEventDates(backendDays);
+          setEvents(data.events || []);
+
           const backendDays = (data.events || [])
             .filter(e => {
               const d = new Date(e.date);
@@ -128,9 +187,9 @@ const ManageCalendar = () => {
           onChange={(e) => setInputDate(e.target.value)}
         />
         <button className="sync-btn" onClick={addEvent}>Add Event</button>
-        <button className="placement-btn" onClick={addPlacement}>
+        {/* <button className="placement-btn" onClick={addPlacement}>
           Add Placement
-        </button>
+        </button> */}
       </div>
 
       {/* CALENDAR */}
@@ -166,11 +225,56 @@ const ManageCalendar = () => {
 
       {/* DETAILS */}
       {selectedDate && (
+        
         <div className="date-details">
           <h3>{selectedDate} {months[monthIndex]} {year}</h3>
 
           {eventDates.includes(selectedDate) && (
-            <p className="event-text">📌 Event scheduled</p>
+            // <p className="event-text">📌 Event scheduled</p>
+            <p className="event-text">
+              {/* 📌 {selectedEvent?.eventName} */}
+              {selectedDate && (
+                <div className="date-details">
+                  {/* <h3>{selectedDate} {months[monthIndex]} {year}</h3> */}
+
+                  {/* EVENTS */}
+                  {events
+                    .filter(e => {
+                      const d = new Date(e.date);
+                      return (
+                        d.getDate() === selectedDate &&
+                        d.getMonth() === monthIndex &&
+                        d.getFullYear() === year
+                      );
+                    })
+                    .map(e => (
+                      <p key={e._id} className="event-text">
+                        📌 {e.eventName}
+                      </p>
+                    ))}
+
+                  {/* PLACEMENTS */}
+                  {placementDates.includes(selectedDate) && (
+                    <p className="placement-text">
+                      💼 Placement / Internship scheduled
+                    </p>
+                  )}
+
+                  {/* EMPTY */}
+                  {!events.some(e => {
+                    const d = new Date(e.date);
+                    return (
+                      d.getDate() === selectedDate &&
+                      d.getMonth() === monthIndex &&
+                      d.getFullYear() === year
+                    );
+                  }) &&
+                    !placementDates.includes(selectedDate) && (
+                      <p>No events or placements on this day.</p>
+                    )}
+                </div>
+              )}
+            </p>
           )}
 
           {placementDates.includes(selectedDate) && (
@@ -184,13 +288,14 @@ const ManageCalendar = () => {
               <p>No events or placements on this day.</p>
             )}
         </div>
+        
       )}
-
-      {/* LEGEND */}
+{/* LEGEND */}
       <div className="calendar-legend">
         <div><span className="legend-box event"></span> Event</div>
         <div><span className="legend-box placement"></span> Placement</div>
       </div>
+      
     </div>
   );
 };

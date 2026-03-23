@@ -18,7 +18,7 @@ const eventSchema = new mongoose.Schema({
   conductedBy: {
     type: mongoose.Schema.Types.ObjectId,   // ✅ IMPORTANT
     ref: "Faculty",                        // ✅ IMPORTANT
-    required: true
+    required: false
   },
 
   status: {
