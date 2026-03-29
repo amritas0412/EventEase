@@ -1132,3 +1132,28 @@ app.post("/admin/add-event", async (req, res) => {
     });
   }
 });
+
+app.get("/admin/placement-cell", async (req, res) => {
+  try {
+    const members = await PlacementCell.find().select("-password");
+
+    res.json({
+      success: true,
+      placementCell: members
+    });
+  } catch (err) {
+    console.error("PLACEMENT CELL FETCH ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.delete("/admin/placement-cell/:id", async (req, res) => {
+  try {
+    await PlacementCell.findByIdAndDelete(req.params.id);
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("PLACEMENT CELL DELETE ERROR:", err);
+    res.status(500).json({ success: false });
+  }
+});

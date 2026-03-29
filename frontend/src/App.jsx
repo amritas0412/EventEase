@@ -5,7 +5,7 @@ import AboutUs from "./pages/AboutUs";
 import ForgotPassword from "./pages/ForgotPassword";
 import ExploreEvents from "./pages/ExploreEvents";
 import ResetPassword from "./pages/ResetPassword";
-// import ProtectedRoute from "./ProtectedRoute";
+ import ProtectedRoute from "./pages/ProtectedRoute";
 
 /* ================= STUDENT PAGES ================= */
 import StudentLayout from "./pages/student/StudentLayout";
@@ -46,6 +46,7 @@ import PlacementCalendar from "./pages/placement/PlacementCalendar";
 import CompaniesVisited from "./pages/placement/CompaniesVisited";
 import UpcomingDrives from "./pages/placement/UpcomingDrives";
 import PendingRequests from "./pages/placement/PendingRequests";
+import PlacementLayout from "./pages/placement/PlacementLayout";
 
 function App() {
   return (
@@ -59,7 +60,7 @@ function App() {
       <Route path="/reset-password/:token" element={<ResetPassword />} />
     
       {/* ---------- STUDENT ROUTES ---------- */}
-      <Route path="/student" element={<StudentLayout />}>
+      <Route path="/student" element={<ProtectedRoute> <StudentLayout /> </ProtectedRoute>}>
         <Route path="dashboard" element={<StudentDashboard />} />
         <Route path="events" element={<StudentEvents />} />
         <Route path="events/:id" element={<StudentEventDetails />} />
@@ -72,7 +73,7 @@ function App() {
       </Route>
 
       {/* ---------- ADMIN ROUTES ---------- */}
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route path="/admin" element={<ProtectedRoute> <AdminLayout /> </ProtectedRoute>}>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="events" element={<ManageEvents />} />
         <Route path="events/:id" element={<AdminEventDetails />} />
@@ -91,7 +92,7 @@ function App() {
       </Route>
 
       {/* ---------- FACULTY ROUTES ----------*/}
-      <Route path="/faculty">
+      <Route path="/faculty" element={<ProtectedRoute> <FacultyLayout /> </ProtectedRoute>}> 
         <Route path="dashboard" element={<FacultyDashboard />} />
         <Route path="events" element={<FacultyEvents />} />
         <Route path="calendar" element={<FacultyCalendar />} />
@@ -99,7 +100,7 @@ function App() {
       </Route>
 
       {/* ---------- PLACEMENT ROUTES ---------- */}
-      <Route path="/placement">
+      <Route path="/placement" element={<ProtectedRoute> <PlacementLayout /> </ProtectedRoute>}> 
         <Route path="dashboard" element={<PlacementDashboard />} />
         <Route path="placements" element={<Placements />} />
         <Route path="companies" element={<CompaniesVisited />} />

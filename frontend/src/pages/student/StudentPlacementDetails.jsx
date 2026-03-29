@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../styles/StudentPlacementDetails.css";
 
 const StudentPlacementDetails = () => {
@@ -10,6 +11,32 @@ const StudentPlacementDetails = () => {
   const [placement, setPlacement] = useState(null);
 
   const studentId = localStorage.getItem("studentId");
+
+  const navigate = useNavigate();
+
+  const formatDescription = (text = "") => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  return text.split("\n").map((line, i) => (
+    <span key={i}>
+      {line.split(urlRegex).map((part, j) =>
+        urlRegex.test(part) ? (
+          <a
+            key={j}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {part}
+          </a>
+        ) : (
+          part
+        )
+      )}
+      <br />
+    </span>
+  ));
+};
 
   useEffect(() => {
     fetch(`http://localhost:5050/placement/${id}`)
@@ -68,6 +95,11 @@ const StudentPlacementDetails = () => {
 
   return (
     <div className="placement-details-page">
+
+      <button className="back-btn top-right" onClick={() => navigate(-1)}>
+  ⬅ Back
+</button>
+
       <h2>{placement.name}</h2>
 
       {/* ===== DETAILS ===== */}
@@ -79,7 +111,12 @@ const StudentPlacementDetails = () => {
         <p><strong>Location:</strong> {placement.location}</p>
         <p><strong>Eligible:</strong> {placement.audience}</p>
         <p><strong>Stipend:</strong> ₹{placement.stipend} / month</p>
-        <p><strong>Description:</strong> {placement.description}</p>
+        <p>
+          <strong>Description:</strong><br />
+          <span className="description-text">
+            {formatDescription(placement.description)}
+          </span>
+        </p>
 
         <p>
           <strong>Status:</strong>{" "}
@@ -94,8 +131,10 @@ const StudentPlacementDetails = () => {
         >
           {registered ? "Registered" : "Register"}
         </button>
+
       </div>
 
+      
     </div>
   );
 };

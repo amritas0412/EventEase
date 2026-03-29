@@ -2,8 +2,20 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../../styles/AdminDashboard.css";
+import { Navigate } from "react-router-dom";
 
 const AdminDashboard = () => {
+
+  const isLoggedIn = localStorage.getItem("role");
+
+if (!isLoggedIn) {
+  return <Navigate to="/login" replace />;
+}
+
+if (!localStorage.getItem("role")) {
+  return <Navigate to="/login" replace />;
+}
+
   const navigate = useNavigate();
   const [pendingEvents, setPendingEvents] = useState([]);
   const [placements, setPlacements] = useState([]);
@@ -64,7 +76,8 @@ const AdminDashboard = () => {
     : 0;
 
   const handleLogout = () => {
-    navigate("/login");
+    localStorage.clear();
+    navigate("/login", { replace: true });
   };
   const [approvedEvents, setApprovedEvents] = useState([]);
   useEffect(() => {
@@ -172,7 +185,7 @@ const AdminDashboard = () => {
                 <tr key={event._id}>
                   <td>{event.eventName}</td>
                   <td>{event.conductedBy ? event.conductedBy.name : "Admin"}</td>
-                  <td>{new Date(event.date).toLocaleDateString()}</td>
+                  <td>{new Date(event.date).toLocaleDateString("en-CA")}</td>
                   <td>{event.status}</td>
                   <td>{event.registeredCount || 0}</td>
                   <td>
@@ -217,7 +230,7 @@ const AdminDashboard = () => {
                 <tr key={placement._id}>
                   <td>{placement.name}</td>
                   <td>{placement.jobrole}</td>
-                  <td>{new Date(placement.date).toLocaleDateString()}</td>
+                  <td>{new Date(placement.date).toLocaleDateString("en-CA")}</td>
                   <td>{placement.venue || "—"}</td>
                   <td>
                     <button

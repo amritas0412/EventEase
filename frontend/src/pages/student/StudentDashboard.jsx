@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useMemo } from "react";
 import "../../styles/StudentDashboard.css";
+import { Navigate } from "react-router-dom";
 
 const StudentDashboard = () => {
 
@@ -16,6 +17,16 @@ const StudentDashboard = () => {
   const studentName = localStorage.getItem("name");
   const studentEmail = localStorage.getItem("email");
   const studentId = localStorage.getItem("studentId");
+
+const isLoggedIn = localStorage.getItem("role");
+
+if (!isLoggedIn) {
+  return <Navigate to="/login" replace />;
+}
+
+if (!localStorage.getItem("role")) {
+  return <Navigate to="/login" replace />;
+}
 
   useEffect(() => {
     fetch("http://localhost:5050/faculty/events")
@@ -66,12 +77,16 @@ const StudentDashboard = () => {
         setRegisteredEvents([]);
       });
   }, []);
-  // 1️⃣ FIRST define filteredEvents
+  // FIRST define filteredEvents
   // const filteredEvents = registrations.filter(reg => reg.eventName);
   const filteredEvents = registeredEvents.filter(reg =>
     reg.eventName?.toLowerCase().includes(search.toLowerCase())
   );
   const today = new Date().toISOString().split("T")[0];
+
+  const upcomingAllEvents = events
+  .filter(ev => ev.date >= today && ev.conductedBy !== null)
+  .sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const upcomingEvents = filteredEvents
     .filter(ev => ev.date >= today)
@@ -86,6 +101,7 @@ const StudentDashboard = () => {
   // const upcomingEvents = events.filter(ev => ev.date >= today);
 
   const todayEvents = upcomingEvents.filter(ev => ev.date === today);
+  
 
   const upcomingPlacements = placements.filter(
     p => p.date >= today && p.status === "approved"
@@ -173,7 +189,7 @@ const StudentDashboard = () => {
                   className="profile-btn logout"
                   onClick={() => {
                     localStorage.removeItem("role");
-                    navigate("/login");
+                    navigate("/login", { replace: true });
                   }}
                 >
                   🚪 Logout
@@ -191,7 +207,7 @@ const StudentDashboard = () => {
             Upcoming Events
           </div>
           <div className="card-number">
-            {upcomingEvents.length}
+            {upcomingAllEvents.length}
           </div>
           <div className="card-subtext">
           </div>

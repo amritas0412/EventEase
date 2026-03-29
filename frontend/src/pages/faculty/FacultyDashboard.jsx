@@ -3,8 +3,19 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/FacultyDashboard.css"; // ✅ FIXED PATH
 import FacultyProfile from "./FacultyProfile";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 const FacultyDashboard = () => {
+  const isLoggedIn = localStorage.getItem("role");
+
+if (!isLoggedIn) {
+  return <Navigate to="/login" replace />;
+}
+
+if (!localStorage.getItem("role")) {
+  return <Navigate to="/login" replace />;
+}
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
@@ -51,7 +62,7 @@ const FacultyDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("role");
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
   const handleViewStudents = async (eventId) => {
     try {
@@ -71,6 +82,7 @@ const FacultyDashboard = () => {
       console.error(err);
     }
   };
+  
   return (
     <div className="faculty-layout">
       {/* Sidebar */}

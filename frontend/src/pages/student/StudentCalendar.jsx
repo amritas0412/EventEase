@@ -50,15 +50,22 @@ const StudentCalendar = () => {
     .map(ev => new Date(ev.date).getDate());
 
   const placementDates = placements
-    .filter(pl => {
-      const d = new Date(pl.date);
-      return (
-        pl.status === "approved" &&
-        d.getMonth() === monthIndex &&
-        d.getFullYear() === year
-      );
-    })
-    .map(pl => new Date(pl.date).getDate());
+  .filter(pl => {
+    if (!pl.date) return false;
+
+    const [y, m, d] = pl.date.split("-").map(Number);
+
+    console.log("PL CHECK →", pl.name, y, m, d, "vs", year, monthIndex);
+
+    return (
+      pl.status === "approved" &&
+      y === year &&
+      m === (monthIndex + 1)
+    );
+  })
+  .map(pl => Number(pl.date.split("-")[2]));
+
+console.log("FINAL placementDates:", placementDates);
 
   // DYNAMIC CALCULATIONS
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();

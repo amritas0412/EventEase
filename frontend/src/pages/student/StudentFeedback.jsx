@@ -40,6 +40,11 @@ const StudentFeedback = () => {
 
   return (
     <div className="feedback-page">
+
+      <button className="back-btn" onClick={() => navigate(-1)}>
+  ⬅ Back
+</button>
+
       <div className="feedback-card">
         <h2>Event Feedback</h2>
 

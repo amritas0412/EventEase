@@ -10,6 +10,30 @@ const AdminPlacementDetails = () => {
 
   const [placement, setPlacement] = useState(null);
 
+  const formatDescription = (text = "") => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+  return text.split("\n").map((line, i) => (
+    <span key={i}>
+      {line.split(urlRegex).map((part, j) =>
+        urlRegex.test(part) ? (
+          <a
+            key={j}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {part}
+          </a>
+        ) : (
+          part
+        )
+      )}
+      <br />
+    </span>
+  ));
+};
+
   //Fetch placement from backend
   useEffect(() => {
     fetch(`http://localhost:5050/placement/${id}`)
@@ -40,7 +64,12 @@ const AdminPlacementDetails = () => {
         <p><strong>Location:</strong> {placement.location}</p>
         <p><strong>Eligible:</strong> {placement.audience}</p>
         <p><strong>Stipend:</strong> {placement.stipend}</p>
-        <p><strong>Description:</strong> {placement.description}</p>
+        <p>
+          <strong>Description:</strong><br />
+          <span className="description-text">
+            {formatDescription(placement.description)}
+          </span>
+        </p>
 
         <button className="back-btn" onClick={() => navigate(-1)}>
           ← Back

@@ -32,13 +32,13 @@ const Placements = () => {
 
       if (data.success) {
         // Detect newly rejected placements
-      const newlyRejected = prevPlacements.filter(
-        p => p.status === "pending" && !data.placements.some(np => np._id === p._id)
-      );
+        const newlyRejected = prevPlacements.filter(
+          p => p.status === "pending" && !data.placements.some(np => np._id === p._id)
+        );
 
-      newlyRejected.forEach(r => {
-        alert(`❌ Request for ${r.name} is rejected`);
-      });
+        newlyRejected.forEach(r => {
+          alert(`❌ Request for ${r.name} is rejected`);
+        });
         setEvents(data.placements);
         setPrevPlacements(data.placements);
       }
@@ -81,37 +81,37 @@ const Placements = () => {
     }
 
     try {
-    let res;
+      let res;
 
-    // ✏ EDIT MODE
-    if (editId) {
-      res = await fetch(`http://localhost:5050/placement/${editId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-    }
-    // ➕ CREATE MODE
-    else {
-      res = await fetch("http://localhost:5050/placement/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-    }
+      // ✏ EDIT MODE
+      if (editId) {
+        res = await fetch(`http://localhost:5050/placement/${editId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+      }
+      // ➕ CREATE MODE
+      else {
+        res = await fetch("http://localhost:5050/placement/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
+      }
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.success) {
-      alert(editId ? "✏ Updated & sent for approval" : "📨 Placement sent for approval");
-      resetForm();
-      fetchPlacements();
-    } else {
-      alert("❌ Failed");
-    }
+      if (data.success) {
+        alert(editId ? "✏ Updated & sent for approval" : "📨 Placement sent for approval");
+        resetForm();
+        fetchPlacements();
+      } else {
+        alert("❌ Failed");
+      }
 
     } catch (err) {
-    console.error(err);
+      console.error(err);
     }
   };
     
@@ -125,31 +125,31 @@ const Placements = () => {
   };
 
   const rejectPlacement = async (placement) => {
-  try {
-    const res = await fetch(`http://localhost:5050/placement/${placement._id}/reject`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-    });
+    try {
+      const res = await fetch(`http://localhost:5050/placement/${placement._id}/reject`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.success) {
-      // Remove from current events immediately
-      setEvents(prev => prev.filter(ev => ev._id !== placement._id));
+      if (data.success) {
+        // Remove from current events immediately
+        setEvents(prev => prev.filter(ev => ev._id !== placement._id));
 
-      // Show alert with company name
-      alert(`❌ Request for ${placement.name} is rejected`);
+        // Show alert with company name
+        alert(`❌ Request for ${placement.name} is rejected`);
 
-      // Optionally refresh list from backend
-      fetchPlacements();
-    } else {
-      alert("❌ Failed to reject");
+        // Optionally refresh list from backend
+        fetchPlacements();
+      } else {
+        alert("❌ Failed to reject");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("❌ Something went wrong");
     }
-  } catch (err) {
-    console.error(err);
-    alert("❌ Something went wrong");
-  }
-};
+  };
 
 
   const handleEdit = (event) => {
@@ -165,22 +165,46 @@ const Placements = () => {
   const [showModal, setShowModal] = useState(false);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const handleViewStudents = async (placementId) => {
-  try {
-    setLoadingStudents(true);
+    try {
+      setLoadingStudents(true);
 
-    const res = await fetch(
-      `http://localhost:5050/placement/${placementId}/registrations`
-    );
-    const data = await res.json();
+      const res = await fetch(
+        `http://localhost:5050/placement/${placementId}/registrations`
+      );
+      const data = await res.json();
 
-    setSelectedStudents(data.registrations || []);
-    setShowModal(true);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setLoadingStudents(false);
-  }
-};
+      setSelectedStudents(data.registrations || []);
+      setShowModal(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+
+  const formatDescription = (text = "") => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+    return text.split("\n").map((line, i) => (
+      <span key={i}>
+        {line.split(urlRegex).map((part, j) =>
+          urlRegex.test(part) ? (
+            <a
+              key={j}
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {part}
+            </a>
+          ) : (
+            part
+          )
+        )}
+        <br />
+      </span>
+    ));
+  };
 
   return (
     <div className="placement-layout">
@@ -219,24 +243,24 @@ const Placements = () => {
             <input name="jobrole" placeholder="Job Role" required value={formData.jobrole} onChange={handleChange} />
             <input type="date" name="date" min={today} required value={formData.date} onChange={handleChange} />
             <div className="time-row">
-            <input
-              type="time"
-              name="time"
-              value={formData.time}
-              onChange={handleChange}
-              required
-            />
+              <input
+                type="time"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+                required
+              />
 
-            <span className="to-text">to</span>
+              <span className="to-text">to</span>
 
-            <input
-              type="time"
-              name="endtime"
-              value={formData.endtime}
-              onChange={handleChange}
-              required
-            />
-          </div>
+              <input
+                type="time"
+                name="endtime"
+                value={formData.endtime}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
             <input name="venue" placeholder="Event Venue" required value={formData.venue} onChange={handleChange} />
             <input name="location" placeholder="Company Location" required value={formData.location} onChange={handleChange} />
@@ -276,28 +300,32 @@ const Placements = () => {
               <p>🌍 {event.location}</p>
               <p>🎓 {event.audience}</p>
               <p>💰 ₹{event.stipend} / month</p>
-              {event.description && <p>{event.description}</p>}
+              {event.description && (
+                <p className="description-text">
+                  {formatDescription(event.description)}
+                </p>
+              )}
         
 
-        {/* Registration Info */}
-        <div className="registration-info">
-          <p>📝 Registered Students: {event.registrations?.length || 0}</p>
-          <button
-            className="view-btn"
-            onClick={() => handleViewStudents(event._id)}
-          >
-            👥 View Students
-          </button>
-        </div>
+              {/* Registration Info */}
+              <div className="registration-info">
+                <p>📝 Registered Students: {event.registrations?.length || 0}</p>
+                <button
+                  className="view-btn"
+                  onClick={() => handleViewStudents(event._id)}
+                >
+                  👥 View Students
+                </button>
+              </div>
 
-        <div className="action-row">
-          <button
-            className="edit-btn"
-            onClick={() => handleEdit(event)}
-          >
-            ✏ Edit
-          </button>
-        </div>
+              <div className="action-row">
+                <button
+                  className="edit-btn"
+                  onClick={() => handleEdit(event)}
+                >
+                  ✏ Edit
+                </button>
+              </div>
             </div>
           ))}
         </div>

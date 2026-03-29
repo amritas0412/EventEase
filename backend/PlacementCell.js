@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
   id: String,
   contact: Number,
   address: String,
-
+  department: String, 
+  
   resetToken: String,
   resetTokenExpiry: Date
 });

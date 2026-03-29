@@ -24,17 +24,12 @@ const ForgotPassword = () => {
       setMessage(data.message);
 
       if (!data.success) {
-  setIsError(true);
-} else {
-  setIsError(false);
-
-  if (!data.success) {
-  setIsError(true);
-} else {
-  setIsError(false);
-  setMessage("If the email exists, a reset link has been sent. Check your inbox.");
-}
-}
+        setIsError(true);
+        setMessage(data.message || "Something went wrong");
+      } else {
+        setIsError(false);
+        setMessage("If the email exists, a reset link has been sent. Check your inbox.");
+      }
 
 
     } catch (error) {
@@ -76,23 +71,22 @@ const ForgotPassword = () => {
             />
           </div>
 
-            {message && (
-    <p
-      style={{
-        color: isError ? "red" : "green",
-        textAlign: "center",
-        margin: "10px 0"
-      }}
-    >
-      {message}
-    </p>
-  )}
+          {message && (
+            <p
+              style={{
+                color: isError ? "red" : "green",
+                textAlign: "center",
+                margin: "10px 0"
+              }}
+            >
+              {message}
+            </p>
+          )}
 
           <button type="submit" className="sign-in-btn">
             Send Reset Link
           </button>
         </form>
-
 
         <div className="login-footer">
           <p>

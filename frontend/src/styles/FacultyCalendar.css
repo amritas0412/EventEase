@@ -14,12 +14,21 @@
 .legend-box.faculty {
   background: #2563eb;   /* same blue as faculty-day */
 }
-.student-calendar-page {
-  padding: 30px;
+.faculty-calendar-page {
+  /*padding: 30px;
   background: #f7f4ff;
+  min-height: 100vh;*/
+  display: flex;
   min-height: 100vh;
+  background-color: #f5f7fb;
+  font-family: "Segoe UI", sans-serif;
 }
-
+.brand {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: center;
+}
 .calendar-header h2 {
   font-size: 26px;
   margin-bottom: 20px;
@@ -84,4 +93,42 @@
 }
 .legend-box.pending {
   background: #f4c430;
+}
+
+.calendar-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.sidebar {
+  width: 240px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 20px;
+  height: 100vh;        /* ✅ FULL HEIGHT */
+  position: sticky;     /* optional but better */
+  top: 0;
+}
+body {
+  margin: 0;
+}
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.sidebar li:hover {
+  background: #1e293b;
+}
+
+.sidebar li.active {
+  background: #2563eb;
 }

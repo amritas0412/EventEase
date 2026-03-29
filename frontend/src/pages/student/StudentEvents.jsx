@@ -14,10 +14,13 @@ const StudentEvents = () => {
     fetch("http://localhost:5050/faculty/events")
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          setEvents(data.events);
-        }
-      });
+  if (data.success) {
+    const filtered = data.events.filter(
+      event => event.conductedBy !== null
+    );
+    setEvents(filtered);
+  }
+});
 
     // Fetch student registrations
     fetch(`http://localhost:5050/student/my-registrations/${studentId}`)

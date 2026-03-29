@@ -57,9 +57,9 @@
 }
 
 /* Placement */
-.placement-day {
-  background: #d9f4e6;
-  color: #1f9254;
+.calendar-day.placement-day {
+  background: #22c55e !important;
+  color: white !important;
 }
 
 /* Legend */

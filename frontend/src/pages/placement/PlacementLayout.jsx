@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-const FacultyLayout = () => {
+const PlacementLayout = () => {
   return (
     <div>
       <Outlet />
@@ -8,4 +8,4 @@ const FacultyLayout = () => {
   );
 };
 
-export default FacultyLayout;
+export default PlacementLayout;

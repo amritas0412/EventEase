@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import "../../styles/PlacementCalendar.css"; // copy FacultyCalendar.css if needed
+import { useNavigate } from "react-router-dom";
+import "../../styles/PlacementCalendar.css"; 
 
 const months = [
   "January","February","March","April","May","June",
@@ -10,12 +11,14 @@ const PlacementCalendar = () => {
   const [monthIndex, setMonthIndex] = useState(new Date().getMonth()); // current month
   const [year, setYear] = useState(new Date().getFullYear());
   const [events, setEvents] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("http://localhost:5050/placement/all")  // fetch all placement drives
       .then(res => res.json())
       .then(data => {
-        if (data.placements) setEvents(data.placements);
+        console.log("PLACEMENTS:", data.placements);
+        setEvents(data.placements);
       })
       .catch(err => console.error(err));
   }, []);
@@ -39,49 +42,110 @@ const PlacementCalendar = () => {
 
   // placement drives approved and in this month
   const approvedDates = events
-    .filter(e =>
-      e.status === "approved" &&
-      new Date(e.date).getMonth() === monthIndex &&
-      new Date(e.date).getFullYear() === year
-    )
-    .map(e => new Date(e.date).getDate());
+  .filter(e => {
+    if (!e.date) return false;
+
+    //  FIX: force local date (no timezone shift)
+    const [y, m, d] = e.date.split("-").map(Number);
+    const eventDate = new Date(y, m - 1, d);
+
+    return (
+      e.status?.toLowerCase().trim() === "approved" &&
+      eventDate.getMonth() === monthIndex &&
+      eventDate.getFullYear() === year
+    );
+  })
+  .map(e => {
+    const [_, __, d] = e.date.split("-").map(Number);
+    return d;
+  });
+
+  const pendingDates = events
+  .filter(e => {
+    if (!e.date) return false;
+
+    const [y, m, d] = e.date.split("-").map(Number);
+    const eventDate = new Date(y, m - 1, d);
+
+    return (
+      e.status?.toLowerCase().trim() === "pending" &&
+      eventDate.getMonth() === monthIndex &&
+      eventDate.getFullYear() === year
+    );
+  })
+  .map(e => {
+    const [_, __, d] = e.date.split("-").map(Number);
+    return d;
+  });
 
   return (
-    <div className="student-calendar-page">
-      <div className="calendar-header">
-        <button className="nav-btn" onClick={prevMonth}>◀</button>
-        <h2>{months[monthIndex]} {year}</h2>
-        <button className="nav-btn" onClick={nextMonth}>▶</button>
-      </div>
+    <div className="placement-calendar-page">
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <h2 className="brand">EventEase</h2>
 
-      <div className="calendar-grid">
-      {/* Weekday Headers */}
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
-          <div key={day} className="calendar-weekday">
-            {day}
-          </div>
-        ))}
-        {Array.from({ length: startDay }).map((_, i) => (
-          <div key={`e-${i}`} className="calendar-day empty"></div>
-        ))}
+        <ul>
+          <li
+            onClick={() => navigate("/placement/dashboard")}
+            style={{ cursor: "pointer" }}
+          >
+            📊 Dashboard
+          </li>
+          <li
+            onClick={() => navigate("/placement/placements")}
+            style={{ cursor: "pointer" }}
+          >
+            📅 Placements
+          </li>
+        </ul>
+      </aside>
 
-        {Array.from({ length: daysInMonth }, (_, i) => {
-          const day = i + 1;
-          let cls = "calendar-day";
+      <div className="calendar-content">
+        <div className="calendar-header">
+          <button className="nav-btn" onClick={prevMonth}>◀</button>
+          <h2>{months[monthIndex]} {year}</h2>
+          <button className="nav-btn" onClick={nextMonth}>▶</button>
+        </div>
 
-          if (approvedDates.includes(day)) cls += " placement-day";
-
-          return (
-            <div key={day} className={cls}>
+        <div className="placement-calendar-grid">
+          {/* Weekday Headers */}
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
+            <div key={day} className="calendar-weekday">
               {day}
             </div>
-          );
-        })}
-      </div>
+          ))}
+          {Array.from({ length: startDay }).map((_, i) => (
+            <div key={`e-${i}`} className="placement-day-cell empty"></div>
+          ))}
 
-      <div className="calendar-legend">
-        <div>
-          <span className="legend-box placement"></span> Approved Placement Drive
+          {Array.from({ length: daysInMonth }, (_, i) => {
+            const day = i + 1;
+            let cls = "placement-day-cell";
+
+            if (approvedDates.includes(day)) {
+              cls += " placement-approved";
+            } else if (pendingDates.includes(day)) {
+              cls += " placement-pending";
+            }
+
+            return (
+              <div key={day} className={cls}>
+                {day}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="calendar-legend">
+          <div className="legend-item">
+            <span className="legend-box placement-approved"></span>
+            Approved Placement Drive
+          </div>
+
+          <div className="legend-item">
+            <span className="legend-box placement-pending"></span>
+            Pending Placement Request
+          </div>
         </div>
       </div>
     </div>

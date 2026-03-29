@@ -3,8 +3,19 @@ import { useNavigate } from "react-router-dom";
 import "../../styles/PlacementDashboard.css"; //  FIXED PATH
 import { companies } from "../../data/companiesData";
 import { useEffect } from "react";
+import { Navigate } from "react-router-dom";
 
 const PlacementDashboard = () => {
+  const isLoggedIn = localStorage.getItem("role");
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!localStorage.getItem("role")) {
+    return <Navigate to="/login" replace />;
+  }
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
@@ -70,7 +81,7 @@ const PlacementDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("role"); 
-    navigate("/login");
+    navigate("/login", { replace: true });
   };
 
   const [showResultForm, setShowResultForm] = useState(false);
@@ -220,10 +231,10 @@ const PlacementDashboard = () => {
                   </p>
                   <button
                     onClick={() => {
-                    setCurrentDriveId(drive._id);          // store which drive
-                    setAppeared(drive.totalAppeared || ""); // prefill existing numbers
-                    setPlaced(drive.totalPlaced || "");
-                    setShowResultForm(true);                // show popup
+                      setCurrentDriveId(drive._id);          // store which drive
+                      setAppeared(drive.totalAppeared || ""); // prefill existing numbers
+                      setPlaced(drive.totalPlaced || "");
+                      setShowResultForm(true);                // show popup
                     }}
                   >
                     Update Result

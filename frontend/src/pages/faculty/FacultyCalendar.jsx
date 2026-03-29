@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../styles/FacultyCalendar.css";
 
 const months = [
@@ -12,6 +13,8 @@ const FacultyCalendar = () => {
   const [year, setYear] = useState(today.getFullYear());
   const [events, setEvents] = useState([]);
   const facultyId = localStorage.getItem("facultyId");
+  const navigate = useNavigate();
+
   useEffect(() => {
     fetch("http://localhost:5050/faculty/events/calendar")
       .then(res => res.json())
@@ -41,7 +44,27 @@ const FacultyCalendar = () => {
   };
 
   return (
-    <div className="student-calendar-page">
+    <div className="faculty-calendar-page">
+
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <h2 className="brand">EventEase</h2>
+        <ul>
+          <li
+            onClick={() => navigate("/faculty/dashboard")}
+            style={{ cursor: "pointer" }}
+          >
+            📊 Dashboard</li>
+          <li
+            onClick={() => navigate("/faculty/events")}
+            style={{ cursor: "pointer" }}
+          >
+            📅 Events
+          </li>
+        </ul>
+      </aside>
+
+      <div className="calendar-content">
       <div className="calendar-header">
         <button className="nav-btn" onClick={prevMonth}>◀</button>
         <h2>{months[monthIndex]} {year}</h2>
@@ -107,6 +130,7 @@ if (hasMyPending) {
         <div>
           <span className="legend-box pending"></span> Pending Approval
         </div>
+      </div>
       </div>
     </div>
   );

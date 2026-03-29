@@ -75,6 +75,8 @@
 
 .form-actions button:last-child {
   background: #e5e7eb;
+  color: #111;              /* ✅ add text color */
+  border: 1px solid #cbd5e1;
 }
 
 /* ================== EVENTS BOX ================== */
@@ -256,9 +258,15 @@
 
 .popup-close {
   border: none;
-  background: transparent;
+  background: #f1f5f9;     /* ✅ give background */
+  color: #0f172a; 
   font-size: 20px;
   cursor: pointer;
+}
+
+.popup-close:hover {
+  background: #e2e8f0;
+  color: #dc2626;          /* red on hover */
 }
 
 @keyframes popupScale {
@@ -280,3 +288,9 @@
 .view-btn:hover {
   background: #1d4ed8;
 }
+
+.description-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+

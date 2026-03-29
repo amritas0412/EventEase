@@ -1,13 +1,123 @@
-.calendar-event {
-  padding: 12px;
-  border-radius: 10px;
+.placement-calendar-page {
+  /*padding: 30px;
+  background: #f7f4ff;
+  min-height: 100vh;
+  display: flex;
+  height: 100vh;*/
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f7fb;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Header */
+.placement-calendar-page .calendar-header {
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.placement-calendar-legend {
+  display: flex;
+  justify-content: center;   /* centers horizontally */
+  align-items: center;
+  gap: 30px;                 /* space between items */
+  margin-top: 25px;
+  font-weight: 500;
+}
+
+.nav-btn {
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Grid */
+.placement-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  justify-content: center;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Weekdays */
+.calendar-weekday {
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Day cell */
+.placement-day-cell {
+  background: #eaeaea;
+  border-radius: 12px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  transition: 0.2s ease;
+  cursor: default;
+}
+
+/* Empty */
+.placement-day-cell.empty {
+  background: transparent;
+}
+
+/* Highlight */
+.placement-day-cell.placement-highlight {
+  background: #22c55e;
   color: white;
 }
 
-.calendar-event.approved {
-  background: #7c3aed; /* purple */
+.placement-approved {
+  background: #22c55e; /* green */
+  color: white;
+  border-radius: 6px;
 }
 
-.calendar-event.placement-own {
-  background: #2563eb; /* blue */
+.placement-pending {
+  background: #facc15; /* yellow */
+  color: black;
+  border-radius: 6px;
+}
+
+.calendar-legend {
+  margin-top: 15px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.sidebar {
+  width: 240px;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 20px;
+}
+
+.calendar-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
 }
