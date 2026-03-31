@@ -139,6 +139,18 @@ const StudentDashboard = () => {
         .includes(search.toLowerCase())
     );
 
+  useEffect(() => {
+    const handleBack = () => {
+      navigate("/login", { replace: true });
+    };
+  
+    window.onpopstate = handleBack;
+  
+    return () => {
+      window.onpopstate = null;
+    };
+  }, []);
+
   return (
     <div className="dashboard-page">
 
@@ -190,7 +202,7 @@ const StudentDashboard = () => {
                 <button
                   className="profile-btn logout"
                   onClick={() => {
-                    localStorage.removeItem("role");
+                    localStorage.clear();
                     navigate("/login", { replace: true });
                   }}
                 >

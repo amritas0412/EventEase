@@ -81,8 +81,11 @@ const PlacementCalendar = () => {
   return (
     <div className="placement-calendar-page">
       {/* Sidebar */}
-      <aside className="sidebar">
-        <h2 className="brand">EventEase</h2>
+      <aside className="placement-sidebar">
+        <div className="sidebar-header">
+          <div className="logo-icon">E</div>
+          <span className="logo-text">EventEase</span>
+        </div>
 
         <ul>
           <li

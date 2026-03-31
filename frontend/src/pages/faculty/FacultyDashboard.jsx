@@ -97,6 +97,18 @@ const FacultyDashboard = () => {
     }
   };
 
+  useEffect(() => {
+    const handleBack = () => {
+      navigate("/login", { replace: true });
+    };
+  
+    window.onpopstate = handleBack;
+  
+    return () => {
+      window.onpopstate = null;
+    };
+  }, []);
+
   return (
     <div className="faculty-layout">
       <FacultySidebar />
@@ -125,7 +137,10 @@ const FacultyDashboard = () => {
 
               <button
                 className="profile-btn logout"
-                onClick={handleLogout}
+                onClick={() => {
+                  localStorage.clear();
+                  navigate("/login", { replace: true });
+                }}
               >
                 🚪 Logout
               </button>

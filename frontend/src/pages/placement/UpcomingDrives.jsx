@@ -23,7 +23,10 @@ const UpcomingDrives = () => {
     <div className="placement-layout">
       {/* Sidebar */}
       <aside className="sidebar">
-        <h2 className="brand">EventEase</h2>
+        <div className="sidebar-header">
+          <div className="logo-icon">E</div>
+          <span className="logo-text">EventEase</span>
+        </div>
         <ul>
           <li onClick={() => navigate("/placement/dashboard")}>
             📊 Dashboard
@@ -32,34 +35,34 @@ const UpcomingDrives = () => {
         </ul>
       </aside>
 
-    {/* Main Content */}
-    <main className="main-content">
+      {/* Main Content */}
+      <main className="main-content">
         <h2>📅 Upcoming Drives</h2>
 
-      <div className="panel-grid">
-        {drives.length > 0 ? (
-          drives.map((drive, index) => (
-            <div key={index} className="event-card">
-              <h4>{drive.name}</h4>
-              <p>
-                Date: {new Date(drive.date).toLocaleDateString("en-GB", {
+        <div className="panel-grid">
+          {drives.length > 0 ? (
+            drives.map((drive, index) => (
+              <div key={index} className="event-card">
+                <h4>{drive.name}</h4>
+                <p>
+                  Date: {new Date(drive.date).toLocaleDateString("en-GB", {
                     day: "2-digit",
                     month: "short",
                     year: "numeric",
-                })}
-              </p>
-              <p>
-                👥 Registered Students:{" "}
-                <strong>{drive.totalRegistrations || 0}</strong>
-              </p>
+                  })}
+                </p>
+                <p>
+                  👥 Registered Students:{" "}
+                  <strong>{drive.totalRegistrations || 0}</strong>
+                </p>
+              </div>
+            ))
+          ) : (
+            <div className="event-card empty-card">
+              <p>No upcoming drives</p>
             </div>
-          ))
-        ) : (
-          <div className="event-card empty-card">
-            <p>No upcoming drives</p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
       </main>
     </div>
   );

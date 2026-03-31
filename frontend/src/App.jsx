@@ -60,7 +60,7 @@ function App() {
       <Route path="/reset-password/:token" element={<ResetPassword />} />
     
       {/* ---------- STUDENT ROUTES ---------- */}
-      <Route path="/student" element={<ProtectedRoute> <StudentLayout /> </ProtectedRoute>}>
+      <Route path="/student" element={<ProtectedRoute allowedRole="student"> <StudentLayout /> </ProtectedRoute>}>
         <Route path="dashboard" element={<StudentDashboard />} />
         <Route path="events" element={<StudentEvents />} />
         <Route path="events/:id" element={<StudentEventDetails />} />
@@ -73,7 +73,7 @@ function App() {
       </Route>
 
       {/* ---------- ADMIN ROUTES ---------- */}
-      <Route path="/admin" element={<ProtectedRoute> <AdminLayout /> </ProtectedRoute>}>
+      <Route path="/admin" element={<ProtectedRoute allowedRole="admin"> <AdminLayout /> </ProtectedRoute>}>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="events" element={<ManageEvents />} />
         <Route path="events/:id" element={<AdminEventDetails />} />
@@ -92,7 +92,7 @@ function App() {
       </Route>
 
       {/* ---------- FACULTY ROUTES ----------*/}
-      <Route path="/faculty" element={<ProtectedRoute> <FacultyLayout /> </ProtectedRoute>}> 
+      <Route path="/faculty" element={<ProtectedRoute allowedRole="faculty"> <FacultyLayout /> </ProtectedRoute>}> 
         <Route path="dashboard" element={<FacultyDashboard />} />
         <Route path="events" element={<FacultyEvents />} />
         <Route path="calendar" element={<FacultyCalendar />} />
@@ -100,7 +100,7 @@ function App() {
       </Route>
 
       {/* ---------- PLACEMENT ROUTES ---------- */}
-      <Route path="/placement" element={<ProtectedRoute> <PlacementLayout /> </ProtectedRoute>}> 
+      <Route path="/placement" element={<ProtectedRoute allowedRole="placement cell"> <PlacementLayout /> </ProtectedRoute>}> 
         <Route path="dashboard" element={<PlacementDashboard />} />
         <Route path="placements" element={<Placements />} />
         <Route path="companies" element={<CompaniesVisited />} />

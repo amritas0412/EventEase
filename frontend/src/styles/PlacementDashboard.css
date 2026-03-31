@@ -7,11 +7,12 @@
 }
 
 /* ================== SIDEBAR ================== */
-.sidebar {
+.placement-layout .sidebar {
   width: 240px;
-  background: #0f172a;
-  color: #ffffff;
+  background-color: #f6f0fb !important;
+  color: #1e293b;
   padding: 20px;
+  min-height: 100vh;
 }
 
 .brand {
@@ -35,11 +36,12 @@
 }
 
 .sidebar li:hover {
-  background: #1e293b;
+  background: #f6f0fb;
 }
 
 .sidebar li.active {
-  background: #2563eb;
+  background: #7c3aed; 
+  color: white;
 }
 
 /* ================== MAIN CONTENT ================== */

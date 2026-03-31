@@ -104,11 +104,40 @@
   border-radius: 3px;
 }
 
-.sidebar {
+.placement-sidebar {
   width: 240px;
-  background: #0f172a;
-  color: #ffffff;
+  background-color: #f6f0fb !important;
+  color: #1e293b;
   padding: 20px;
+  min-height: 100vh;
+}
+.brand {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.placement-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.placement-sidebar li {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.placement-sidebar li:hover {
+  background: #f6f0fb;
+}
+
+.placement-sidebar li.active {
+  background: #7c3aed; 
+  color: white;
 }
 
 .calendar-content {

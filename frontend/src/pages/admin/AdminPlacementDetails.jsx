@@ -63,7 +63,7 @@ const AdminPlacementDetails = () => {
         <p><strong>Venue:</strong> {placement.venue}</p>
         <p><strong>Location:</strong> {placement.location}</p>
         <p><strong>Eligible:</strong> {placement.audience}</p>
-        <p><strong>Stipend:</strong> {placement.stipend}</p>
+        <p><strong>Stipend:</strong> ₹{placement.stipend} / month</p>
         <p>
           <strong>Description:</strong><br />
           <span className="description-text">

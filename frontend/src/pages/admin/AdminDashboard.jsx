@@ -108,6 +108,18 @@ if (!localStorage.getItem("role")) {
     )
     : [];
 
+  useEffect(() => {
+    const handleBack = () => {
+      navigate("/login", { replace: true });
+    };
+
+    window.onpopstate = handleBack;
+
+    return () => {
+      window.onpopstate = null;
+    };
+  }, []);
+
   return (
     <div className="admin-dashboard-page">
       {/* ===== TOP BAR ===== */}
@@ -133,7 +145,10 @@ if (!localStorage.getItem("role")) {
               <p className="profile-email">
                 {localStorage.getItem("email")}
               </p>
-              <button className="logout-btn" onClick={handleLogout}>
+              <button className="logout-btn" onClick={() => {
+                localStorage.clear();
+                navigate("/login", { replace: true });
+              }}>
                 Logout
               </button>
             </div>

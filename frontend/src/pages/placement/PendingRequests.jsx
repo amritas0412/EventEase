@@ -21,7 +21,10 @@ const PendingRequests = () => {
     <div className="placement-layout">
       {/* Sidebar */}
       <aside className="sidebar">
-        <h2 className="brand">EventEase</h2>
+        <div className="sidebar-header">
+          <div className="logo-icon">E</div>
+          <span className="logo-text">EventEase</span>
+        </div>
         <ul>
           <li onClick={() => navigate("/placement/dashboard")}>
             📊 Dashboard

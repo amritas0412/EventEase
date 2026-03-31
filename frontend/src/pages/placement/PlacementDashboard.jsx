@@ -127,11 +127,26 @@ const PlacementDashboard = () => {
     }
   };
 
+  useEffect(() => {
+    const handleBack = () => {
+      navigate("/login", { replace: true });
+    };
+
+    window.onpopstate = handleBack;
+
+    return () => {
+      window.onpopstate = null;
+    };
+  }, []);
+
   return (
     <div className="placement-layout">
       {/* Sidebar */}
       <aside className="sidebar">
-        <h2 className="brand">EventEase</h2>
+        <div className="sidebar-header">
+          <div className="logo-icon">E</div>
+          <span className="logo-text">EventEase</span>
+        </div>
 
         <ul>
           <li className="active">📊 Dashboard</li>
@@ -170,7 +185,10 @@ const PlacementDashboard = () => {
 
               <button
                 className="profile-btn logout"
-                onClick={handleLogout}
+                onClick={() => {
+                  localStorage.clear();
+                  navigate("/login", { replace: true });
+                }}
               >
                 🚪 Logout
               </button>

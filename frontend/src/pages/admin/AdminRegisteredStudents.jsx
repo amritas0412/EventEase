@@ -31,8 +31,8 @@ const AdminRegisteredStudents = () => {
       <table className="admin-table">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
+            <td>Name</td>
+            <td>Email</td>
           </tr>
         </thead>
 
