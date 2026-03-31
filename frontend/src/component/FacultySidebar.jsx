@@ -27,15 +27,6 @@ const FacultySidebar = () => {
         >
           Events
         </NavLink>
-
-        <NavLink
-          to="/faculty/calendar"
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-        >
-          Calendar
-        </NavLink>
       </nav>
     </div>
   );

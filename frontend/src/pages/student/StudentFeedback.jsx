@@ -42,8 +42,8 @@ const StudentFeedback = () => {
     <div className="feedback-page">
 
       <button className="back-btn" onClick={() => navigate(-1)}>
-  ⬅ Back
-</button>
+        ⬅ Back
+      </button>
 
       <div className="feedback-card">
         <h2>Event Feedback</h2>
@@ -73,14 +73,13 @@ const StudentFeedback = () => {
                 </span>
               ))}
             </div>
-
-            {/* 📝 Comment */}
             <textarea
+              className="feedback-textarea"
               placeholder="Write your feedback (optional)"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
-
+            {/* 📝 Comment */}
             <button className="submit-btn" onClick={handleSubmit}>
               Submit Feedback
             </button>

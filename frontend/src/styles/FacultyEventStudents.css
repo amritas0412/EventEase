@@ -1,31 +1,66 @@
+/* ================= PAGE ================= */
 .students-page {
   padding: 40px;
   background: #f5f7fb;
   min-height: 100vh;
   font-family: "Segoe UI", sans-serif;
+  position: relative; /* 🔥 needed for top-right positioning */
 }
 
+/* ================= HEADER ================= */
 .students-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative;
   margin-bottom: 25px;
 }
 
+/* TITLE */
 .students-title {
   font-size: 24px;
   font-weight: 600;
   color: #0f172a;
 }
 
+/* 🔥 TOP RIGHT GROUP */
+.header-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* BACK BUTTON */
+.back-btn {
+  height: 36px;
+  padding: 0 12px;
+  border: none;
+  background-color: #1f2937;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.back-btn:hover {
+  background-color: #374151;
+}
+
+/* STUDENT COUNT */
 .students-count {
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
   background: #2563eb;
   color: white;
-  padding: 6px 14px;
   border-radius: 20px;
   font-size: 14px;
 }
 
+/* ================= TABLE ================= */
 .students-table {
   width: 100%;
   border-collapse: collapse;
@@ -56,6 +91,7 @@
   transition: 0.2s;
 }
 
+/* ================= EMPTY STATE ================= */
 .empty-state {
   background: white;
   padding: 40px;

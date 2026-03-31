@@ -5,15 +5,10 @@ import "../../styles/StudentPlacementDetails.css";
 
 const StudentPlacementDetails = () => {
   const { id } = useParams();
-
   const [registered, setRegistered] = useState(false);
-
   const [placement, setPlacement] = useState(null);
-
   const studentId = localStorage.getItem("studentId");
-
   const navigate = useNavigate();
-
   const formatDescription = (text = "") => {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
 
@@ -39,7 +34,7 @@ const StudentPlacementDetails = () => {
 };
 
   useEffect(() => {
-    fetch(`http://localhost:5050/placement/${id}`)
+   fetch(`http://localhost:5050/placement/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
@@ -52,13 +47,15 @@ const StudentPlacementDetails = () => {
   useEffect(() => {
     if (!studentId) return;
 
-    fetch(`http://localhost:5050/student/registration/check?studentId=${studentId}&placementId=${id}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.registered) {
-          setRegistered(true);
-        }
-      })
+    fetch(
+    `http://localhost:5050/student/registration/check?studentId=${studentId}&placementId=${id}`
+  )
+    .then(res => res.json())
+    .then(data => {
+      if (data.registered) {
+        setRegistered(true);
+      }
+    })
       .catch(err => console.error(err));
   }, [id, studentId]);
 

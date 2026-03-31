@@ -14,13 +14,15 @@ const StudentEvents = () => {
     fetch("http://localhost:5050/faculty/events")
       .then(res => res.json())
       .then(data => {
-  if (data.success) {
-    const filtered = data.events.filter(
-      event => event.conductedBy !== null
-    );
-    setEvents(filtered);
-  }
-});
+        if (data.success) {
+          const filtered = data.events.filter(
+            event =>
+              event.conductedBy !== null &&
+              event.status === "approved"   // ✅ ADD THIS
+          );
+          setEvents(filtered);
+        }
+      });
 
     // Fetch student registrations
     fetch(`http://localhost:5050/student/my-registrations/${studentId}`)
@@ -38,13 +40,9 @@ const StudentEvents = () => {
 
   const upcomingEvents = events.filter(e => e.date >= today);
   const pastEvents = events.filter(e => e.date < today);
-
-  // return (
-  //   <div>
-  //     <h2 className="events-title">Upcoming Events</h2>
   return (
-  <div className="student-events-page">
-    <h2 className="events-title">Upcoming Events</h2>
+    <div className="student-events-page">
+      <h2 className="events-title">Upcoming Events</h2>
 
       <div className="events-list">
         {upcomingEvents.map(event => {

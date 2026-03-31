@@ -1,14 +1,3 @@
-/* .faculty-layout {
-  display: flex;
-  min-height: 100vh;
-  background: #f5f7fb;
-}
-
-/* sidebar width already controlled inside FacultySidebar */
-/* .faculty-main {
-  flex: 1;
-  padding: 30px;
-} */ */
 .faculty-layout {
   display: flex;
   min-height: 100vh;
@@ -29,4 +18,3 @@
   padding: 30px;
   background: #f5f6fa;
 }
-

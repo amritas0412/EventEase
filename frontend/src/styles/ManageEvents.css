@@ -1,6 +1,6 @@
 /* PAGE WRAPPER */
 .manage-events-page {
-  padding: 30px;
+  padding: 10px;
 }
 
 /* PAGE TITLE */
@@ -104,7 +104,7 @@
   color: #fff;
   border: none;
   padding: 8px 16px;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 13px;
   cursor: pointer;
 }
@@ -155,7 +155,7 @@
 
 .performance-bar {
   background: linear-gradient(90deg, #4caf50, #2e7d32);
-  height: 100%;
+  height: 90%;
   border-radius: 6px;
 }
 .rating-cell {
@@ -170,7 +170,7 @@ button {
   background: #6c63ff;
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 6px;
   cursor: pointer;
   transition: 0.2s ease;
@@ -178,4 +178,41 @@ button {
 
 button:hover {
   background: #574bff;
+}
+.admin-table td,
+.admin-table th {
+  white-space: normal;     /* allow wrapping */
+  word-break: break-word;  /* prevent overflow */
+  font-size: 13px;         /* slightly smaller */
+  padding: 10px;
+}
+.admin-table {
+  min-width: 1000px;
+}
+/* Event name */
+.admin-table td:nth-child(1) {
+  max-width: 120px;
+}
+
+/* Organizer */
+.admin-table td:nth-child(2) {
+  max-width: 140px;
+}
+.admin-table td:last-child {
+  min-width: 140px;
+  text-align: center;
+}
+.performance-wrapper {
+  width: 80px;
+  height: 8px;
+}
+.details-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.table-card {
+  overflow-x: auto;
+}
+.admin-section {
+  padding: 15px;
 }

@@ -161,54 +161,6 @@
   cursor: pointer;
   font-size: 18px;
 }
-
-/* .profile-dropdown {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  width: 220px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  padding: 15px;
-  z-index: 100;
-}
-
-.profile-name {
-  font-weight: 600;
-}
-
-.profile-email {
-  font-size: 13px;
-  color: gray;
-  margin-bottom: 10px;
-} */
-
-/* .profile-btn {
-  width: 100%;
-  padding: 8px;
-  margin-top: 8px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #f1f5f9;
-} */
-
-/* .profile-btn.logout {
-  background: #fee2e2;
-  color: #b91c1c;
-} */
-
-/* .today-event {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-} */
-
-/* .event-time {
-  font-size: 14px;
-  color: gray;
-} */
 .registration-block {
   margin-top: 15px;
 }
@@ -248,4 +200,54 @@
 .empty-text {
   grid-column: 1 / -1;
   color: #777;
+}
+/* TODAY SECTION CONTAINER */
+.dashboard-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* TODAY TITLE */
+.dashboard-section h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #4c1d95;
+}
+
+/* TODAY EVENT CARD */
+.today-event {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+  border-left: 5px solid #7c3aed;
+
+  padding: 14px 18px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+
+  transition: 0.25s ease;
+}
+
+/* HOVER EFFECT */
+.today-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(124, 58, 237, 0.2);
+}
+
+/* EVENT NAME */
+.today-event span:first-child {
+  font-weight: 600;
+  font-size: 15px;
+  color: #1f2937;
+}
+
+/* TIME TEXT */
+.today-event span:last-child {
+  font-size: 14px;
+  color: #6b7280;
 }

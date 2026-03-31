@@ -10,7 +10,17 @@ const ExploreEvents = () => {
 
   const isLoggedIn = !!localStorage.getItem("token");
 
-  // 🔥 FETCH APPROVED EVENTS
+  // 🔥 FORMAT DESCRIPTION (LIKE PLACEMENT PAGE)
+  const formatDescription = (text = "") => {
+    return text.split("\n").map((line, i) => (
+      <span key={i}>
+        {line}
+        <br />
+      </span>
+    ));
+  };
+
+  // 🔥 FETCH EVENTS
   useEffect(() => {
     fetch("http://localhost:5050/faculty/events")
       .then(res => res.json())
@@ -24,27 +34,34 @@ const ExploreEvents = () => {
 
   const today = new Date().toISOString().split("T")[0];
 
-  // UPCOMING
-  const upcomingEvents = events.filter(
+  // ✅ ONLY APPROVED EVENTS
+  const approvedEvents = events.filter(
+    e => e.status === "approved"
+  );
+
+  // UPCOMING EVENTS
+  const upcomingEvents = approvedEvents.filter(
     e =>
-      e.conductedBy &&  
+      e.conductedBy &&
       e.date >= today &&
       e.eventName.toLowerCase().includes(search.toLowerCase())
   );
 
-  // PAST
-  const pastEvents = events.filter(
+  // PAST EVENTS
+  const pastEvents = approvedEvents.filter(
     e =>
-      e.conductedBy &&  
+      e.conductedBy &&
       e.date < today &&
       e.eventName.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div className="explore-container">
+
       <h1>Explore Events</h1>
       <p className="subtitle">Discover events at Banasthali Vidyapith</p>
 
+      {/* SEARCH */}
       <input
         type="text"
         placeholder="Search events..."
@@ -53,66 +70,90 @@ const ExploreEvents = () => {
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {/* ===== TWO COLUMN LAYOUT ===== */}
-      <div className="events-layout">
+      <div className="events-page">
+        <div className="events-layout">
 
-        {/* LEFT → UPCOMING */}
-        <div className="events-column">
-          <h2 className="section-title">Upcoming Events</h2>
+          {/* ================= UPCOMING ================= */}
+          <div className="events-column">
+            <h2 className="section-title">Upcoming Events</h2>
 
-          {upcomingEvents.length === 0 ? (
-            <p className="no-events">No upcoming events.</p>
-          ) : (
-            upcomingEvents.map(event => (
-              <div className="event-card" key={event._id}>
-                <span className="category">Approved</span>
-                <h3>{event.eventName}</h3>
-                <p><strong>Date:</strong> {event.date}</p>
-                <p><strong>Venue:</strong> {event.venue}</p>
-                <p className="desc">{event.description}</p>
+            {upcomingEvents.length === 0 ? (
+              <p className="no-events">No upcoming events.</p>
+            ) : (
+              upcomingEvents.map(event => (
+                <div className="event-card" key={event._id}>
 
-                <button
-                  className="register-btn"
-                  onClick={() => {
-                    if (!isLoggedIn) {
-                      alert("Please login first to register");
-                      navigate("/login");
-                    } else {
-                      navigate("/student/events");
-                    }
-                  }}
-                >
-                  Register Now
-                </button>
-              </div>
-            ))
-          )}
+                  <span className="category">Approved</span>
+
+                  <h3>{event.eventName}</h3>
+
+                  {/* ✅ CLEAN META */}
+                  <div className="event-meta">
+                    <p><strong>Date:</strong> {event.date}</p>
+                    <p><strong>Venue:</strong> {event.venue}</p>
+                  </div>
+
+                  {/* ✅ FORMATTED DESCRIPTION */}
+                  <p className="desc">
+                    {formatDescription(event.description)}
+                  </p>
+
+                  <button
+                    className="register-btn"
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        alert("Please login first to register");
+                        navigate("/login");
+                      } else {
+                        navigate("/student/events");
+                      }
+                    }}
+                  >
+                    Register Now
+                  </button>
+
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* ================= PAST ================= */}
+          <div className="events-column">
+            <h2 className="section-title past-title">Past Events</h2>
+
+            {pastEvents.length === 0 ? (
+              <p className="no-events">No past events.</p>
+            ) : (
+              pastEvents.map(event => (
+                <div className="event-card past-event" key={event._id}>
+
+                  <span className="category past-badge">Completed</span>
+
+                  <h3>{event.eventName}</h3>
+
+                  {/* ✅ CLEAN META */}
+                  <div className="event-meta">
+                    <p><strong>Date:</strong> {event.date}</p>
+                    <p><strong>Venue:</strong> {event.venue}</p>
+                  </div>
+
+                  {/* ✅ FORMATTED DESCRIPTION */}
+                  <p className="desc">
+                    {formatDescription(event.description)}
+                  </p>
+
+                  <button className="completed-btn" disabled>
+                    Event Completed
+                  </button>
+
+                </div>
+              ))
+            )}
+          </div>
+
         </div>
-
-        {/* RIGHT → PAST */}
-        <div className="events-column">
-          <h2 className="section-title past-title">Past Events</h2>
-
-          {pastEvents.length === 0 ? (
-            <p className="no-events">No past events.</p>
-          ) : (
-            pastEvents.map(event => (
-              <div className="event-card past-event" key={event._id}>
-                <span className="category past-badge">Completed</span>
-                <h3>{event.eventName}</h3>
-                <p><strong>Date:</strong> {event.date}</p>
-                <p><strong>Venue:</strong> {event.venue}</p>
-                <p className="desc">{event.description}</p>
-
-                <button className="completed-btn" disabled>
-                  Event Completed
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-
       </div>
+
     </div>
   );
 };

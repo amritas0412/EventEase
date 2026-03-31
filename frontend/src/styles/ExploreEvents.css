@@ -1,19 +1,23 @@
-/* Two-column layout */
-.events-layout {
-  display: flex;
-  gap: 40px;
-  margin-top: 30px;
+.explore-container {
+  margin: 0 20px;   /* reduced side spacing */
+  padding: 10px 0;
 }
 
-/* Each column */
+/* Layout */
+.events-layout {
+  display: flex;
+  gap: 20px;              /* ↓ reduced from 40px */
+  margin-top: 20px;       /* ↓ tighter */
+}
+
 .events-column {
   flex: 1;
 }
 
-/* Section titles */
+/* Titles */
 .section-title {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 22px;
+  margin-bottom: 12px;   /* ↓ reduced */
   color: #3b2fbf;
 }
 
@@ -21,54 +25,73 @@
   color: #777;
 }
 
-/* Event cards */
+/* Cards */
 .event-card {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  margin-bottom: 20px;
+  background: #fff;
+  padding: 16px;          /* ↓ reduced from 20px */
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06); /* softer */
+  margin-bottom: 14px;    /* ↓ reduced */
   transition: transform 0.2s ease;
 }
 
 .event-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px); /* subtle */
 }
 
-/* Past events style */
+/* Past events */
 .past-event {
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
-/* Category badges */
+/* Badge */
 .category {
   display: inline-block;
   background: #5a2dfc;
   color: #fff;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  margin-bottom: 10px;
+  padding: 3px 10px;
+  border-radius: 16px;
+  font-size: 11px;
+  margin-bottom: 6px;  /* ↓ reduced */
 }
 
 .past-badge {
   background: #999;
 }
 
+/* Meta */
+.event-meta {
+  margin: 6px 0;   /* ↓ reduced */
+}
+
+.event-meta p {
+  margin: 2px 0;   /* ↓ tighter */
+  font-size: 13px;
+  color: #444;
+}
+
+/* Description */
+.desc {
+  margin-top: 6px;   /* ↓ reduced */
+  line-height: 1.5;
+  color: #555;
+  font-size: 13px;
+}
+
 /* Buttons */
 .signin-btn,
 .register-btn,
 .completed-btn {
-  margin-top: 15px;
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  font-size: 14px;
+  margin-top: 10px;   /* ↓ reduced */
+  padding: 8px;
+  font-size: 13px;
+  border-radius: 6px;
 }
 
+/* Buttons styles */
 .signin-btn {
   background: transparent;
-  border: 2px solid #5a2dfc;
+  border: 1.5px solid #5a2dfc;
   color: #5a2dfc;
 }
 
@@ -89,14 +112,15 @@
 
 .completed-btn {
   background: #ccc;
-  border: none;
   color: #555;
+  border: none;
   cursor: not-allowed;
 }
 
-/* Responsive: stack on mobile */
+/* Responsive */
 @media (max-width: 900px) {
   .events-layout {
     flex-direction: column;
+    gap: 16px;
   }
 }

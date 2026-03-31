@@ -5,28 +5,25 @@ import "../../styles/StudentDashboard.css";
 import { Navigate } from "react-router-dom";
 
 const StudentDashboard = () => {
-
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState([]);
-
   // 🔵 FETCHED EVENTS
   const [events, setEvents] = useState([]);
   const [placements, setPlacements] = useState([]);
   const studentName = localStorage.getItem("name");
   const studentEmail = localStorage.getItem("email");
   const studentId = localStorage.getItem("studentId");
+  const isLoggedIn = localStorage.getItem("role");
 
-const isLoggedIn = localStorage.getItem("role");
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
 
-if (!isLoggedIn) {
-  return <Navigate to="/login" replace />;
-}
-
-if (!localStorage.getItem("role")) {
-  return <Navigate to="/login" replace />;
-}
+  if (!localStorage.getItem("role")) {
+    return <Navigate to="/login" replace />;
+  }
 
   useEffect(() => {
     fetch("http://localhost:5050/faculty/events")
@@ -65,7 +62,7 @@ if (!localStorage.getItem("role")) {
       .then(res => res.json())
       .then(data => {
         console.log("REG DATA:", data);
-
+        console.log("STATE BEFORE:", registeredEvents); // 👈 add this
         if (data && data.success && Array.isArray(data.registrations)) {
           setRegisteredEvents(data.registrations);
         } else {
@@ -77,32 +74,41 @@ if (!localStorage.getItem("role")) {
         setRegisteredEvents([]);
       });
   }, []);
-  // FIRST define filteredEvents
-  // const filteredEvents = registrations.filter(reg => reg.eventName);
   const filteredEvents = registeredEvents.filter(reg =>
     reg.eventName?.toLowerCase().includes(search.toLowerCase())
   );
+
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+
+  const upcomingEvents = filteredEvents.filter(ev => {
+    const d = new Date(ev.date);
+    d.setHours(0, 0, 0, 0);
+    return d >= todayDate;
+  });
+
+  const pastEvents = filteredEvents.filter(ev => {
+    const d = new Date(ev.date);
+    d.setHours(0, 0, 0, 0);
+    return d < todayDate;
+  });
+  const todayEvents = events.filter(ev => {
+    const d = new Date(ev.date);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime() === todayDate.getTime() &&
+      ev.status === "approved" &&
+      ev.conductedBy !== null;
+  });
   const today = new Date().toISOString().split("T")[0];
-
-  const upcomingAllEvents = events
-  .filter(ev => ev.date >= today && ev.conductedBy !== null)
-  .sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  const upcomingEvents = filteredEvents
-    .filter(ev => ev.date >= today)
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  const pastEvents = filteredEvents
-    .filter(ev => ev.date < today)
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
-  //  DATE LOGIC
-  // const today = new Date().toISOString().split("T")[0];
-
-  // const upcomingEvents = events.filter(ev => ev.date >= today);
-
-  const todayEvents = upcomingEvents.filter(ev => ev.date === today);
-  
-
+  const upcomingAllEvents = events.filter(ev => {
+    const d = new Date(ev.date);
+    d.setHours(0, 0, 0, 0);
+    return (
+      d >= todayDate &&
+      ev.status === "approved" &&
+      ev.conductedBy !== null
+    );
+  });
   const upcomingPlacements = placements.filter(
     p => p.date >= today && p.status === "approved"
   );
@@ -114,7 +120,6 @@ if (!localStorage.getItem("role")) {
   const [registeredPlacements, setRegisteredPlacements] = useState([]);
   useEffect(() => {
     if (!studentId) return;
-
     fetch(`http://localhost:5050/student/my-placements/${studentId}`)
       .then(res => res.json())
       .then(data => {
@@ -124,9 +129,6 @@ if (!localStorage.getItem("role")) {
       })
       .catch(err => console.error("MY PLACEMENTS ERROR:", err));
   }, [studentId]);
-
-
-
   const filteredPlacements = registeredPlacements
     .map(reg => reg.placementId)
     .filter(Boolean)
@@ -262,24 +264,6 @@ if (!localStorage.getItem("role")) {
         <h3>📝 My Registrations</h3>
         <div className="registrations-grid">
           {/* EVENTS */}
-          {/*<div>
-            <h4>Registered Events</h4>
-
-            {filteredEvents.length === 0 ? (
-
-              <p>No registered events</p>
-            ) : (
-              <ul>
-                {filteredEvents.map((reg) => (
-                  <li key={reg._id}>
-                    {reg.eventName} — {reg.date}
-                  </li>
-                ))}
-              </ul>
-            )}
-
-          </div>*/}
-          {/* EVENTS */}
           <div>
             <h4>Registered Events</h4>
 
@@ -343,3 +327,4 @@ if (!localStorage.getItem("role")) {
 };
 
 export default StudentDashboard;
+

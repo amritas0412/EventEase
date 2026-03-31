@@ -11,10 +11,11 @@ const StudentPlacements = () => {
   const [pastPlacements, setPastPlacements] = useState([]);
   const studentId = localStorage.getItem("studentId");
 
+
   useEffect(() => {
     fetch("http://localhost:5050/placement/all")
       .then(res => res.json())
-      .then(async(data) => {
+      .then(async (data) => {
 
         if (data.success) {
           // show only approved ones for students
@@ -31,12 +32,12 @@ const StudentPlacements = () => {
 
             if (regData.success) {
               const pastRegistered = (regData.placements || []).filter(r => {
-                
+
                 const todayDate = new Date();
                 todayDate.setHours(0, 0, 0, 0);
 
                 if (!r.placementId?.date) return false;
-                
+
                 const driveDate = new Date(r.placementId.date);
                 driveDate.setHours(0, 0, 0, 0);
 
@@ -49,32 +50,6 @@ const StudentPlacements = () => {
       })
       .catch(err => console.error("FETCH ERROR:", err));
   }, [studentId, today]);
-
-// useEffect(() => {
-//   fetch("http://localhost:5050/placement/all")
-//     .then(res => res.json())
-//     .then(data => {
-//       console.log("PLACEMENT DATA:", data); // debug
-
-//       if (data && data.success && Array.isArray(data.placements)) {
-//         const upcoming = data.placements.filter(
-//   p =>
-//     (!p.status || p.status === "approved") &&
-//     p.date >= today
-// );
-
-//         setPlacements(upcoming);
-//       } else {
-//         setPlacements([]);
-//       }
-//     })
-//     .catch(err => {
-//       console.error("FETCH ERROR:", err);
-//       setPlacements([]);
-//     });
-// }, []);
-
-
   return (
     <div className="placements-page">
       <h2 className="placements-title">Placements & Internships</h2>

@@ -8,17 +8,27 @@ const StudentSidebar = () => {
 
   // 🔥 Fetch approved events count
   useEffect(() => {
-    fetch("http://localhost:5050/faculty/events")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setEventCount(data.events.length);
-        }
-      })
-      .catch(err =>
-        console.error("SIDEBAR COUNT ERROR:", err)
-      );
-  }, []);
+  fetch("http://localhost:5050/faculty/events")
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        // const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toLocaleDateString("en-CA");
+
+        const filtered = data.events.filter(
+          event =>
+            event.status === "approved" &&   // ✅ only approved
+            event.date >= today &&           // ✅ only upcoming
+            event.conductedBy !== null       // ✅ valid
+        );
+
+        setEventCount(filtered.length); // 🔥 correct count
+      }
+    })
+    .catch(err =>
+      console.error("SIDEBAR COUNT ERROR:", err)
+    );
+}, []);
 
   return (
     <div className="student-sidebar">

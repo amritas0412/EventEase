@@ -1,9 +1,4 @@
 .placement-calendar-page {
-  /*padding: 30px;
-  background: #f7f4ff;
-  min-height: 100vh;
-  display: flex;
-  height: 100vh;*/
   display: flex;
   min-height: 100vh;
   background-color: #f5f7fb;
@@ -43,7 +38,7 @@
   background: white;
   padding: 20px;
   border-radius: 16px;
-  max-width: 700px;
+  max-width: 550px;
   margin: 0 auto;
 }
 

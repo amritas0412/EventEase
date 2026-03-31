@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/FacultyEvents.css"; //  FIXED PATH
+import FacultySidebar from "../../component/FacultySidebar.jsx";
 
 const FacultyEvents = () => {
   const navigate = useNavigate();
@@ -27,16 +28,6 @@ const FacultyEvents = () => {
   };
 
   const today = new Date().toISOString().split("T")[0];
-
-  // const emptyForm = {
-  //   eventName: "",
-  //   date: "",
-  //   startTime: "",
-  //   endTime: "",
-  //   venue: "",
-  //   eligible: "",
-  //   description: "",
-  // };
   const emptyForm = {
     eventName: "",
     date: "",
@@ -151,24 +142,7 @@ const FacultyEvents = () => {
 
   return (
     <div className="faculty-layout">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <h2 className="brand">EventEase</h2>
-        <ul>
-          <li
-            onClick={() => navigate("/faculty/dashboard")}
-            style={{ cursor: "pointer" }}
-          >
-            📊 Dashboard
-          </li>
-          <li className="active">
-            📅 Events <span className="badge">{upcomingEvents.length}</span>
-
-
-          </li>
-        </ul>
-      </aside>
-
+      <FacultySidebar />
       {/* Main Content */} <main className="main-content"> <div className="page-header"> <h2>Events</h2> <p>Create, edit, and manage department events.</p> </div> <button className="add-event-btn" onClick={() => setShowForm(true)} > ➕ Add Event </button>
 
         {showForm && (

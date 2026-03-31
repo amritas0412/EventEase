@@ -30,30 +30,39 @@ const AdminEventDetails = () => {
 
   return (
     <div className="admin-event-details-page">
+
+      {/* HEADER */}
       <div className="details-header">
         <h2>{event.eventName}</h2>
 
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button 
+          className="back-btn" 
+          onClick={() => navigate(-1)}
+        >
           ← Back
         </button>
       </div>
 
+      {/* DETAILS CARD */}
       <div className="details-card">
         <p><strong>Date:</strong> {event.date}</p>
         <p><strong>Time:</strong> {event.startTime} - {event.endTime}</p>
         <p><strong>Venue:</strong> {event.venue}</p>
         <p><strong>Eligible:</strong> {event.eligible}</p>
 
+        {/* DESCRIPTION */}
         <div className="description-box">
           <strong>Description:</strong>
-          <p>{event.description}</p>
+          <p className="description-text">
+            {event.description}
+          </p>
         </div>
 
         <p><strong>Status:</strong> {event.status}</p>
       </div>
+
     </div>
   );
 };
 
 export default AdminEventDetails;
-

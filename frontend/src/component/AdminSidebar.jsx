@@ -4,7 +4,12 @@ import "../styles/AdminSidebar.css";
 const AdminSidebar = () => {
   return (
     <div className="admin-sidebar">
-      <h2 className="admin-logo">EventEase</h2>
+      {/* Logo */}
+      <div className="sidebar-header">
+        <div className="logo-icon">E</div>
+        <span className="logo-text">EventEase</span>
+      </div>
+      {/* <h2 className="admin-logo">EventEase</h2> */}
 
       <nav className="admin-menu">
         <NavLink to="/admin/dashboard">Home</NavLink>

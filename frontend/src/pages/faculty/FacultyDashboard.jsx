@@ -4,17 +4,18 @@ import "../../styles/FacultyDashboard.css"; // ✅ FIXED PATH
 import FacultyProfile from "./FacultyProfile";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
+import FacultySidebar from "../../component/FacultySidebar.jsx";
 
 const FacultyDashboard = () => {
   const isLoggedIn = localStorage.getItem("role");
 
-if (!isLoggedIn) {
-  return <Navigate to="/login" replace />;
-}
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
 
-if (!localStorage.getItem("role")) {
-  return <Navigate to="/login" replace />;
-}
+  if (!localStorage.getItem("role")) {
+    return <Navigate to="/login" replace />;
+  }
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfile, setShowProfile] = useState(false);
@@ -41,10 +42,20 @@ if (!localStorage.getItem("role")) {
 
   const today = new Date().toISOString().split("T")[0];
   const loggedInEmail = localStorage.getItem("email");
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
 
+  const parseDateSafe = (dateStr) => {
+    const d = new Date(dateStr);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
   const upcomingEvents = events
     .filter(ev => ev.status === "approved")
-    .filter(ev => ev.date >= today)
+    .filter(ev => {
+      const d = parseDateSafe(ev.date);
+      return d >= todayDate;
+    })
     .filter(ev =>
       ev.eventName.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -53,12 +64,15 @@ if (!localStorage.getItem("role")) {
     .filter(ev => ev.conductedBy?._id === facultyId)
     .filter(ev => ev.status === "pending");
 
-  // Past = finished events
-  const pastEvents = events.filter(ev =>
-    new Date(ev.date) < new Date() &&
-    String(ev.conductedBy?._id) === String(facultyId) &&
-    ev.status?.toLowerCase() === "approved"
-  );
+  const pastEvents = events.filter(ev => {
+    const d = parseDateSafe(ev.date);
+
+    return (
+      d < todayDate &&
+      String(ev.conductedBy?._id) === String(facultyId) &&
+      ev.status?.toLowerCase() === "approved"
+    );
+  });
 
   const handleLogout = () => {
     localStorage.removeItem("role");
@@ -82,23 +96,10 @@ if (!localStorage.getItem("role")) {
       console.error(err);
     }
   };
-  
+
   return (
     <div className="faculty-layout">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <h2 className="brand">EventEase</h2>
-        <ul>
-          <li className="active">📊 Dashboard</li>
-          <li
-            onClick={() => navigate("/faculty/events")}
-            style={{ cursor: "pointer" }}
-          >
-            📅 Events
-          </li>
-        </ul>
-      </aside>
-
+      <FacultySidebar />
       {/* Main Content */}
       <main className="main-content">
         {/* Profile */}
@@ -154,33 +155,6 @@ if (!localStorage.getItem("role")) {
                 <p>No department events yet</p>
               </div>
             ) : (
-              // upcomingEvents.map(ev => (
-              //   <div key={ev._id} className="event-card dashboard-card">
-              //     <h4>{ev.eventName}</h4>
-              //     <p>📅 {ev.date}</p>
-              //     <p>⏰ {ev.startTime} - {ev.endTime}</p>
-              //     <p>📍 {ev.venue}</p>
-              //     {ev.conductedBy ? (
-              //       <p>Conducted by {ev.conductedBy.name}</p>
-              //     ) : (
-              //       <p className="admin-label">📌 Admin Scheduled Event</p>
-              //     )}
-              //     {ev.conductedBy?._id === facultyId && (
-              //       <>
-              //         <p className="muted-text">
-              //           Registered: {ev.registeredCount || 0}
-              //         </p>
-              //         <button
-              //           className="profile-btn"
-              //           onClick={() => navigate(`/faculty/event/${ev._id}/students`)}
-              //         >
-              //           View Registered Students
-              //         </button>
-              //       </>
-              //     )}
-
-              //   </div>
-              // )
               upcomingEvents.map(ev => (
                 <div key={ev._id} className="event-card dashboard-card">
                   <h4>{ev.eventName}</h4>
@@ -197,7 +171,7 @@ if (!localStorage.getItem("role")) {
 
                   {/* 🔥 Label */}
                   {ev.conductedBy ? (
-                    <p>Conducted by {ev.conductedBy.name}</p>
+                    <p>Conducted by: {ev.conductedBy.name}</p>
                   ) : (
                     <p className="admin-label">📌 Admin Scheduled Event</p>
                   )}

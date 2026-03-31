@@ -1,8 +1,9 @@
 /* ================= PAGE ================= */
 .placement-details-page {
-  max-width: 850px;
-  margin: 30px auto;
-  padding: 20px;
+  max-width: none;
+  margin: 0 auto 0px;
+  padding: 10px 40px;
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
 
@@ -32,11 +33,14 @@
 
 /* ================= CARD ================= */
 .placement-card {
+  width: 100%;
+  max-width: 900px;       /* controlled readable width */
+  margin: 0 auto;         /* center it properly */
+
   background: #ffffff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-  margin-bottom: 30px;
 }
 
 .placement-card p {
@@ -166,6 +170,7 @@
     font-size: 24px;
   }
 }
+
 
 .description-text {
   white-space: pre-wrap;
