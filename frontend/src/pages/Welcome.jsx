@@ -16,7 +16,7 @@ const Welcome = () => {
 
         <div className="nav-links">
           <button
-            className="sign-in"
+            className="nav-btn"
             onClick={() => navigate("/login")}
           >
             Sign In

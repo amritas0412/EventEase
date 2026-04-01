@@ -150,21 +150,21 @@ const ManageCalendar = () => {
         console.log("API DATA:", data);
 
         if (data.success) {
-  setPlacements(data.placements || []);
+          setPlacements(data.placements || []);
 
-  const days = (data.placements || [])
-    .filter(p => {
-      const d = new Date(p.date);
-      return (
-        p.status === "approved" &&
-        d.getMonth() === monthIndex &&
-        d.getFullYear() === year
-      );
-    })
-    .map(p => new Date(p.date).getDate());
+          const days = (data.placements || [])
+            .filter(p => {
+              const d = new Date(p.date);
+              return (
+                p.status === "approved" &&
+                d.getMonth() === monthIndex &&
+                d.getFullYear() === year
+              );
+            })
+            .map(p => new Date(p.date).getDate());
 
-  setPlacementDates(days);
-}
+          setPlacementDates(days);
+        }
       })
       .catch(err => console.error(err));
   }, [monthIndex, year]);
@@ -207,13 +207,68 @@ const ManageCalendar = () => {
           <div key={`empty-${i}`} className="calendar-day empty"></div>
         ))}
 
+        {/* {Array.from({ length: daysInMonth }, (_, i) => {
+          const day = i + 1;
+          let cls = "calendar-day";
+          // if (eventDates.includes(day)) cls += " event-day";
+          // if (placementDates.includes(day)) cls += " placement-day";
+          const currentDate = new Date(year, monthIndex, day);
+
+          // normalize today
+          const todayDate = new Date();
+          todayDate.setHours(0, 0, 0, 0);
+
+          const isPast = currentDate < todayDate;
+
+          const hasEvent = eventDates.includes(day);
+          const hasPlacement = placementDates.includes(day);
+
+          // priority
+          if (hasEvent && hasPlacement) cls += " both-day";
+          else if (hasPlacement) cls += " placement-day";
+          else if (hasEvent) cls += " event-day";
+
+          // ✅ fade past (only if something exists)
+          if (isPast && (hasEvent || hasPlacement)) {
+            cls += " past-day";
+          }
+          if (selectedDate === day) cls += " selected-day";
+
+          return (
+            <div
+              key={day}
+              className={cls}
+              onClick={() => setSelectedDate(day)}
+            >
+              {day}
+            </div>
+          );
+        })} */}
         {Array.from({ length: daysInMonth }, (_, i) => {
           const day = i + 1;
           let cls = "calendar-day";
-          if (eventDates.includes(day)) cls += " event-day";
-          if (placementDates.includes(day)) cls += " placement-day";
-          if (selectedDate === day) cls += " selected-day";
 
+          const currentDate = new Date(year, monthIndex, day);
+
+          const todayDate = new Date();
+          todayDate.setHours(0, 0, 0, 0);
+const isToday =
+  currentDate.toDateString() === todayDate.toDateString();
+          const isPast = currentDate < todayDate;
+
+          const hasEvent = eventDates.includes(day);
+          const hasPlacement = placementDates.includes(day);
+
+          if (hasEvent && hasPlacement) cls += " both-day";
+          else if (hasPlacement) cls += " placement-day";
+          else if (hasEvent) cls += " event-day";
+
+          if (isPast && (hasEvent || hasPlacement)) {
+            cls += " past-day";
+          }
+
+          if (selectedDate === day) cls += " selected-day";
+if (isToday) cls += " today";
           return (
             <div
               key={day}
@@ -228,70 +283,70 @@ const ManageCalendar = () => {
 
       {/* DETAILS */}
       {selectedDate && (
-  <div className="date-details">
-    <h3>{selectedDate} {months[monthIndex]} {year}</h3>
+        <div className="date-details">
+          <h3>{selectedDate} {months[monthIndex]} {year}</h3>
 
-    {/* EVENTS */}
-    {events
-      .filter(e => {
-        const d = new Date(e.date);
-        return (
-          d.getDate() === selectedDate &&
-          d.getMonth() === monthIndex &&
-          d.getFullYear() === year
-        );
-      })
-      .map(e => (
-        <p key={e._id} className="event-text">
-          📌 {e.eventName}
-        </p>
-      ))}
+          {/* EVENTS */}
+          {events
+            .filter(e => {
+              const d = new Date(e.date);
+              return (
+                d.getDate() === selectedDate &&
+                d.getMonth() === monthIndex &&
+                d.getFullYear() === year
+              );
+            })
+            .map(e => (
+              <p key={e._id} className="event-text">
+                📌 {e.eventName}
+              </p>
+            ))}
 
-    {/* PLACEMENTS */}
-    {placements
-      .filter(p => {
-        const d = new Date(p.date);
-        return (
-          d.getDate() === selectedDate &&
-          d.getMonth() === monthIndex &&
-          d.getFullYear() === year &&
-          p.status === "approved"
-        );
-      })
-      .map(p => (
-        <p key={p._id} className="placement-text">
-          💼 {p.name} — {p.jobrole}
-        </p>
-      ))}
+          {/* PLACEMENTS */}
+          {placements
+            .filter(p => {
+              const d = new Date(p.date);
+              return (
+                d.getDate() === selectedDate &&
+                d.getMonth() === monthIndex &&
+                d.getFullYear() === year &&
+                p.status === "approved"
+              );
+            })
+            .map(p => (
+              <p key={p._id} className="placement-text">
+                💼 {p.name} — {p.jobrole}
+              </p>
+            ))}
 
-    {/* EMPTY */}
-    {events.filter(e => {
-      const d = new Date(e.date);
-      return (
-        d.getDate() === selectedDate &&
-        d.getMonth() === monthIndex &&
-        d.getFullYear() === year
-      );
-    }).length === 0 &&
-     placements.filter(p => {
-      const d = new Date(p.date);
-      return (
-        d.getDate() === selectedDate &&
-        d.getMonth() === monthIndex &&
-        d.getFullYear() === year &&
-        p.status === "approved"
-      );
-    }).length === 0 && (
-      <p>No events or placements on this day.</p>
-    )}
-  </div>
-)}
-{/* LEGEND */}
+          {/* EMPTY */}
+          {events.filter(e => {
+            const d = new Date(e.date);
+            return (
+              d.getDate() === selectedDate &&
+              d.getMonth() === monthIndex &&
+              d.getFullYear() === year
+            );
+          }).length === 0 &&
+            placements.filter(p => {
+              const d = new Date(p.date);
+              return (
+                d.getDate() === selectedDate &&
+                d.getMonth() === monthIndex &&
+                d.getFullYear() === year &&
+                p.status === "approved"
+              );
+            }).length === 0 && (
+              <p>No events or placements on this day.</p>
+            )}
+        </div>
+      )}
+      {/* LEGEND */}
       <div className="calendar-legend">
         <div><span className="legend-box event"></span> Event</div>
         <div><span className="legend-box placement"></span> Placement</div>
       </div>
-      
+
     </div>
   );
 };

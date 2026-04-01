@@ -20,7 +20,7 @@ const PlacementCalendar = () => {
         console.log("PLACEMENTS:", data.placements);
         setEvents(data.placements);
       })
-      .catch(err => console.error(err));
+      .catch(err =>  console.error(err));
   }, []);
 
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
@@ -120,23 +120,40 @@ const PlacementCalendar = () => {
           {Array.from({ length: startDay }).map((_, i) => (
             <div key={`e-${i}`} className="placement-day-cell empty"></div>
           ))}
+{Array.from({ length: daysInMonth }, (_, i) => {
+  const day = i + 1;
+  let cls = "placement-day-cell";
 
-          {Array.from({ length: daysInMonth }, (_, i) => {
-            const day = i + 1;
-            let cls = "placement-day-cell";
+  const currentDate = new Date(year, monthIndex, day);
 
-            if (approvedDates.includes(day)) {
-              cls += " placement-approved";
-            } else if (pendingDates.includes(day)) {
-              cls += " placement-pending";
-            }
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
 
-            return (
-              <div key={day} className={cls}>
-                {day}
-              </div>
-            );
-          })}
+  const isPast = currentDate < todayDate;
+  const isToday =
+    currentDate.toDateString() === todayDate.toDateString();
+
+  const isApproved = approvedDates.includes(day);
+  const isPending = pendingDates.includes(day);
+
+  // priority
+  if (isApproved) cls += " placement-approved";
+  else if (isPending) cls += " placement-pending";
+
+  // ✅ fade past
+  if (isPast && (isApproved || isPending)) {
+    cls += " past-day";
+  }
+
+  // ✅ highlight today
+  if (isToday) cls += " today";
+
+  return (
+    <div key={day} className={cls}>
+      {day}
+    </div>
+  );
+})}
         </div>
 
         <div className="calendar-legend">

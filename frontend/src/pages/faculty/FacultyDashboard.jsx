@@ -152,7 +152,7 @@ const FacultyDashboard = () => {
         {/* Department Events */}
         <section className="panel">
           <div className="panel-header">
-            <h3>🏫 Department Events</h3>
+            <h3>🏫 Upcoming Department Events</h3>
             <input
               type="text"
               className="search-input"
@@ -281,6 +281,7 @@ const FacultyDashboard = () => {
                     <div key={student._id} className="border-b py-2">
                       <p><strong>{student.name}</strong></p>
                       <p>{student.email}</p>
+                      {/* <p>{student.class}</p> */}
                     </div>
                   ))
                 )}

@@ -12,6 +12,7 @@
   margin: 20px 0;
 }
 /* HEADER */
+
 .calendar-header {
   display: flex;
   align-items: center;
@@ -183,4 +184,26 @@ overflow: hidden;
   display: flex;
   justify-content: center;
   gap: 15px;
+}
+.past-day {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+/* keep gradient visible */
+.both-day.past-day {
+  opacity: 0.6;
+}
+/* TODAY highlight */
+.calendar-day.today {
+  border: 2px solid #7c3aed;   /* purple border */
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+  font-weight: 700;
+}
+.calendar-day.event-day.today {
+  border: 2px solid #5b3df2;
+}
+
+.calendar-day.placement-day.today {
+  border: 2px solid #22c55e;
 }

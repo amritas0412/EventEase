@@ -817,7 +817,7 @@ app.get("/faculty/event/:id/students", async (req, res) => {
 
     const registrations = await Registration.find({
       eventId: eventObjectId
-    }).populate("studentId", "name email studentId");  //  THIS LINE IS KEY
+    }).populate("studentId", "name email studentId ");  //  THIS LINE IS KEY
 
     console.log("EVENT ID:", req.params.id);
     console.log("FOUND:", registrations);

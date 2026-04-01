@@ -145,3 +145,25 @@
   padding: 20px;
   overflow-y: auto;
 }
+/* Past fade */
+.past-day {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+/* keep color visible for approved */
+.placement-approved.past-day {
+  opacity: 0.6;
+}
+
+/* keep color visible for pending */
+.placement-pending.past-day {
+  opacity: 0.6;
+}
+
+/* TODAY highlight (works on any color) */
+.placement-day-cell.today {
+  border: 2px solid #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+  font-weight: bold;
+}

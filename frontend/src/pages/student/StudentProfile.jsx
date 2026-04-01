@@ -13,6 +13,7 @@ const STUDENTS = {
     year: "3rd Year",
     semester: "6",
     cgpa: "5",
+    contact: "123",
   },
 
   "btbtc23292_kumari@banasthali.in": {
@@ -26,6 +27,7 @@ const STUDENTS = {
     year: "3rd Year",
     semester: "6",
     cgpa: "5",
+    contact: "456",
   },
 
   "btbtc23237_palak@banasthali.in": {
@@ -39,6 +41,7 @@ const STUDENTS = {
     year: "3rd Year",
     semester: "6",
     cgpa: "5",
+    contact: "876",
   },
 
   "btbtc23078_neetika@banasthali.in": {
@@ -52,6 +55,7 @@ const STUDENTS = {
     year: "3rd Year",
     semester: "6",
     cgpa: "5",
+    contact: "789",
   },
 };
 
@@ -133,6 +137,11 @@ const StudentProfile = () => {
           <div className="profile-row">
             <span>CGPA</span>
             <span>{student.cgpa}</span>
+          </div>
+
+          <div className="profile-row">
+            <span>Contact</span>
+            <span>{student.contact}</span>
           </div>
         </div>
 

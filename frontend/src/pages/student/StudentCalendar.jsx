@@ -14,7 +14,6 @@ const StudentCalendar = () => {
 
   const [events, setEvents] = useState([]);
   const [placements, setPlacements] = useState([]);
-
   const [selectedDate, setSelectedDate] = useState(null);
 
   // ✅ Fetch events
@@ -37,40 +36,45 @@ const StudentCalendar = () => {
       .catch(err => console.error(err));
   }, []);
 
-  // ✅ Safe date parser (IMPORTANT)
+  // ✅ Safe date parser
   const parseDate = (dateStr) => {
     if (!dateStr) return null;
-    const [y, m, d] = dateStr.split("-").map(Number);
-    return new Date(y, m - 1, d);
+    return new Date(dateStr);   // ✅ handles ISO format correctly
   };
 
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const startDay = new Date(year, monthIndex, 1).getDay();
 
-  // 🔥 Highlight logic
-  const eventDates = events
-    .filter(ev => {
-      const d = parseDate(ev.date);
-      return (
-        ev.status === "approved" &&
-        d &&
-        d.getMonth() === monthIndex &&
-        d.getFullYear() === year
-      );
-    })
-    .map(ev => parseDate(ev.date).getDate());
+  // ✅ PRECOMPUTE (IMPORTANT - outside JSX)
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
 
-  const placementDates = placements
-    .filter(pl => {
-      const d = parseDate(pl.date);
-      return (
-        pl.status === "approved" &&
-        d &&
-        d.getMonth() === monthIndex &&
-        d.getFullYear() === year
-      );
-    })
-    .map(pl => parseDate(pl.date).getDate());
+  const eventSet = new Set();
+  const placementSet = new Set();
+
+  events.forEach(ev => {
+    const d = parseDate(ev.date);
+    if (
+      ev.status === "approved" &&
+      d &&
+      d.getMonth() === monthIndex &&
+      d.getFullYear() === year
+    ) {
+      eventSet.add(d.getDate());
+    }
+  });
+
+  placements.forEach(pl => {
+    const d = parseDate(pl.date);
+    if (
+      pl.status === "approved" &&
+      d &&
+      d.getMonth() === monthIndex &&
+      d.getFullYear() === year
+    ) {
+      placementSet.add(d.getDate());
+    }
+  });
 
   // ⬅️➡️ Navigation
   const prevMonth = () => {
@@ -106,7 +110,7 @@ const StudentCalendar = () => {
       {/* GRID */}
       <div className="calendar-grid">
 
-        {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(day => (
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
           <div key={day} className="calendar-weekday">
             {day}
           </div>
@@ -116,18 +120,51 @@ const StudentCalendar = () => {
           <div key={`empty-${i}`} className="calendar-day empty"></div>
         ))}
 
+        {/* ✅ DAYS LOOP */}
         {Array.from({ length: daysInMonth }, (_, i) => {
           const day = i + 1;
 
           let cls = "calendar-day";
 
-          const hasEvent = eventDates.includes(day);
-          const hasPlacement = placementDates.includes(day);
+          // const hasEvent = eventSet.has(day);
+          // const hasPlacement = placementSet.has(day);
+          const hasEvent = events.some(ev => {
+            const d = parseDate(ev.date);
+            return (
+              ev.status?.toLowerCase() === "approved" &&
+              d &&
+              d.getDate() === day &&
+              d.getMonth() === monthIndex &&
+              d.getFullYear() === year
+            );
+          });
+
+          const hasPlacement = placements.some(pl => {
+            const d = parseDate(pl.date);
+            return (
+              pl.status?.toLowerCase() === "approved" &&
+              d &&
+              d.getDate() === day &&
+              d.getMonth() === monthIndex &&
+              d.getFullYear() === year
+            );
+          });
+
+          const currentDate = new Date(year, monthIndex, day);
+          const isPast = currentDate < todayDate;
 
           if (hasEvent && hasPlacement) cls += " both-day";
           else if (hasPlacement) cls += " placement-day";
           else if (hasEvent) cls += " event-day";
 
+          if (isPast && (hasEvent || hasPlacement)) {
+            cls += " past-day";
+          }
+
+          const isToday =
+            currentDate.toDateString() === todayDate.toDateString();
+
+          if (isToday) cls += " today";
           if (selectedDate === day) cls += " selected-day";
 
           return (
@@ -142,7 +179,7 @@ const StudentCalendar = () => {
         })}
       </div>
 
-      {/* ✅ DETAILS SECTION (LIKE MANAGE CALENDAR) */}
+      {/* DETAILS */}
       {selectedDate && (
         <div className="date-details">
           <h3>{selectedDate} {months[monthIndex]} {year}</h3>
@@ -191,16 +228,16 @@ const StudentCalendar = () => {
               d.getMonth() === monthIndex &&
               d.getFullYear() === year;
           }).length === 0 &&
-           placements.filter(p => {
-            const d = parseDate(p.date);
-            return d &&
-              d.getDate() === selectedDate &&
-              d.getMonth() === monthIndex &&
-              d.getFullYear() === year &&
-              p.status === "approved";
-          }).length === 0 && (
-            <p>No events or placements on this day.</p>
-          )}
+            placements.filter(p => {
+              const d = parseDate(p.date);
+              return d &&
+                d.getDate() === selectedDate &&
+                d.getMonth() === monthIndex &&
+                d.getFullYear() === year &&
+                p.status === "approved";
+            }).length === 0 && (
+              <p>No events or placements on this day.</p>
+            )}
         </div>
       )}
 

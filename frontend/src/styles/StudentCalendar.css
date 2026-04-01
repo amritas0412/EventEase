@@ -1,28 +1,25 @@
+/* ================= PAGE ================= */
 .student-calendar-page {
   padding: 30px;
   background: #f7f4ff;
   min-height: 100vh;
 }
 
-.calendar-header h2 {
-  font-size: 26px;
+/* ================= HEADER ================= */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
   margin-bottom: 20px;
 }
 
-/* Weekday row */
-.calendar-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 10px;
+.calendar-header h2 {
+  font-size: 26px;
+  margin: 0;
 }
 
-.weekday {
-  text-align: center;
-  font-weight: 600;
-  color: #555;
-}
-
-/* Calendar grid */
+/* ================= GRID ================= */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -31,9 +28,17 @@
   padding: 20px;
   border-radius: 16px;
   width: fit-content;
+  margin: 0 auto;
 }
 
-/* Calendar day */
+/* ================= WEEKDAYS ================= */
+.calendar-weekday {
+  text-align: center;
+  font-weight: 600;
+  color: #555;
+}
+
+/* ================= DAY ================= */
 .calendar-day {
   width: 60px;
   height: 60px;
@@ -43,12 +48,17 @@
   align-items: center;
   justify-content: center;
   font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 /* Empty cells */
 .calendar-day.empty {
   background: transparent;
+  cursor: default;
 }
+
+/* ================= STATES ================= */
 
 /* Event */
 .event-day {
@@ -58,15 +68,55 @@
 
 /* Placement */
 .calendar-day.placement-day {
-  background: #22c55e !important;
-  color: white !important;
+  background: #22c55e;
+  color: white;
 }
 
-/* Legend */
+/* BOTH (highest priority) */
+.both-day {
+  background: linear-gradient(135deg, #7c3aed, #22c55e);
+  color: white;
+}
+
+/* Past */
+.past-day {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+/* Important: keep colors for both-day even if past */
+.both-day.past-day {
+  opacity: 0.6;
+}
+
+/* Today (must stay visible on top of colors) */
+.calendar-day.today {
+  border: 2px solid #6a3df2;
+  box-shadow: 0 0 0 3px rgba(106, 61, 242, 0.25);
+  font-weight: 700;
+}
+
+/* Selected */
+.selected-day {
+  outline: 2px solid #000;
+}
+
+/* ================= HOVER ================= */
+.calendar-day:hover {
+  transform: translateY(-3px) scale(1.05);
+}
+
+/* Disable hover for past */
+.past-day:hover {
+  transform: scale(0.95);
+}
+
+/* ================= LEGEND ================= */
 .calendar-legend {
   display: flex;
   gap: 20px;
   margin-top: 15px;
+  justify-content: center;
 }
 
 .legend-box {
@@ -82,16 +132,10 @@
 }
 
 .legend-box.placement {
-  background: #1f9254;
-}
-.calendar-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 20px;
+  background: #22c55e;
 }
 
+/* ================= BUTTON ================= */
 .nav-btn {
   background: #7c3aed;
   color: white;
@@ -105,9 +149,3 @@
 .nav-btn:hover {
   background: #6d28d9;
 }
-
-.faculty-day {
-  background-color: #3b82f6;   /* Blue */
-  color: white;
-}
-

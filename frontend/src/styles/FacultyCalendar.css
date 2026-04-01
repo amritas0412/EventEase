@@ -167,3 +167,17 @@ body {
   border-radius: 8px;
   margin-bottom: 10px;
 }
+.past-day {
+  opacity: 0.5;
+  filter: grayscale(40%);
+  transform: scale(0.95);
+}
+.pending-day.past-day {
+  opacity: 0.4;
+  filter: grayscale(60%);
+}
+.calendar-day.today {
+  border: 2px solid #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+  font-weight: 700;
+}

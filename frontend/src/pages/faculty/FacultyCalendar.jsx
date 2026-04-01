@@ -83,7 +83,7 @@ const FacultyCalendar = () => {
         <div className="calendar-grid">
 
           {/* Weekdays */}
-          {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(day => (
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
             <div key={day} className="calendar-weekday">{day}</div>
           ))}
 
@@ -93,7 +93,7 @@ const FacultyCalendar = () => {
           ))}
 
           {/* Days */}
-          {Array.from({ length: daysInMonth }, (_, i) => {
+          {/* {Array.from({ length: daysInMonth }, (_, i) => {
             const day = i + 1;
 
             const dayEvents = events.filter(e => {
@@ -130,6 +130,61 @@ const FacultyCalendar = () => {
                 className={cls}
                 onClick={() => setSelectedDate(day)}
                 style={{ cursor: "pointer" }}
+              >
+                {day}
+              </div>
+            );
+          })} */}
+          {Array.from({ length: daysInMonth }, (_, i) => {
+            const day = i + 1;
+
+            const currentDate = new Date(year, monthIndex, day);
+
+            const todayDate = new Date();
+            todayDate.setHours(0, 0, 0, 0);
+
+            const isPast = currentDate < todayDate;
+
+            const dayEvents = events.filter(e => {
+              const d = parseDate(e.date);
+              return (
+                d &&
+                d.getDate() === day &&
+                d.getMonth() === monthIndex &&
+                d.getFullYear() === year
+              );
+            });
+
+            const myEvents = dayEvents.filter(
+              e => e.conductedBy?._id === facultyId
+            );
+
+            const hasMyApproved = myEvents.some(e => e.status === "approved");
+            const hasMyPending = myEvents.some(e => e.status === "pending");
+            const hasOtherApproved = dayEvents.some(
+              e => e.status === "approved" && e.conductedBy?._id !== facultyId
+            );
+
+            let cls = "calendar-day";
+
+            if (hasMyPending) cls += " pending-day";
+            else if (hasMyApproved) cls += " faculty-day";
+            else if (hasOtherApproved) cls += " event-day";
+
+            // ✅ ADD THIS
+            if (isPast && dayEvents.length > 0) {
+              cls += " past-day";
+            }
+const isToday =
+  currentDate.toDateString() === todayDate.toDateString();
+  if (isToday) cls += " today";
+            if (selectedDate === day) cls += " selected-day";
+
+            return (
+              <div
+                key={day}
+                className={cls}
+                onClick={() => setSelectedDate(day)}
               >
                 {day}
               </div>
@@ -178,8 +233,8 @@ const FacultyCalendar = () => {
                 d.getFullYear() === year
               );
             }).length === 0 && (
-              <p>No events on this day</p>
-            )}
+                <p>No events on this day</p>
+              )}
           </div>
         )}
 
