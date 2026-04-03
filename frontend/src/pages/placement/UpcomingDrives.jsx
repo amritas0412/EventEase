@@ -6,14 +6,20 @@ const UpcomingDrives = () => {
   const navigate = useNavigate();
   const [drives, setDrives] = useState([]);
   const today = new Date();
+today.setHours(0, 0, 0, 0);
 
   useEffect(() => {
     fetch("http://localhost:5050/placement/all")
       .then(res => res.json())
       .then(data => {
-        const upcoming = data.placements.filter(
-          d => d.status === "approved" && new Date(d.date) >= today
-        );
+        const upcoming = data.placements.filter((d) => {
+  if (d.status !== "approved") return false;
+
+  const driveDate = new Date(d.date);
+  driveDate.setHours(0, 0, 0, 0);
+
+  return driveDate >= today;
+});
         setDrives(upcoming);
       })
       .catch(err => console.log(err));

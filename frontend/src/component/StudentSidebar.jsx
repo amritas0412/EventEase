@@ -71,10 +71,7 @@ const StudentSidebar = () => {
 
       </nav>
 
-      {/* Footer */}
-      <div className="sidebar-footer">
-        <span className="settings-text">Settings</span>
-      </div>
+      
     </div>
   );
 };

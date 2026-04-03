@@ -21,6 +21,7 @@ const PlacementDashboard = () => {
   const navigate = useNavigate();
   const [placements, setPlacements] = useState([]);
   const today = new Date();
+today.setHours(0, 0, 0, 0); // ✅ normalize to midnight
   const totalDrives = Array.isArray(placements)
     ? placements.filter(d => d.status !== "rejected").length
     : 0;
@@ -64,12 +65,24 @@ const PlacementDashboard = () => {
   
   // Drives that already occurred (history)
   const completedDrives = Array.isArray(placements)
-    ? placements.filter((d) => new Date(d.date) < today && d.status === "approved")
-    : [];
+  ? placements.filter((d) => {
+      const driveDate = new Date(d.date);
+      driveDate.setHours(0, 0, 0, 0);
+
+      return driveDate < today && d.status === "approved";
+    })
+  : [];
 
   const upcomingDrives = Array.isArray(placements)
-    ? placements.filter((d) => d.status === "approved" && new Date(d.date) >= today).length
-    : 0;
+  ? placements.filter((d) => {
+      if (d.status !== "approved") return false;
+
+      const driveDate = new Date(d.date);
+      driveDate.setHours(0, 0, 0, 0);
+
+      return driveDate >= today; // today included ✅
+    }).length
+  : 0;
 
   const pendingRequests = Array.isArray(placements)
     ? placements.filter((d) => d.status === "pending").length
@@ -102,30 +115,49 @@ const PlacementDashboard = () => {
   };
 
   const handleSaveResult = async () => {
-    if (!currentDriveId) return;
+  if (!currentDriveId) return;
 
-    try {
-      await fetch(`http://localhost:5050/placement/result/${currentDriveId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          totalAppeared: Number(appeared),
-          totalPlaced: Number(placed),
-        }),
-      });
+  const appearedNum = Number(appeared);
+  const placedNum = Number(placed);
 
-      alert("Updated successfully");
-      setShowResultForm(false);
+  // Integer + non-negative check
+  if (
+    !Number.isInteger(appearedNum) ||
+    !Number.isInteger(placedNum) ||
+    appearedNum < 0 ||
+    placedNum < 0
+  ) {
+    alert("Please enter valid non-negative integers only.");
+    return;
+  }
 
-      // Refresh placements
-      const res = await fetch("http://localhost:5050/placement/all");
-      const data = await res.json();
-      if (data.success) setPlacements(data.placements);
-    } catch (err) {
-      console.error(err);
-      alert("Update failed");
-    }
-  };
+  //  Main condition
+  if (placedNum > appearedNum) {
+    alert("Total Placed cannot be greater than Total Appeared.");
+    return;
+  }
+
+  try {
+    await fetch(`http://localhost:5050/placement/result/${currentDriveId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        totalAppeared: appearedNum,
+        totalPlaced: placedNum,
+      }),
+    });
+
+    alert("Updated successfully");
+    setShowResultForm(false);
+
+    const res = await fetch("http://localhost:5050/placement/all");
+    const data = await res.json();
+    if (data.success) setPlacements(data.placements);
+  } catch (err) {
+    console.error(err);
+    alert("Update failed");
+  }
+};
 
   useEffect(() => {
     const handleBack = () => {
@@ -276,19 +308,33 @@ const PlacementDashboard = () => {
               <div className="popup-field">
                 <label>Total Appeared:</label>
                 <input
-                  type="number"
-                  value={appeared}
-                  onChange={(e) => setAppeared(e.target.value)}
-                />
+  type="number"
+  value={appeared}
+  min="0"
+  step="1"
+  onChange={(e) => {
+    const value = e.target.value;
+    if (value === "" || /^[0-9]+$/.test(value)) {
+      setAppeared(value);
+    }
+  }}
+/>
               </div>
 
               <div className="popup-field">
                 <label>Total Placed:</label>
                 <input
-                  type="number"
-                  value={placed}
-                  onChange={(e) => setPlaced(e.target.value)}
-                />
+  type="number"
+  value={placed}
+  min="0"
+  step="1"
+  onChange={(e) => {
+    const value = e.target.value;
+    if (value === "" || /^[0-9]+$/.test(value)) {
+      setPlaced(value);
+    }
+  }}
+/>
               </div>
 
               <div className="popup-buttons">

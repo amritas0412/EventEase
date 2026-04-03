@@ -68,15 +68,24 @@ const ManagePlacements = () => {
 );
 
   const today = new Date();
+today.setHours(0, 0, 0, 0); // remove time
 
   const pastApprovedPlacements = placements.filter((p) => {
   if (p.status?.toLowerCase() !== "approved") return false;
-  return new Date(p.date) < today;
+
+  const driveDate = new Date(p.date);
+  driveDate.setHours(0, 0, 0, 0);
+
+  return driveDate < today;
 });
 
 const upcomingApprovedPlacements = placements.filter((p) => {
   if (p.status?.toLowerCase() !== "approved") return false;
-  return new Date(p.date) >= today;
+
+  const driveDate = new Date(p.date);
+  driveDate.setHours(0, 0, 0, 0);
+
+  return driveDate >= today;
 });
 
 const getSuccessRate = (appeared, placed) => {

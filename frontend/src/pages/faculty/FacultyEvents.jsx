@@ -39,8 +39,10 @@ const FacultyEvents = () => {
     maxParticipants: ""
   };
   const upcomingEvents = approvedEvents.filter(
-    event => event.date >= today
-  );
+  (event) =>
+    event.status?.toLowerCase() === "approved" &&
+    event.date >= today
+);
 
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -63,10 +65,18 @@ const FacultyEvents = () => {
       alert("❌ End time must be after start time");
       return;
     }
+
+    const max = Number(formData.maxParticipants);
+
+if (!Number.isInteger(max) || max <= 0) {
+  alert("Maximum participants must be a positive integer.");
+  return;
+}
+
     const email = localStorage.getItem("email");
     const payload = {
       ...formData,
-      conductedBy: email   // ✅ ADD THIS
+      conductedBy: email   // ADD THIS
     };
 
     console.log("🚀 Sending to backend:", payload);
@@ -210,12 +220,21 @@ const FacultyEvents = () => {
               onChange={handleChange}
             />
             <input
-              type="number"
-              name="maxParticipants"
-              placeholder="Max Participants"
-              value={formData.maxParticipants}
-              onChange={handleChange}
-            />
+  type="number"
+  name="maxParticipants"
+  placeholder="Max Participants"
+  min="1"
+  step="1"
+  value={formData.maxParticipants}
+  onChange={(e) => {
+    const value = e.target.value;
+
+    // allow only positive integers or empty
+    if (value === "" || /^[1-9][0-9]*$/.test(value)) {
+      setFormData({ ...formData, maxParticipants: value });
+    }
+  }}
+/>
 
             <div className="form-actions">
               <button type="submit">📨 Submit</button>

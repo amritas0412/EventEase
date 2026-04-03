@@ -4,7 +4,14 @@ import "../../styles/Placements.css"; // ✅ FIXED PATH
 
 const Placements = () => {
   const navigate = useNavigate();
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0]; // for input
+  const normalizeDate = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const todayDate = normalizeDate(new Date());
 
   const emptyForm = {
     name: "",
@@ -159,7 +166,11 @@ const Placements = () => {
   };
 
   const pendingPlacements = events.filter(ev => ev.status === "pending");
-  const approvedPlacements = events.filter(ev => ev.status === "approved" && ev.date && ev.date >= today);
+  const approvedPlacements = events.filter((ev) => {
+  if (ev.status !== "approved" || !ev.date) return false;
+
+  return normalizeDate(ev.date) >= todayDate;
+});
 
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [showModal, setShowModal] = useState(false);

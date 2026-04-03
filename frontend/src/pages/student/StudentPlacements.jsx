@@ -6,50 +6,53 @@ const StudentPlacements = () => {
   const navigate = useNavigate();
 
   const [placements, setPlacements] = useState([]);
-  const today = new Date().toISOString().split("T")[0];
+  //const today = new Date().toISOString().split("T")[0];
 
   const [pastPlacements, setPastPlacements] = useState([]);
   const studentId = localStorage.getItem("studentId");
 
 
-  useEffect(() => {
-    fetch("http://localhost:5050/placement/all")
-      .then(res => res.json())
-      .then(async (data) => {
+  const normalizeDate = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
 
-        if (data.success) {
-          // show only approved ones for students
-          const upcoming = data.placements.filter(
-            p => p.status === "approved" && p.date >= today
+useEffect(() => {
+  fetch("http://localhost:5050/placement/all")
+    .then(res => res.json())
+    .then(async (data) => {
+      if (data.success) {
+
+        const todayDate = normalizeDate(new Date());
+
+        const upcoming = data.placements.filter((p) => {
+          if (p.status !== "approved") return false;
+          return normalizeDate(p.date) >= todayDate;
+        });
+
+        setPlacements(upcoming);
+
+        if (studentId) {
+          const regRes = await fetch(
+            `http://localhost:5050/student/my-placements/${studentId}`
           );
-          setPlacements(upcoming);
+          const regData = await regRes.json();
 
-          if (studentId) {
-            const regRes = await fetch(
-              `http://localhost:5050/student/my-placements/${studentId}`
-            );
-            const regData = await regRes.json();
+          if (regData.success) {
+            const pastRegistered = (regData.placements || []).filter((r) => {
+              if (!r.placementId?.date) return false;
 
-            if (regData.success) {
-              const pastRegistered = (regData.placements || []).filter(r => {
+              return normalizeDate(r.placementId.date) < todayDate;
+            });
 
-                const todayDate = new Date();
-                todayDate.setHours(0, 0, 0, 0);
-
-                if (!r.placementId?.date) return false;
-
-                const driveDate = new Date(r.placementId.date);
-                driveDate.setHours(0, 0, 0, 0);
-
-                return driveDate < todayDate;
-              });
-              setPastPlacements(pastRegistered);
-            }
+            setPastPlacements(pastRegistered);
           }
         }
-      })
-      .catch(err => console.error("FETCH ERROR:", err));
-  }, [studentId, today]);
+      }
+    })
+    .catch(err => console.error("FETCH ERROR:", err));
+}, [studentId]);
   return (
     <div className="placements-page">
       <h2 className="placements-title">Placements & Internships</h2>
