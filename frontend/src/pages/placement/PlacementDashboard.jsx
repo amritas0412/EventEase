@@ -28,7 +28,7 @@ const PlacementDashboard = () => {
   const [feedbackMap, setFeedbackMap] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:5050/placement/all")  
+    fetch("http://localhost:5050/placement/all")
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
@@ -62,19 +62,19 @@ const PlacementDashboard = () => {
       fetchFeedbacks();
     }
   }, [placements]);
-  
+
   // Drives that already occurred (history)
   const completedDrives = Array.isArray(placements)
-  ? placements.filter((d) => {
+    ? placements.filter((d) => {
       const driveDate = new Date(d.date);
       driveDate.setHours(0, 0, 0, 0);
 
       return driveDate < today && d.status === "approved";
     })
-  : [];
+    : [];
 
   const upcomingDrives = Array.isArray(placements)
-  ? placements.filter((d) => {
+    ? placements.filter((d) => {
       if (d.status !== "approved") return false;
 
       const driveDate = new Date(d.date);
@@ -82,7 +82,7 @@ const PlacementDashboard = () => {
 
       return driveDate >= today; // today included 
     }).length
-  : 0;
+    : 0;
 
   const pendingRequests = Array.isArray(placements)
     ? placements.filter((d) => d.status === "pending").length
@@ -93,7 +93,7 @@ const PlacementDashboard = () => {
   ].length;
 
   const handleLogout = () => {
-    localStorage.removeItem("role"); 
+    localStorage.removeItem("role");
     navigate("/login", { replace: true });
   };
 
@@ -113,51 +113,54 @@ const PlacementDashboard = () => {
 
     alert("Updated");
   };
-
+  const filteredDrives = completedDrives.filter((drive) =>
+    drive.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    drive.date?.includes(searchQuery)
+  );
   const handleSaveResult = async () => {
-  if (!currentDriveId) return;
+    if (!currentDriveId) return;
 
-  const appearedNum = Number(appeared);
-  const placedNum = Number(placed);
+    const appearedNum = Number(appeared);
+    const placedNum = Number(placed);
 
-  // Integer + non-negative check
-  if (
-    !Number.isInteger(appearedNum) ||
-    !Number.isInteger(placedNum) ||
-    appearedNum < 0 ||
-    placedNum < 0
-  ) {
-    alert("Please enter valid non-negative integers only.");
-    return;
-  }
+    // Integer + non-negative check
+    if (
+      !Number.isInteger(appearedNum) ||
+      !Number.isInteger(placedNum) ||
+      appearedNum < 0 ||
+      placedNum < 0
+    ) {
+      alert("Please enter valid non-negative integers only.");
+      return;
+    }
 
-  //  Main condition
-  if (placedNum > appearedNum) {
-    alert("Total Placed cannot be greater than Total Appeared.");
-    return;
-  }
+    //  Main condition
+    if (placedNum > appearedNum) {
+      alert("Total Placed cannot be greater than Total Appeared.");
+      return;
+    }
 
-  try {
-    await fetch(`http://localhost:5050/placement/result/${currentDriveId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        totalAppeared: appearedNum,
-        totalPlaced: placedNum,
-      }),
-    });
+    try {
+      await fetch(`http://localhost:5050/placement/result/${currentDriveId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          totalAppeared: appearedNum,
+          totalPlaced: placedNum,
+        }),
+      });
 
-    alert("Updated successfully");
-    setShowResultForm(false);
+      alert("Updated successfully");
+      setShowResultForm(false);
 
-    const res = await fetch("http://localhost:5050/placement/all");
-    const data = await res.json();
-    if (data.success) setPlacements(data.placements);
-  } catch (err) {
-    console.error(err);
-    alert("Update failed");
-  }
-};
+      const res = await fetch("http://localhost:5050/placement/all");
+      const data = await res.json();
+      if (data.success) setPlacements(data.placements);
+    } catch (err) {
+      console.error(err);
+      alert("Update failed");
+    }
+  };
 
   useEffect(() => {
     const handleBack = () => {
@@ -170,7 +173,6 @@ const PlacementDashboard = () => {
       window.onpopstate = null;
     };
   }, []);
-
   return (
     <div className="placement-layout">
       {/* Sidebar */}
@@ -237,7 +239,7 @@ const PlacementDashboard = () => {
             <p>Approved placement drives</p>
           </div>
 
-          <div 
+          <div
             className="card clickable"
             onClick={() => navigate("/placement/pending-requests")}
           >
@@ -254,7 +256,14 @@ const PlacementDashboard = () => {
           </div>
 
         </section>
-
+        <div className="search-bar">
+          <input
+            type="text"
+            placeholder="Search by company or date..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
         {/*History*/}
         <section className="panel">
           <div className="panel-header">
@@ -263,7 +272,7 @@ const PlacementDashboard = () => {
 
           <div className="panel-grid">
             {completedDrives.length > 0 ? (
-              completedDrives.map((drive, index) => (
+              filteredDrives.map((drive, index) => (
                 <div key={index} className="event-card dashboard-card">
                   <h4>{drive.name}</h4>
                   <p>Date: {new Date(drive.date).toLocaleDateString("en-GB")}</p>
@@ -299,7 +308,7 @@ const PlacementDashboard = () => {
             )}
           </div>
         </section>
-        
+
         {showResultForm && (
           <div className="popup-overlay">
             <div className="popup-content">
@@ -308,33 +317,33 @@ const PlacementDashboard = () => {
               <div className="popup-field">
                 <label>Total Appeared:</label>
                 <input
-  type="number"
-  value={appeared}
-  min="0"
-  step="1"
-  onChange={(e) => {
-    const value = e.target.value;
-    if (value === "" || /^[0-9]+$/.test(value)) {
-      setAppeared(value);
-    }
-  }}
-/>
+                  type="number"
+                  value={appeared}
+                  min="0"
+                  step="1"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "" || /^[0-9]+$/.test(value)) {
+                      setAppeared(value);
+                    }
+                  }}
+                />
               </div>
 
               <div className="popup-field">
                 <label>Total Placed:</label>
                 <input
-  type="number"
-  value={placed}
-  min="0"
-  step="1"
-  onChange={(e) => {
-    const value = e.target.value;
-    if (value === "" || /^[0-9]+$/.test(value)) {
-      setPlaced(value);
-    }
-  }}
-/>
+                  type="number"
+                  value={placed}
+                  min="0"
+                  step="1"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "" || /^[0-9]+$/.test(value)) {
+                      setPlaced(value);
+                    }
+                  }}
+                />
               </div>
 
               <div className="popup-buttons">

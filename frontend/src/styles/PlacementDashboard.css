@@ -269,3 +269,23 @@
 .popup-buttons button:hover {
   opacity: 0.9;
 }
+.search-bar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;  /* push to right */
+  margin-bottom: 10px;
+}
+
+.search-bar input {
+  width: 260px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 14px;
+}
+
+.search-bar input:focus {
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.1);
+}

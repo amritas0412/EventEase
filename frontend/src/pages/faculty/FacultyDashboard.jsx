@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/FacultyDashboard.css"; 
+import "../../styles/FacultyDashboard.css";
 import FacultyProfile from "./FacultyProfile";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
@@ -12,6 +12,7 @@ const FacultyDashboard = () => {
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
+
 
   if (!localStorage.getItem("role")) {
     return <Navigate to="/login" replace />;
@@ -32,7 +33,7 @@ const FacultyDashboard = () => {
         if (data.success) {
           setEvents(data.events);
 
-          
+
           console.log("Logged Email:", localStorage.getItem("email"));
           console.log("Events:", data.events);
         }
@@ -101,9 +102,9 @@ const FacultyDashboard = () => {
     const handleBack = () => {
       navigate("/login", { replace: true });
     };
-  
+
     window.onpopstate = handleBack;
-  
+
     return () => {
       window.onpopstate = null;
     };

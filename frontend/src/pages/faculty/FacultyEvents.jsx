@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/FacultyEvents.css"; //  FIXED PATH
+import FacultyProfile from "./FacultyProfile";
 import FacultySidebar from "../../component/FacultySidebar.jsx";
 
 const FacultyEvents = () => {
   const navigate = useNavigate();
+  const [showProfile, setShowProfile] = useState(false);
   const [approvedEvents, setApprovedEvents] = useState([]);
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+  const facultyId = localStorage.getItem("facultyId");
+  const pastEvents = approvedEvents.filter(event => {
+    const d = new Date(event.date);
 
+    return (
+      event.status === "approved" &&
+      d < new Date() &&
+      String(event.conductedBy?._id) === String(facultyId)
+    );
+  });
   useEffect(() => {
     fetch("http://localhost:5050/faculty/events")
       .then(res => res.json())
@@ -39,10 +52,10 @@ const FacultyEvents = () => {
     maxParticipants: ""
   };
   const upcomingEvents = approvedEvents.filter(
-  (event) =>
-    event.status?.toLowerCase() === "approved" &&
-    event.date >= today
-);
+    (event) =>
+      event.status?.toLowerCase() === "approved" &&
+      event.date >= today
+  );
 
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -68,10 +81,10 @@ const FacultyEvents = () => {
 
     const max = Number(formData.maxParticipants);
 
-if (!Number.isInteger(max) || max <= 0) {
-  alert("Maximum participants must be a positive integer.");
-  return;
-}
+    if (!Number.isInteger(max) || max <= 0) {
+      alert("Maximum participants must be a positive integer.");
+      return;
+    }
 
     const email = localStorage.getItem("email");
     const payload = {
@@ -153,7 +166,47 @@ if (!Number.isInteger(max) || max <= 0) {
   return (
     <div className="faculty-layout">
       <FacultySidebar />
-      {/* Main Content */} <main className="main-content"> <div className="page-header"> <h2>Events</h2> <p>Create, edit, and manage department events.</p> </div> <button className="add-event-btn" onClick={() => setShowForm(true)} > ➕ Add Event </button>
+      {/* Main Content */} <main className="main-content">
+        <div className="top-bar-profile">
+          <div
+            className="profile-icon"
+            onClick={() => setShowProfile(!showProfile)}
+          >
+            👤
+          </div>
+
+          {showProfile && (
+            <div className="profile-dropdown">
+
+              <FacultyProfile events={pastEvents} />
+
+              <button
+                className="profile-btn"
+                onClick={() => navigate("/faculty/calendar")}
+              >
+                📅 View Calendar
+              </button>
+
+              <button
+                className="profile-btn logout"
+                onClick={() => {
+                  localStorage.clear();
+                  navigate("/login", { replace: true });
+                }}
+              >
+                🚪 Logout
+              </button>
+
+            </div>
+          )}
+        </div>
+        <div className="page-header">
+          <h2>Events</h2>
+          <p>Create, edit, and manage department events.</p>
+        </div>
+        <button className="add-event-btn"
+          onClick={() => setShowForm(true)} > ➕ Add Event
+        </button>
 
         {showForm && (
           <form className="event-form" onSubmit={handleSubmit}>
@@ -220,21 +273,21 @@ if (!Number.isInteger(max) || max <= 0) {
               onChange={handleChange}
             />
             <input
-  type="number"
-  name="maxParticipants"
-  placeholder="Max Participants"
-  min="1"
-  step="1"
-  value={formData.maxParticipants}
-  onChange={(e) => {
-    const value = e.target.value;
+              type="number"
+              name="maxParticipants"
+              placeholder="Max Participants"
+              min="1"
+              step="1"
+              value={formData.maxParticipants}
+              onChange={(e) => {
+                const value = e.target.value;
 
-    // allow only positive integers or empty
-    if (value === "" || /^[1-9][0-9]*$/.test(value)) {
-      setFormData({ ...formData, maxParticipants: value });
-    }
-  }}
-/>
+                // allow only positive integers or empty
+                if (value === "" || /^[1-9][0-9]*$/.test(value)) {
+                  setFormData({ ...formData, maxParticipants: value });
+                }
+              }}
+            />
 
             <div className="form-actions">
               <button type="submit">📨 Submit</button>

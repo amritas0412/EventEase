@@ -163,7 +163,6 @@ const StudentDashboard = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-
         <div className="topbar-actions">
           <div className="profile-wrapper">
             <div

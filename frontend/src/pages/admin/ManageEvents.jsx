@@ -9,7 +9,7 @@ const ManageEvents = () => {
     fetch("http://localhost:5050/admin/event-requests")
       .then(res => res.json())
       .then(data => {
-        console.log("ADMIN EVENTS:", data.events); 
+        console.log("ADMIN EVENTS:", data.events);
         if (data.success) {
           setEvents(data.events);
         }
@@ -152,31 +152,16 @@ const ManageEvents = () => {
               </tr>
             ) : (
               pastEvents.map(event => {
-
-                // const performance =
-                //   event.registeredCount > 0
-                //     ? (
-                //       (event.feedbackCount / event.registeredCount) * 100
-                //     ).toFixed(0)
-                //     : 0;
                 const performance =
-                  event.registeredCount > 0
-                    ? (
-                      ((event.feedbackCount || 0) / event.registeredCount) * 100
-                    ).toFixed(0)
+                  event.averageRating
+                    ? ((event.averageRating / 5) * 100).toFixed(0)
                     : 0;
-
                 return (
                   <tr key={event._id}>
                     <td>{event.eventName}</td>
                     <td>{event.conductedBy?.name}</td>
                     <td>{event.date}</td>
                     <td>{event.registeredCount || 0}</td>
-                    {/* <td>
-                      {event.feedbackCount > 0
-                        ? `⭐ ${event.averageRating.toFixed(1)}`
-                        : "—"}
-                    </td> */}
                     <td className="rating-cell">
                       {event.feedbackCount > 0
                         ? <>

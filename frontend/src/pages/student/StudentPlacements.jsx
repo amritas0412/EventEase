@@ -6,55 +6,98 @@ const StudentPlacements = () => {
   const navigate = useNavigate();
 
   const [placements, setPlacements] = useState([]);
-  //const today = new Date().toISOString().split("T")[0];
-
   const [pastPlacements, setPastPlacements] = useState([]);
-  const studentId = localStorage.getItem("studentId");
+  const [showProfile, setShowProfile] = useState(false); // ✅ added
 
+  const studentId = localStorage.getItem("studentId");
+  const studentName = localStorage.getItem("name");      // ✅ added
+  const studentEmail = localStorage.getItem("email");    // ✅ added
 
   const normalizeDate = (date) => {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
 
-useEffect(() => {
-  fetch("http://localhost:5050/placement/all")
-    .then(res => res.json())
-    .then(async (data) => {
-      if (data.success) {
+  useEffect(() => {
+    fetch("http://localhost:5050/placement/all")
+      .then(res => res.json())
+      .then(async (data) => {
+        if (data.success) {
 
-        const todayDate = normalizeDate(new Date());
+          const todayDate = normalizeDate(new Date());
 
-        const upcoming = data.placements.filter((p) => {
-          if (p.status !== "approved") return false;
-          return normalizeDate(p.date) >= todayDate;
-        });
+          const upcoming = data.placements.filter((p) => {
+            if (p.status !== "approved") return false;
+            return normalizeDate(p.date) >= todayDate;
+          });
 
-        setPlacements(upcoming);
+          setPlacements(upcoming);
 
-        if (studentId) {
-          const regRes = await fetch(
-            `http://localhost:5050/student/my-placements/${studentId}`
-          );
-          const regData = await regRes.json();
+          if (studentId) {
+            const regRes = await fetch(
+              `http://localhost:5050/student/my-placements/${studentId}`
+            );
+            const regData = await regRes.json();
 
-          if (regData.success) {
-            const pastRegistered = (regData.placements || []).filter((r) => {
-              if (!r.placementId?.date) return false;
+            if (regData.success) {
+              const pastRegistered = (regData.placements || []).filter((r) => {
+                if (!r.placementId?.date) return false;
+                return normalizeDate(r.placementId.date) < todayDate;
+              });
 
-              return normalizeDate(r.placementId.date) < todayDate;
-            });
-
-            setPastPlacements(pastRegistered);
+              setPastPlacements(pastRegistered);
+            }
           }
         }
-      }
-    })
-    .catch(err => console.error("FETCH ERROR:", err));
-}, [studentId]);
+      })
+      .catch(err => console.error("FETCH ERROR:", err));
+  }, [studentId]);
+
   return (
     <div className="placements-page">
+
+      {/* ================= PROFILE BAR ================= */}
+      <div className="top-bar-profile">
+        <div
+          className="profile-icon"
+          onClick={() => setShowProfile(!showProfile)}
+        >
+          👤
+        </div>
+
+        {showProfile && (
+          <div className="profile-dropdown">
+            <p
+              className="profile-name clickable"
+              onClick={() => navigate("/student/profile")}
+            >
+              {studentName || "Student"}
+            </p>
+
+            <p className="profile-email">{studentEmail}</p>
+
+            <button
+              className="profile-btn"
+              onClick={() => navigate("/student/calendar")}
+            >
+              📅 View Calendar
+            </button>
+
+            <button
+              className="profile-btn logout"
+              onClick={() => {
+                localStorage.clear();
+                navigate("/login", { replace: true });
+              }}
+            >
+              🚪 Logout
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ================= MAIN CONTENT ================= */}
       <h2 className="placements-title">Placements & Internships</h2>
 
       <div className="placements-list">
@@ -65,7 +108,6 @@ useEffect(() => {
             <p><strong>Location:</strong> {item.location}</p>
             <p><strong>Date:</strong> {item.date}</p>
 
-            {/*ONLY NAVIGATION BUTTON */}
             <button
               className="apply-btn"
               onClick={() =>
@@ -86,7 +128,10 @@ useEffect(() => {
           <p>No past drives</p>
         ) : (
           pastPlacements.map((item) => (
-            <div className="placement-card" key={item._id || item.placementId?._id}>
+            <div
+              className="placement-card"
+              key={item._id || item.placementId?._id}
+            >
               <h3>{item.placementId?.name}</h3>
               <p><strong>Role:</strong> {item.placementId?.jobrole}</p>
               <p><strong>Date:</strong> {item.placementId?.date}</p>

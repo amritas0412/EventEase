@@ -88,3 +88,21 @@
   margin-top: auto;  /* 🔥 THIS is the main fix */
   width: 100%;
 }
+/* ================= PROFILE BUTTON ================= */
+.profile-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #6a3df2;
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-btn:hover {
+  background: #5a2fe0;
+}

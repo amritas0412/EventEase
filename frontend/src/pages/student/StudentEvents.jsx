@@ -4,10 +4,14 @@ import "../../styles/StudentEvents.css";
 
 const StudentEvents = () => {
   const navigate = useNavigate();
+
   const [events, setEvents] = useState([]);
   const [registeredEventIds, setRegisteredEventIds] = useState([]);
+  const [showProfile, setShowProfile] = useState(false); // ✅ added
 
   const studentId = localStorage.getItem("studentId");
+  const studentName = localStorage.getItem("name");
+  const studentEmail = localStorage.getItem("email");
 
   useEffect(() => {
     // Fetch events
@@ -18,7 +22,7 @@ const StudentEvents = () => {
           const filtered = data.events.filter(
             event =>
               event.conductedBy !== null &&
-              event.status === "approved"   
+              event.status === "approved"
           );
           setEvents(filtered);
         }
@@ -40,10 +44,52 @@ const StudentEvents = () => {
 
   const upcomingEvents = events.filter(e => e.date >= today);
   const pastEvents = events.filter(e => e.date < today);
+
   return (
     <div className="student-events-page">
-      <h2 className="events-title">Upcoming Events</h2>
 
+      {/* ================= TOP BAR (ADDED) ================= */}
+      <div className="top-bar-profile">
+        <div
+          className="profile-icon"
+          onClick={() => setShowProfile(!showProfile)}
+        >
+          👤
+        </div>
+
+        {showProfile && (
+          <div className="profile-dropdown">
+            <p
+              className="profile-name clickable"
+              onClick={() => navigate("/student/profile")}
+            >
+              {studentName || "Student"}
+            </p>
+
+            <p className="profile-email">{studentEmail}</p>
+
+            <button
+              className="profile-btn"
+              onClick={() => navigate("/student/calendar")}
+            >
+              📅 View Calendar
+            </button>
+
+            <button
+              className="profile-btn logout"
+              onClick={() => {
+                localStorage.clear();
+                navigate("/login", { replace: true });
+              }}
+            >
+              🚪 Logout
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ================= UPCOMING EVENTS ================= */}
+      <h2 className="events-title">Upcoming Events</h2>
       <div className="events-list">
         {upcomingEvents.map(event => {
           const isRegistered = registeredEventIds.includes(event._id);
@@ -75,9 +121,9 @@ const StudentEvents = () => {
           );
         })}
       </div>
-      {/* ---------- PAST EVENTS SECTION ---------- */}
 
-      <h2 className="events-title" style={{ marginTop: "40px" }}>
+      {/* ================= PAST EVENTS ================= */}
+      <h2 className="events-title">
         Completed Events
       </h2>
 

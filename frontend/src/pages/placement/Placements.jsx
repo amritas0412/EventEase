@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/Placements.css"; 
+import "../../styles/Placements.css";
 
 const Placements = () => {
   const navigate = useNavigate();
-  const today = new Date().toISOString().split("T")[0]; 
+  const [showProfile, setShowProfile] = useState(false);
+  const today = new Date().toISOString().split("T")[0];
   const normalizeDate = (date) => {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
 
-const todayDate = normalizeDate(new Date());
+  const todayDate = normalizeDate(new Date());
 
   const emptyForm = {
     name: "",
     jobrole: "",
     date: "",
     time: "",
-    endtime: "", 
+    endtime: "",
     venue: "",
     location: "",
     audience: "",
@@ -31,7 +32,7 @@ const todayDate = normalizeDate(new Date());
   const [formData, setFormData] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
   const [prevPlacements, setPrevPlacements] = useState([]);
-
+  const totalDrives = events.filter(d => d.status === "approved").length;
   const fetchPlacements = async () => {
     try {
       const res = await fetch("http://localhost:5050/placement/all");
@@ -44,6 +45,7 @@ const todayDate = normalizeDate(new Date());
         );
 
         newlyRejected.forEach(r => {
+
           alert(`❌ Request for ${r.name} is rejected`);
         });
         setEvents(data.placements);
@@ -57,7 +59,7 @@ const todayDate = normalizeDate(new Date());
   useEffect(() => {
     fetchPlacements();
 
-     // Poll every 5 seconds
+    // Poll every 5 seconds
     const interval = setInterval(() => {
       fetchPlacements();
     }, 5000);
@@ -121,7 +123,7 @@ const todayDate = normalizeDate(new Date());
       console.error(err);
     }
   };
-    
+
   const approvePlacement = async (id) => {
     await fetch(`http://localhost:5050/placement/${id}/approve`, {
       method: "PATCH",
@@ -167,10 +169,10 @@ const todayDate = normalizeDate(new Date());
 
   const pendingPlacements = events.filter(ev => ev.status === "pending");
   const approvedPlacements = events.filter((ev) => {
-  if (ev.status !== "approved" || !ev.date) return false;
+    if (ev.status !== "approved" || !ev.date) return false;
 
-  return normalizeDate(ev.date) >= todayDate;
-});
+    return normalizeDate(ev.date) >= todayDate;
+  });
 
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -221,7 +223,11 @@ const todayDate = normalizeDate(new Date());
     <div className="placement-layout">
       {/* Sidebar */}
       <aside className="sidebar">
-        <h2 className="brand">EventEase</h2>
+        {/* <h2 className="brand">EventEase</h2> */}
+        <div className="sidebar-header">
+          <div className="logo-icon">E</div>
+          <span className="logo-text">EventEase</span>
+        </div>
         <ul>
           <li
             onClick={() => navigate("/placement/dashboard")}
@@ -237,6 +243,39 @@ const todayDate = normalizeDate(new Date());
 
       {/* Main */}
       <main className="main-content">
+        <div className="top-bar-profile">
+          <div
+            className="profile-icon"
+            onClick={() => setShowProfile(!showProfile)}
+          >
+            👤
+          </div>
+
+          {showProfile && (
+            <div className="profile-dropdown">
+              <p className="profile-name">Placement Cell</p>
+              <p className="profile-email">placementcell@banasthali.in</p>
+
+              <p className="profile-stat">
+                Total Placement Drives: <strong>{totalDrives}</strong>
+              </p>
+
+              <button className="profile-btn" onClick={() => navigate("/placement/calendar")}>
+                📅 View Calendar
+              </button>
+
+              <button
+                className="profile-btn logout"
+                onClick={() => {
+                  localStorage.clear();
+                  navigate("/login", { replace: true });
+                }}
+              >
+                🚪 Logout
+              </button>
+            </div>
+          )}
+        </div>
         <div className="page-header">
           <h2>Placements</h2>
           <p>Create and manage placement drives</p>
@@ -299,7 +338,7 @@ const todayDate = normalizeDate(new Date());
               <p>💼 {event.jobrole}</p>
               <p>
                 📅 {" "}
-                  {new Date(event.date).toLocaleDateString("en-GB"/*, {
+                {new Date(event.date).toLocaleDateString("en-GB"/*, {
                     day: "2-digit",
                     month: "short",
                     year: "numeric",
@@ -316,7 +355,7 @@ const todayDate = normalizeDate(new Date());
                   {formatDescription(event.description)}
                 </p>
               )}
-        
+
 
               {/* Registration Info */}
               <div className="registration-info">
@@ -347,7 +386,7 @@ const todayDate = normalizeDate(new Date());
             <h3>Request Processing</h3>
 
             {pendingPlacements.map(event => (
-              <div key={event.id} className="event-card pending">
+              <div key={event._id} className="event-card pending">
                 <h4>{event.name}</h4>
                 <p>{event.jobrole}</p>
               </div>
@@ -356,11 +395,11 @@ const todayDate = normalizeDate(new Date());
         )}
 
         {showModal && (
-          <div 
+          <div
             className="popup-backdrop"
             onClick={() => setShowModal(false)}
           >
-            <div 
+            <div
               className="popup-card"
               onClick={(e) => e.stopPropagation()}
             >
