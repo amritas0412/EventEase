@@ -27,7 +27,7 @@ const StudentEventDetails = () => {
       </span>
     ));
   };
-  // ✅ Fetch event by ID
+  //Fetch event by ID
   useEffect(() => {
     fetch(`http://localhost:5050/student/events/${id}`)
       .then(res => res.json())
@@ -39,7 +39,7 @@ const StudentEventDetails = () => {
       .catch(err => console.error("DETAIL FETCH ERROR:", err));
   }, [id]);
 
-  // ✅ Check registration status
+  //Check registration status
   useEffect(() => {
     if (!event) return;
 

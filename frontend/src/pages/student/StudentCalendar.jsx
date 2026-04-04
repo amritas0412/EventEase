@@ -16,7 +16,7 @@ const StudentCalendar = () => {
   const [placements, setPlacements] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // ✅ Fetch events
+  //Fetch events
   useEffect(() => {
     fetch("http://localhost:5050/admin/events")
       .then(res => res.json())
@@ -26,7 +26,7 @@ const StudentCalendar = () => {
       .catch(err => console.error(err));
   }, []);
 
-  // ✅ Fetch placements
+  //Fetch placements
   useEffect(() => {
     fetch("http://localhost:5050/placement/all")
       .then(res => res.json())
@@ -36,16 +36,16 @@ const StudentCalendar = () => {
       .catch(err => console.error(err));
   }, []);
 
-  // ✅ Safe date parser
+  //Safe date parser
   const parseDate = (dateStr) => {
     if (!dateStr) return null;
-    return new Date(dateStr);   // ✅ handles ISO format correctly
+    return new Date(dateStr);   //handles ISO format correctly
   };
 
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const startDay = new Date(year, monthIndex, 1).getDay();
 
-  // ✅ PRECOMPUTE (IMPORTANT - outside JSX)
+  
   const todayDate = new Date();
   todayDate.setHours(0, 0, 0, 0);
 
@@ -76,7 +76,7 @@ const StudentCalendar = () => {
     }
   });
 
-  // ⬅️➡️ Navigation
+  // Navigation
   const prevMonth = () => {
     if (monthIndex === 0) {
       setMonthIndex(11);
@@ -120,7 +120,7 @@ const StudentCalendar = () => {
           <div key={`empty-${i}`} className="calendar-day empty"></div>
         ))}
 
-        {/* ✅ DAYS LOOP */}
+        {/*DAYS LOOP */}
         {Array.from({ length: daysInMonth }, (_, i) => {
           const day = i + 1;
 

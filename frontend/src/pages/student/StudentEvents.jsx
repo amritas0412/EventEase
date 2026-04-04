@@ -18,7 +18,7 @@ const StudentEvents = () => {
           const filtered = data.events.filter(
             event =>
               event.conductedBy !== null &&
-              event.status === "approved"   // ✅ ADD THIS
+              event.status === "approved"   
           );
           setEvents(filtered);
         }

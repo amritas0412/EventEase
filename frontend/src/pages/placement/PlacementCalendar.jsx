@@ -140,12 +140,12 @@ const PlacementCalendar = () => {
   if (isApproved) cls += " placement-approved";
   else if (isPending) cls += " placement-pending";
 
-  // ✅ fade past
+  //fade past
   if (isPast && (isApproved || isPending)) {
     cls += " past-day";
   }
 
-  // ✅ highlight today
+  //highlight today
   if (isToday) cls += " today";
 
   return (

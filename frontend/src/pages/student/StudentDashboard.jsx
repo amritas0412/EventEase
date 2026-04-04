@@ -9,7 +9,7 @@ const StudentDashboard = () => {
   const [search, setSearch] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const [registeredEvents, setRegisteredEvents] = useState([]);
-  // 🔵 FETCHED EVENTS
+  //FETCHED EVENTS
   const [events, setEvents] = useState([]);
   const [placements, setPlacements] = useState([]);
   const studentName = localStorage.getItem("name");
@@ -62,7 +62,7 @@ const StudentDashboard = () => {
       .then(res => res.json())
       .then(data => {
         console.log("REG DATA:", data);
-        console.log("STATE BEFORE:", registeredEvents); // 👈 add this
+        console.log("STATE BEFORE:", registeredEvents); 
         if (data && data.success && Array.isArray(data.registrations)) {
           setRegisteredEvents(data.registrations);
         } else {

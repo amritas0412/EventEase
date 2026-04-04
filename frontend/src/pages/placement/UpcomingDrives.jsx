@@ -6,7 +6,7 @@ const UpcomingDrives = () => {
   const navigate = useNavigate();
   const [drives, setDrives] = useState([]);
   const today = new Date();
-today.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
 
   useEffect(() => {
     fetch("http://localhost:5050/placement/all")

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/Placements.css"; // ✅ FIXED PATH
+import "../../styles/Placements.css"; 
 
 const Placements = () => {
   const navigate = useNavigate();
-  const today = new Date().toISOString().split("T")[0]; // for input
+  const today = new Date().toISOString().split("T")[0]; 
   const normalizeDate = (date) => {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);

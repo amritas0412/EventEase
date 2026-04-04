@@ -9,7 +9,7 @@ const ManageEvents = () => {
     fetch("http://localhost:5050/admin/event-requests")
       .then(res => res.json())
       .then(data => {
-        console.log("ADMIN EVENTS:", data.events); // 👈 ADD THIS
+        console.log("ADMIN EVENTS:", data.events); 
         if (data.success) {
           setEvents(data.events);
         }

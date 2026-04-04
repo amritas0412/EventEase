@@ -22,7 +22,7 @@ const placementFeedbackSchema = new mongoose.Schema({
   }
 });
 
-// COMPOUND UNIQUE INDEX
+
 placementFeedbackSchema.index(
   { placementId: 1, studentId: 1 },
   { unique: true }

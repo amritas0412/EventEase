@@ -65,7 +65,7 @@ useEffect(() => {
             <p><strong>Location:</strong> {item.location}</p>
             <p><strong>Date:</strong> {item.date}</p>
 
-            {/* ✅ ONLY NAVIGATION BUTTON */}
+            {/*ONLY NAVIGATION BUTTON */}
             <button
               className="apply-btn"
               onClick={() =>

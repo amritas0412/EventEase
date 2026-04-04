@@ -15,13 +15,13 @@ const FacultyCalendar = () => {
   const [year, setYear] = useState(today.getFullYear());
   const [events, setEvents] = useState([]);
 
-  // ✅ Selected date (instead of popup)
+  //Selected date (instead of popup)
   const [selectedDate, setSelectedDate] = useState(null);
 
   const facultyId = localStorage.getItem("facultyId");
   const navigate = useNavigate();
 
-  // 🔥 Fetch events
+  //Fetch events
   useEffect(() => {
     fetch("http://localhost:5050/faculty/events/calendar")
       .then(res => res.json())
@@ -33,7 +33,7 @@ const FacultyCalendar = () => {
       .catch(err => console.error(err));
   }, []);
 
-  // 🔥 Safe date parser (fix timezone bug)
+  
   const parseDate = (dateStr) => {
     if (!dateStr) return null;
     const [y, m, d] = dateStr.split("-").map(Number);
@@ -43,7 +43,7 @@ const FacultyCalendar = () => {
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const startDay = new Date(year, monthIndex, 1).getDay();
 
-  // 🔄 Month navigation
+  // Month navigation
   const prevMonth = () => {
     if (monthIndex === 0) {
       setMonthIndex(11);
@@ -171,7 +171,7 @@ const FacultyCalendar = () => {
             else if (hasMyApproved) cls += " faculty-day";
             else if (hasOtherApproved) cls += " event-day";
 
-            // ✅ ADD THIS
+            
             if (isPast && dayEvents.length > 0) {
               cls += " past-day";
             }
@@ -199,7 +199,7 @@ const isToday =
           <div><span className="legend-box pending"></span> Pending Approval</div>
         </div>
 
-        {/* ✅ DETAILS SECTION (LIKE MANAGE CALENDAR) */}
+        {/*DETAILS SECTION (LIKE MANAGE CALENDAR) */}
         {selectedDate && (
           <div className="date-details">
             <h3>{selectedDate} {months[monthIndex]} {year}</h3>

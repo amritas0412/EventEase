@@ -13,7 +13,7 @@ const STUDENTS = {
     year: "3rd Year",
     semester: "6",
     cgpa: "5",
-    contact: "123",
+    contact: "9638527410",
   },
 
   "btbtc23292_kumari@banasthali.in": {
@@ -27,7 +27,7 @@ const STUDENTS = {
     year: "3rd Year",
     semester: "6",
     cgpa: "5",
-    contact: "456",
+    contact: "9638527410",
   },
 
   "btbtc23237_palak@banasthali.in": {
@@ -41,7 +41,7 @@ const STUDENTS = {
     year: "3rd Year",
     semester: "6",
     cgpa: "5",
-    contact: "876",
+    contact: "9638527410",
   },
 
   "btbtc23078_neetika@banasthali.in": {
@@ -55,7 +55,7 @@ const STUDENTS = {
     year: "3rd Year",
     semester: "6",
     cgpa: "5",
-    contact: "789",
+    contact: "9638527410",
   },
 };
 
@@ -63,7 +63,7 @@ const StudentProfile = () => {
   const [student, setStudent] = useState(null);
 
   useEffect(() => {
-    // 👇 email saved during login
+    //email saved during login
     const email = localStorage.getItem("email");
 
     if (email && STUDENTS[email]) {

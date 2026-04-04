@@ -21,9 +21,9 @@ const PlacementDashboard = () => {
   const navigate = useNavigate();
   const [placements, setPlacements] = useState([]);
   const today = new Date();
-today.setHours(0, 0, 0, 0); // ✅ normalize to midnight
+  today.setHours(0, 0, 0, 0); //normalize to midnight
   const totalDrives = Array.isArray(placements)
-    ? placements.filter(d => d.status !== "rejected").length
+    ? placements.filter(d => d.status === "approved").length
     : 0;
   const [feedbackMap, setFeedbackMap] = useState({});
 
@@ -80,7 +80,7 @@ today.setHours(0, 0, 0, 0); // ✅ normalize to midnight
       const driveDate = new Date(d.date);
       driveDate.setHours(0, 0, 0, 0);
 
-      return driveDate >= today; // today included ✅
+      return driveDate >= today; // today included 
     }).length
   : 0;
 

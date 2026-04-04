@@ -228,7 +228,7 @@ const ManageCalendar = () => {
           else if (hasPlacement) cls += " placement-day";
           else if (hasEvent) cls += " event-day";
 
-          // ✅ fade past (only if something exists)
+          //  fade past (only if something exists)
           if (isPast && (hasEvent || hasPlacement)) {
             cls += " past-day";
           }

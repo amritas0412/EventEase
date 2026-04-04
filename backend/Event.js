@@ -16,8 +16,8 @@ const eventSchema = new mongoose.Schema({
     default: null   // null = unlimited
   },
   conductedBy: {
-    type: mongoose.Schema.Types.ObjectId,   // ✅ IMPORTANT
-    ref: "Faculty",                        // ✅ IMPORTANT
+    type: mongoose.Schema.Types.ObjectId,   
+    ref: "Faculty",                        
     required: false
   },
 

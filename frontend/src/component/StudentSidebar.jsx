@@ -6,7 +6,7 @@ const StudentSidebar = () => {
 
   const [eventCount, setEventCount] = useState(0);
 
-  // 🔥 Fetch approved events count
+  // Fetch approved events count
   useEffect(() => {
   fetch("http://localhost:5050/faculty/events")
     .then(res => res.json())
@@ -17,12 +17,12 @@ const StudentSidebar = () => {
 
         const filtered = data.events.filter(
           event =>
-            event.status === "approved" &&   // ✅ only approved
-            event.date >= today &&           // ✅ only upcoming
-            event.conductedBy !== null       // ✅ valid
+            event.status === "approved" &&   // only approved
+            event.date >= today &&           // only upcoming
+            event.conductedBy !== null       // valid
         );
 
-        setEventCount(filtered.length); // 🔥 correct count
+        setEventCount(filtered.length); //correct count
       }
     })
     .catch(err =>

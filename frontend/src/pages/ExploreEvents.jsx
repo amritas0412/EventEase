@@ -10,7 +10,7 @@ const ExploreEvents = () => {
 
   const isLoggedIn = !!localStorage.getItem("token");
 
-  // 🔥 FORMAT DESCRIPTION (LIKE PLACEMENT PAGE)
+  //FORMAT DESCRIPTION (LIKE PLACEMENT PAGE)
   const formatDescription = (text = "") => {
     return text.split("\n").map((line, i) => (
       <span key={i}>
@@ -20,7 +20,7 @@ const ExploreEvents = () => {
     ));
   };
 
-  // 🔥 FETCH EVENTS
+  //FETCH EVENTS
   useEffect(() => {
     fetch("http://localhost:5050/faculty/events")
       .then(res => res.json())
@@ -34,7 +34,7 @@ const ExploreEvents = () => {
 
   const today = new Date().toISOString().split("T")[0];
 
-  // ✅ ONLY APPROVED EVENTS
+  //ONLY APPROVED EVENTS
   const approvedEvents = events.filter(
     e => e.status === "approved"
   );
@@ -87,13 +87,13 @@ const ExploreEvents = () => {
 
                   <h3>{event.eventName}</h3>
 
-                  {/* ✅ CLEAN META */}
+                  {/*CLEAN META */}
                   <div className="event-meta">
                     <p><strong>Date:</strong> {event.date}</p>
                     <p><strong>Venue:</strong> {event.venue}</p>
                   </div>
 
-                  {/* ✅ FORMATTED DESCRIPTION */}
+                  {/*FORMATTED DESCRIPTION */}
                   <p className="desc">
                     {formatDescription(event.description)}
                   </p>
@@ -131,13 +131,13 @@ const ExploreEvents = () => {
 
                   <h3>{event.eventName}</h3>
 
-                  {/* ✅ CLEAN META */}
+                  {/*CLEAN META */}
                   <div className="event-meta">
                     <p><strong>Date:</strong> {event.date}</p>
                     <p><strong>Venue:</strong> {event.venue}</p>
                   </div>
 
-                  {/* ✅ FORMATTED DESCRIPTION */}
+                  {/*FORMATTED DESCRIPTION */}
                   <p className="desc">
                     {formatDescription(event.description)}
                   </p>

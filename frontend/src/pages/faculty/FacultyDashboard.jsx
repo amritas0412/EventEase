@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/FacultyDashboard.css"; // ✅ FIXED PATH
+import "../../styles/FacultyDashboard.css"; 
 import FacultyProfile from "./FacultyProfile";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
@@ -32,7 +32,7 @@ const FacultyDashboard = () => {
         if (data.success) {
           setEvents(data.events);
 
-          // ✅ ADD THESE TWO LINES
+          
           console.log("Logged Email:", localStorage.getItem("email"));
           console.log("Events:", data.events);
         }
@@ -176,7 +176,7 @@ const FacultyDashboard = () => {
 
                   <p>📅 {new Date(ev.date).toLocaleDateString()}</p>
 
-                  {/* 🔥 ONLY for faculty events */}
+                  {/*ONLY for faculty events */}
                   {ev.conductedBy && (
                     <>
                       {ev.startTime && <p>⏰ {ev.startTime} - {ev.endTime}</p>}
@@ -184,14 +184,14 @@ const FacultyDashboard = () => {
                     </>
                   )}
 
-                  {/* 🔥 Label */}
+                  {/*Label */}
                   {ev.conductedBy ? (
                     <p>Conducted by: {ev.conductedBy.name}</p>
                   ) : (
                     <p className="admin-label">📌 Admin Scheduled Event</p>
                   )}
 
-                  {/* 🔥 Faculty-only controls */}
+                  {/*Faculty-only controls */}
                   {ev.conductedBy?._id === facultyId && (
                     <>
                       <p className="muted-text">

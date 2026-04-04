@@ -40,7 +40,7 @@ const Welcome = () => {
             placement opportunities, all in one place.
           </p>
 
-          {/* ✅ FIXED BUTTON */}
+          {/*FIXED BUTTON */}
           <button
             className="explore-btn"
             onClick={() => navigate("/events")}

@@ -38,7 +38,7 @@ const Reports = () => {
 
         return name === selectedItem;
       });
-  // ✅ Calculate Average Rating Safely
+  //Calculate Average Rating Safely
   const avgRating =
     filteredFeedback.length > 0
       ? (
@@ -145,7 +145,7 @@ const Reports = () => {
           <div
             key={item._id}
             className="feedback-card"
-            data-rating={item.rating}   // 🔥 ADD THIS
+            data-rating={item.rating}   
           >
             <div className="feedback-header">
               <span className="event-name">

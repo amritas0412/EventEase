@@ -6,7 +6,7 @@ const ResetPassword = () => {
   const { token } = useParams(); // get token from URL
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState(""); // Student / Faculty / Admin / Placement Cell
+  
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -20,18 +20,13 @@ const ResetPassword = () => {
       return;
     }
 
-    if (!role) {
-      setError("Please select your role");
-      return;
-    }
-
     try {
       const res = await fetch(
         `http://localhost:5050/reset-password/${token}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password, role }),
+          body: JSON.stringify({ password }),
         }
       );
       const data = await res.json();
@@ -72,14 +67,6 @@ const ResetPassword = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
-
-            <select value={role} onChange={(e) => setRole(e.target.value)} required>
-              <option value="">Select Role</option>
-              <option value="Student">Student</option>
-              <option value="Faculty">Faculty</option>
-              <option value="Placement Cell">Placement Cell</option>
-              <option value="Admin">Admin</option>
-            </select>
 
             <button className="reset-btn" type="submit">
               Reset Password

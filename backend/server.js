@@ -96,7 +96,7 @@ app.post("/login", async (req, res) => {
       return res.json({ success: false, message: "User not found" });
     }
 
-    // ✅ 🔥 PASSWORD CHECK (YOU MISSED THIS)
+    
     
 const isMatch = password === user.password;
 if (!isMatch) {
@@ -167,6 +167,7 @@ app.post("/forgot-password", async (req, res) => {
 
     user.resetToken = hashedToken;
     user.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
+    user.resetTokenRole = role;
     await user.save();
 
     const resetURL = `http://localhost:5173/reset-password/${resetToken}`;
@@ -200,27 +201,31 @@ app.post("/forgot-password", async (req, res) => {
 
 //Reset Password
 app.post("/reset-password/:token", async (req, res) => {
-  const { password, role } = req.body;
+  const { password } = req.body;
   const { token } = req.params;
-
-  let Model;
-  if (role === "Student") Model = Student;
-  else if (role === "Faculty") Model = Faculty;
-  else if (role === "Placement Cell") Model = PlacementCell;
-  else if (role === "Admin") Model = Admin;
-  else {
-    return res.json({ success: false, message: "Invalid role" });
-  }
 
   const hashedToken = crypto
     .createHash("sha256")
     .update(token)
     .digest("hex");
 
-  const user = await Model.findOne({
-    resetToken: hashedToken,
-    resetTokenExpiry: { $gt: Date.now() },
-  });
+  let user =
+    await Student.findOne({
+      resetToken: hashedToken,
+      resetTokenExpiry: { $gt: Date.now() },
+    }) ||
+    await Faculty.findOne({
+      resetToken: hashedToken,
+      resetTokenExpiry: { $gt: Date.now() },
+    }) ||
+    await PlacementCell.findOne({
+      resetToken: hashedToken,
+      resetTokenExpiry: { $gt: Date.now() },
+    }) ||
+    await Admin.findOne({
+      resetToken: hashedToken,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
 
   if (!user) {
     return res.json({
@@ -232,6 +237,7 @@ app.post("/reset-password/:token", async (req, res) => {
   user.password = password; // bcrypt via pre-save hook
   user.resetToken = undefined;
   user.resetTokenExpiry = undefined;
+  user.resetTokenRole = undefined;
 
   await user.save();
 
@@ -618,7 +624,7 @@ app.post("/student/register/event", async (req, res) => {
     if (!event) {
       return res.status(400).json({ message: "Event not found" });
     }
-    // ✅ 1️⃣ CHECK DUPLICATE REGISTRATION (ADD HERE)
+    
     const alreadyRegistered = await Registration.findOne({
       studentId,
       eventId
@@ -629,7 +635,7 @@ app.post("/student/register/event", async (req, res) => {
         message: "Already registered"
       });
     }
-    // 🔥 ADD THIS PART HERE
+    
     //  if (event.maxParticipants !== null){
     if (event.maxParticipants && event.maxParticipants > 0){
       const totalRegistrations = await Registration.countDocuments({
@@ -642,7 +648,7 @@ app.post("/student/register/event", async (req, res) => {
         });
       }
     }
-    // 🔥 END OF ADDED PART
+    
 
     const registration = new Registration({
       studentId: student._id,
@@ -728,7 +734,7 @@ app.get("/placement/:id/registrations", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-// 🔴 DELETE STUDENT
+// DELETE STUDENT
 app.delete("/admin/student/:id", async (req, res) => {
   try {
     await Student.findByIdAndDelete(req.params.id);
@@ -738,7 +744,7 @@ app.delete("/admin/student/:id", async (req, res) => {
   }
 });
 
-// 🔴 DELETE FACULTY
+// DELETE FACULTY
 app.delete("/admin/faculty/:id", async (req, res) => {
   try {
     await Faculty.findByIdAndDelete(req.params.id);
@@ -1117,7 +1123,7 @@ app.post("/admin/add-event", async (req, res) => {
   eventName: req.body.eventName,
   date: new Date(req.body.date),
   status: "approved",
-  conductedBy: req.body.adminId || null  // ✅ temporary fix
+  conductedBy: req.body.adminId || null  
 });
 
     await newEvent.save();
@@ -1125,7 +1131,7 @@ app.post("/admin/add-event", async (req, res) => {
     res.json({ success: true });
 
   } catch (err) {
-    console.error("ADD EVENT ERROR:", err);  // 🔥 THIS WILL SHOW REAL ISSUE
+    console.error("ADD EVENT ERROR:", err);  
     res.status(500).json({
       success: false,
       message: err.message
