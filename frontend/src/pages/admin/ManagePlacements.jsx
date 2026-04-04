@@ -9,34 +9,41 @@ const ManagePlacements = () => {
   const [placements, setPlacements] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
 
+  const [showDropdown, setShowDropdown] = useState(false);
+  useEffect(() => {
+    const closeDropdown = () => setShowDropdown(false);
+    document.addEventListener("click", closeDropdown);
+    return () => document.removeEventListener("click", closeDropdown);
+  }, []);
+
   //  APPROVE HANDLER
   const approvePlacement = async (id) => {
-  try {
-    await fetch(`http://localhost:5050/admin/placement/status/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "approved" }),
-    });
+    try {
+      await fetch(`http://localhost:5050/admin/placement/status/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "approved" }),
+      });
 
-    fetchPlacements(); // refresh list
-  } catch (err) {
-    console.log(err);
-  }
+      fetchPlacements(); // refresh list
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   //  REJECT HANDLER
   const rejectPlacement = async (id) => {
-  try {
-    await fetch(`http://localhost:5050/admin/placement/status/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "rejected" }),
-    });
+    try {
+      await fetch(`http://localhost:5050/admin/placement/status/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "rejected" }),
+      });
 
-    fetchPlacements(); // refresh list
-  } catch (err) {
-    console.log(err);
-  }
+      fetchPlacements(); // refresh list
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   useEffect(() => {
@@ -54,266 +61,294 @@ const ManagePlacements = () => {
   };
 
   useEffect(() => {
-  fetch("http://localhost:5050/admin/reports")
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        setFeedbacks(data.feedbacks);
-      }
-    });
-}, []);
+    fetch("http://localhost:5050/admin/reports")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setFeedbacks(data.feedbacks);
+        }
+      });
+  }, []);
 
   const pendingPlacements = placements.filter(
-  (p) => p.status?.toLowerCase() === "pending"
-);
-
-  const today = new Date();
-today.setHours(0, 0, 0, 0); // remove time
-
-  const pastApprovedPlacements = placements.filter((p) => {
-  if (p.status?.toLowerCase() !== "approved") return false;
-
-  const driveDate = new Date(p.date);
-  driveDate.setHours(0, 0, 0, 0);
-
-  return driveDate < today;
-});
-
-const upcomingApprovedPlacements = placements.filter((p) => {
-  if (p.status?.toLowerCase() !== "approved") return false;
-
-  const driveDate = new Date(p.date);
-  driveDate.setHours(0, 0, 0, 0);
-
-  return driveDate >= today;
-});
-
-const getSuccessRate = (appeared, placed) => {
-  if (!appeared || appeared === 0) return 0;
-  return (placed / appeared) * 100;
-};
-
-const getPlacementStats = (placementId) => {
-  const placementFeedbacks = feedbacks.filter(
-    f =>
-      f.type === "placement" &&
-      f.placementId?._id === placementId
+    (p) => p.status?.toLowerCase() === "pending"
   );
 
-  const count = placementFeedbacks.length;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // remove time
 
-  const avg =
-    count > 0
-      ? (
+  const pastApprovedPlacements = placements.filter((p) => {
+    if (p.status?.toLowerCase() !== "approved") return false;
+
+    const driveDate = new Date(p.date);
+    driveDate.setHours(0, 0, 0, 0);
+
+    return driveDate < today;
+  });
+
+  const upcomingApprovedPlacements = placements.filter((p) => {
+    if (p.status?.toLowerCase() !== "approved") return false;
+
+    const driveDate = new Date(p.date);
+    driveDate.setHours(0, 0, 0, 0);
+
+    return driveDate >= today;
+  });
+
+  const getSuccessRate = (appeared, placed) => {
+    if (!appeared || appeared === 0) return 0;
+    return (placed / appeared) * 100;
+  };
+
+  const getPlacementStats = (placementId) => {
+    const placementFeedbacks = feedbacks.filter(
+      f =>
+        f.type === "placement" &&
+        f.placementId?._id === placementId
+    );
+
+    const count = placementFeedbacks.length;
+
+    const avg =
+      count > 0
+        ? (
           placementFeedbacks.reduce(
             (acc, curr) => acc + curr.rating,
             0
           ) / count
         ).toFixed(1)
-      : 0;
+        : 0;
 
-  return { avg, count };
-};
+    return { avg, count };
+  };
 
   return (
     <div className="manage-placements-page">
       <h2 className="page-title">Placements & Internships</h2>
+      <div className="top-bar-profile">
+        <div className="profile-container">
+          <div
+            className="profile-icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDropdown(!showDropdown);
+            }}
+          >
+            👤
+          </div>
+
+          {showDropdown && (
+            <div className="profile-dropdown">
+              <p className="profile-email">
+                {localStorage.getItem("email")}
+              </p>
+              <button className="logout-btn" onClick={() => {
+                localStorage.clear();
+                navigate("/login", { replace: true });
+              }}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+
+      </div>
 
       <div className="table-card">
-  <h3>Placement Requests</h3>
+        <h3>Placement Requests</h3>
 
-  <table className="data-table">
-    <thead>
-      <tr>
-        <th>Company</th>
-        <th>Job Role</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Action</th>
-        <th>Details</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      {pendingPlacements.length === 0 ? (
-        <tr>
-          <td colSpan="6" className="empty-state">
-            No pending requests
-          </td>
-        </tr>
-      ) : (
-        pendingPlacements.map((item) => {
-          const status = item.status?.toLowerCase();
-
-          return (
-            <tr key={item._id}>
-              <td>{item.name}</td>
-              <td>{item.jobrole}</td>
-              <td>{new Date(item.date).toLocaleDateString("en-CA")}</td>
-
-              <td>
-                <span className={`status ${status}`}>
-                  {status}
-                </span>
-              </td>
-
-              <td>
-                <button
-                  className="approve-btn"
-                  onClick={() => approvePlacement(item._id)}
-                >
-                  Approve
-                </button>
-
-                <button
-                  className="reject-btn"
-                  onClick={() => rejectPlacement(item._id)}
-                >
-                  Reject
-                </button>
-              </td>
-
-              <td>
-                <button
-                  className="details-btn"
-                  onClick={() =>
-                    navigate(`/admin/placements/${item._id}`)
-                  }
-                >
-                  See Details
-                </button>
-              </td>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Job Role</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
+              <th>Details</th>
             </tr>
-          );
-        })
-      )}
-    </tbody>
-  </table>
-</div>
+          </thead>
 
-<div className="admin-section">
-  <h3>Upcoming Approved Drives</h3>
+          <tbody>
+            {pendingPlacements.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="empty-state">
+                  No pending requests
+                </td>
+              </tr>
+            ) : (
+              pendingPlacements.map((item) => {
+                const status = item.status?.toLowerCase();
 
-  <table className="data-table">
-    <thead>
-      <tr>
-        <th>Company</th>
-        <th>Job Role</th>
-        <th>Date</th>
-        <th>Details</th>
-      </tr>
-    </thead>
+                return (
+                  <tr key={item._id}>
+                    <td>{item.name}</td>
+                    <td>{item.jobrole}</td>
+                    <td>{new Date(item.date).toLocaleDateString("en-CA")}</td>
 
-    <tbody>
-      {upcomingApprovedPlacements.length === 0 ? (
-        <tr>
-          <td colSpan="5" className="empty-state">
-            No upcoming approved drives
-          </td>
-        </tr>
-      ) : (
-        upcomingApprovedPlacements.map((item) => (
-          <tr key={item._id}>
-            <td>{item.name}</td>
-            <td>{item.jobrole}</td>
-            <td>{new Date(item.date).toLocaleDateString("en-CA")}</td>
+                    <td>
+                      <span className={`status ${status}`}>
+                        {status}
+                      </span>
+                    </td>
 
-            <td>
-              <button
-                className="details-btn"
-                onClick={() =>
-                  navigate(`/admin/placements/${item._id}`)
-                }
-              >
-                See Details
-              </button>
-            </td>
-          </tr>
-        ))
-      )}
-    </tbody>
-  </table>
-  </div>
-  <div className="admin-section">
-  <h3>Past Approved Placements</h3>
+                    <td>
+                      <button
+                        className="approve-btn"
+                        onClick={() => approvePlacement(item._id)}
+                      >
+                        Approve
+                      </button>
 
-  <table className="data-table">
-    <thead>
-      <tr>
-  <th>Company</th>
-  <th>Job Role</th>
-  <th>Date</th>
-  <th>Appeared</th>
-  <th>Placed</th>
-  <th>Success %</th>
-  <th>Ratings</th>
-  <th>Details</th>
-      </tr>
-    </thead>
+                      <button
+                        className="reject-btn"
+                        onClick={() => rejectPlacement(item._id)}
+                      >
+                        Reject
+                      </button>
+                    </td>
 
-    <tbody>
-      {pastApprovedPlacements.length === 0 ? (
-        <tr>
-          <td colSpan="5" className="empty-state">
-            No approved placements yet
-          </td>
-        </tr>
-      ) : (
-        pastApprovedPlacements.map((item) => {
-          const status = item.status?.toLowerCase();
-          const { avg, count } = getPlacementStats(item._id);
-const performance = count > 0 ? avg * 20 : 0;
-          return (
-            <tr key={item._id}>
-  <td>{item.name}</td>
-  <td>{item.jobrole}</td>
-  <td>{new Date(item.date).toLocaleDateString("en-CA")}</td>
+                    <td>
+                      <button
+                        className="details-btn"
+                        onClick={() =>
+                          navigate(`/admin/placements/${item._id}`)
+                        }
+                      >
+                        See Details
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
 
-  <td>{item.totalAppeared}</td>
+      <div className="admin-section">
+        <h3>Upcoming Approved Drives</h3>
 
-  <td>{item.totalPlaced}</td>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Job Role</th>
+              <th>Date</th>
+              <th>Details</th>
+            </tr>
+          </thead>
 
-  <td>
-    {item.totalAppeared > 0 ? (
-    <div className="performance-wrapper">
-      <div
-        className="performance-bar"
-        style={{
-          width: `${getSuccessRate(item.totalAppeared, item.totalPlaced)}%`
-        }}
-      ></div>
+          <tbody>
+            {upcomingApprovedPlacements.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="empty-state">
+                  No upcoming approved drives
+                </td>
+              </tr>
+            ) : (
+              upcomingApprovedPlacements.map((item) => (
+                <tr key={item._id}>
+                  <td>{item.name}</td>
+                  <td>{item.jobrole}</td>
+                  <td>{new Date(item.date).toLocaleDateString("en-CA")}</td>
 
-      <span>
-        {getSuccessRate(item.totalAppeared, item.totalPlaced).toFixed(1)}%
-      </span>
-    </div>
-  ) : (
-    "—"
-  )}
-  </td>
+                  <td>
+                    <button
+                      className="details-btn"
+                      onClick={() =>
+                        navigate(`/admin/placements/${item._id}`)
+                      }
+                    >
+                      See Details
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      <div className="admin-section">
+        <h3>Past Approved Placements</h3>
 
-  {/* ⭐ AVG RATING */}
-  <td>
-    {count > 0 ? <>⭐ {avg} ({count})</> : "—"}
-  </td>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Job Role</th>
+              <th>Date</th>
+              <th>Appeared</th>
+              <th>Placed</th>
+              <th>Success %</th>
+              <th>Ratings</th>
+              <th>Details</th>
+            </tr>
+          </thead>
 
-  <td>
-    <button
-      className="details-btn"
-      onClick={() =>
-        navigate(`/admin/placements/${item._id}`)
-      }
-    >
-      See Details
-    </button>
-  </td>
-</tr>
-          );
-        })
-      )}
-    </tbody>
-  </table>
-</div>
+          <tbody>
+            {pastApprovedPlacements.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="empty-state">
+                  No approved placements yet
+                </td>
+              </tr>
+            ) : (
+              pastApprovedPlacements.map((item) => {
+                const status = item.status?.toLowerCase();
+                const { avg, count } = getPlacementStats(item._id);
+                const performance = count > 0 ? avg * 20 : 0;
+                return (
+                  <tr key={item._id}>
+                    <td>{item.name}</td>
+                    <td>{item.jobrole}</td>
+                    <td>{new Date(item.date).toLocaleDateString("en-CA")}</td>
+
+                    <td>{item.totalAppeared}</td>
+
+                    <td>{item.totalPlaced}</td>
+
+                    <td>
+                      {item.totalAppeared > 0 ? (
+                        <div className="performance-wrapper">
+                          <div
+                            className="performance-bar"
+                            style={{
+                              width: `${getSuccessRate(item.totalAppeared, item.totalPlaced)}%`
+                            }}
+                          ></div>
+
+                          <span>
+                            {getSuccessRate(item.totalAppeared, item.totalPlaced).toFixed(1)}%
+                          </span>
+                        </div>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+
+                    {/* ⭐ AVG RATING */}
+                    <td>
+                      {count > 0 ? <>⭐ {avg} ({count})</> : "—"}
+                    </td>
+
+                    <td>
+                      <button
+                        className="details-btn"
+                        onClick={() =>
+                          navigate(`/admin/placements/${item._id}`)
+                        }
+                      >
+                        See Details
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
 
     </div>
   );

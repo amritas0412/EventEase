@@ -1,9 +1,27 @@
-import React from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Welcome.css";
 
 const Welcome = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+
+    if (role) {
+      if (role === "student")
+        navigate("/student/dashboard", { replace: true });
+
+      else if (role === "admin")
+        navigate("/admin/dashboard", { replace: true });
+
+      else if (role === "faculty")
+        navigate("/faculty/dashboard", { replace: true });
+
+      else if (role.includes("placement"))
+        navigate("/placement/dashboard", { replace: true });
+    }
+  }, []);
 
   return (
     <div className="welcome-container">

@@ -1,4 +1,4 @@
-
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "../../styles/ManageUsers.css";
 
@@ -11,6 +11,14 @@ const ManageUsers = () => {
 
   const [placementCell, setPlacementCell] = useState([]);
   const [placementSearch, setPlacementSearch] = useState("");
+
+  const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  useEffect(() => {
+    const closeDropdown = () => setShowDropdown(false);
+    document.addEventListener("click", closeDropdown);
+    return () => document.removeEventListener("click", closeDropdown);
+  }, []);
 
   // ================= FETCH DATA =================
   useEffect(() => {
@@ -30,13 +38,13 @@ const ManageUsers = () => {
         }
       });
 
-      fetch("http://localhost:5050/admin/placement-cell")
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            setPlacementCell(data.placementCell);
-          }
-        });
+    fetch("http://localhost:5050/admin/placement-cell")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setPlacementCell(data.placementCell);
+        }
+      });
   }, []);
 
   // ================= FILTER =================
@@ -54,10 +62,10 @@ const ManageUsers = () => {
   );
 
   const filteredPlacement = placementCell.filter(
-  (p) =>
-    p.email?.toLowerCase().includes(placementSearch.toLowerCase()) ||
-    p.department?.toLowerCase().includes(placementSearch.toLowerCase())
-);
+    (p) =>
+      p.email?.toLowerCase().includes(placementSearch.toLowerCase()) ||
+      p.department?.toLowerCase().includes(placementSearch.toLowerCase())
+  );
   // ================= DELETE =================
   const deleteStudent = async (id) => {
     if (!window.confirm("Delete this student?")) return;
@@ -90,23 +98,52 @@ const ManageUsers = () => {
   };
 
   const deletePlacement = async (id) => {
-  if (!window.confirm("Delete this placement cell member?")) return;
+    if (!window.confirm("Delete this placement cell member?")) return;
 
-  const res = await fetch(
-    `http://localhost:5050/admin/placement-cell/${id}`,
-    { method: "DELETE" }
-  );
+    const res = await fetch(
+      `http://localhost:5050/admin/placement-cell/${id}`,
+      { method: "DELETE" }
+    );
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.success) {
-    setPlacementCell(prev => prev.filter(p => p._id !== id));
-  }
-};
+    if (data.success) {
+      setPlacementCell(prev => prev.filter(p => p._id !== id));
+    }
+  };
 
   return (
     <div className="manage-users-page">
       <h2 className="page-title">People Management</h2>
+
+      <div className="top-bar-profile">
+        <div className="profile-container">
+          <div
+            className="profile-icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDropdown(!showDropdown);
+            }}
+          >
+            👤
+          </div>
+
+          {showDropdown && (
+            <div className="profile-dropdown">
+              <p className="profile-email">
+                {localStorage.getItem("email")}
+              </p>
+              <button className="logout-btn" onClick={() => {
+                localStorage.clear();
+                navigate("/login", { replace: true });
+              }}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+
+      </div>
 
       {/* ================= STUDENTS ================= */}
       <div className="table-section">
@@ -211,54 +248,54 @@ const ManageUsers = () => {
       </div>
 
       {/* ================= PLACEMENT CELL ================= */}
-<div className="table-section">
-  <div className="section-header">
-    <h3>Placement Cell</h3>
-    <input
-      type="text"
-      placeholder="Search placement cell..."
-      className="search-input"
-      value={placementSearch}
-      onChange={(e) => setPlacementSearch(e.target.value)}
-    />
-  </div>
+      <div className="table-section">
+        <div className="section-header">
+          <h3>Placement Cell</h3>
+          <input
+            type="text"
+            placeholder="Search placement cell..."
+            className="search-input"
+            value={placementSearch}
+            onChange={(e) => setPlacementSearch(e.target.value)}
+          />
+        </div>
 
-  <div className="table-card">
-    <table className="data-table">
-      <thead>
-        <tr>
-          <th>Department</th>
-          <th>Email</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {filteredPlacement.length > 0 ? (
-          filteredPlacement.map((p) => (
-            <tr key={p._id}>
-  <td>{p.department || "N/A"}</td>
-  <td>{p.email}</td>
-  <td>
-    <button
-      className="delete-btn"
-      onClick={() => deletePlacement(p._id)}
-    >
-      🗑 Delete
-    </button>
-  </td>
-</tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan="3" className="no-data">
-              No placement cell members found
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </div>
-</div>
+        <div className="table-card">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Email</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPlacement.length > 0 ? (
+                filteredPlacement.map((p) => (
+                  <tr key={p._id}>
+                    <td>{p.department || "N/A"}</td>
+                    <td>{p.email}</td>
+                    <td>
+                      <button
+                        className="delete-btn"
+                        onClick={() => deletePlacement(p._id)}
+                      >
+                        🗑 Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="no-data">
+                    No placement cell members found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

@@ -4,6 +4,12 @@ import "../../styles/ManageEvents.css";
 
 const ManageEvents = () => {
   const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  useEffect(() => {
+    const closeDropdown = () => setShowDropdown(false);
+    document.addEventListener("click", closeDropdown);
+    return () => document.removeEventListener("click", closeDropdown);
+  }, []);
   const [events, setEvents] = useState([]);
   useEffect(() => {
     fetch("http://localhost:5050/admin/event-requests")
@@ -58,6 +64,34 @@ const ManageEvents = () => {
   return (
     <div className="manage-events-page">
       <h2 className="page-title">Events</h2>
+      <div className="top-bar-profile">
+        <div className="profile-container">
+          <div
+            className="profile-icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDropdown(!showDropdown);
+            }}
+          >
+            👤
+          </div>
+
+          {showDropdown && (
+            <div className="profile-dropdown">
+              <p className="profile-email">
+                {localStorage.getItem("email")}
+              </p>
+              <button className="logout-btn" onClick={() => {
+                localStorage.clear();
+                navigate("/login", { replace: true });
+              }}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+
+      </div>
 
       <div className="table-card">
         <table className="data-table">

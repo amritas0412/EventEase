@@ -1,9 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+
+    if (role) {
+      // user already logged in → redirect
+      if (role === "student")
+        navigate("/student/dashboard", { replace: true });
+
+      else if (role === "admin")
+        navigate("/admin/dashboard", { replace: true });
+
+      else if (role === "faculty")
+        navigate("/faculty/dashboard", { replace: true });
+
+      else if (role.includes("placement"))
+        navigate("/placement/dashboard", { replace: true });
+    }
+  }, []);
 
   const [role, setRole] = useState("Student");
   const [email, setEmail] = useState("");

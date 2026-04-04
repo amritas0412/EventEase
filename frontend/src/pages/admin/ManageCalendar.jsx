@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../styles/ManageCalendar.css";
 
 const months = [
@@ -15,6 +16,15 @@ const getStartDay = (month, year) =>
   new Date(year, month, 1).getDay();
 
 const ManageCalendar = () => {
+
+  const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  useEffect(() => {
+    const closeDropdown = () => setShowDropdown(false);
+    document.addEventListener("click", closeDropdown);
+    return () => document.removeEventListener("click", closeDropdown);
+  }, []);
+  
   const today = new Date();
   const [events, setEvents] = useState([]);
   const [placements, setPlacements] = useState([]);
@@ -35,7 +45,6 @@ const ManageCalendar = () => {
 
     if (!day || day < 1 || day > daysInMonth) return;
 
-    // 🔥 ask event name
     const eventName = prompt("Enter Event Name:");
     if (!eventName) return;
 
@@ -172,6 +181,36 @@ const ManageCalendar = () => {
 
   return (
     <div className="student-calendar-page">
+
+      <div className="top-bar-profile">
+        <div className="profile-container">
+          <div
+            className="profile-icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDropdown(!showDropdown);
+            }}
+          >
+            👤
+          </div>
+
+          {showDropdown && (
+            <div className="profile-dropdown">
+              <p className="profile-email">
+                {localStorage.getItem("email")}
+              </p>
+              <button className="logout-btn" onClick={() => {
+                localStorage.clear();
+                navigate("/login", { replace: true });
+              }}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+
+      </div>
+
       {/* HEADER */}
       <div className="calendar-header">
         <button onClick={prevMonth}>◀</button>

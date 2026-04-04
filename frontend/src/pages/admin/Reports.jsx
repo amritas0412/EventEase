@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../styles/Reports.css";
 
 const Reports = () => {
+
+  const navigate = useNavigate();
+    const [showDropdown, setShowDropdown] = useState(false);
+    useEffect(() => {
+      const closeDropdown = () => setShowDropdown(false);
+      document.addEventListener("click", closeDropdown);
+      return () => document.removeEventListener("click", closeDropdown);
+    }, []);
+
   const [feedbacks, setFeedbacks] = useState([]);
   const [selectedItem, setSelectedItem] = useState("All");
 
@@ -77,6 +87,35 @@ const Reports = () => {
   return (
     <div className="reports-page">
       <h2 className="reports-title">Reports & Feedback</h2>
+
+      <div className="top-bar-profile">
+        <div className="profile-container">
+          <div
+            className="profile-icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDropdown(!showDropdown);
+            }}
+          >
+            👤
+          </div>
+
+          {showDropdown && (
+            <div className="profile-dropdown">
+              <p className="profile-email">
+                {localStorage.getItem("email")}
+              </p>
+              <button className="logout-btn" onClick={() => {
+                localStorage.clear();
+                navigate("/login", { replace: true });
+              }}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
+
+      </div>
 
       {/* FILTER */}
       <div className="report-filter">
